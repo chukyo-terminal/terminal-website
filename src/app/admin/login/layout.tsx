@@ -9,12 +9,12 @@ import type { RootLayoutProps } from '@/types';
 
 
 export const metadata: Metadata = {
-  title: 'お問い合わせ - Terminal | 中京大学公式エンジニアサークル',
+  title: '管理者ログイン - Terminal | 中京大学公式エンジニアサークル',
 };
 
 
 /**
- * 問い合わせフォーム専用のレイアウトを構成する。
+ * ログインフォーム専用のレイアウトを構成する。
  *
  * @param param0 - 子要素
  * @returns 生成したページ
