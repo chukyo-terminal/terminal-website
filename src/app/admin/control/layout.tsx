@@ -14,12 +14,12 @@ import type { RootLayoutProps } from '@/types';
  */
 export default function RootLayout({ children }: RootLayoutProps): JSX.Element {
   return (
-    <>
+    <div className="flex flex-col min-h-screen">
       <Header />
       <main className="container mx-auto px-4 py-16 space-y-32">
         {children}
       </main>
-      <Footer />
-    </>
+      <Footer className="mt-auto" />
+    </div>
   );
 }
