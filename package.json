@@ -7,10 +7,12 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "lint:fix": "next lint --fix"
+    "lint:fix": "next lint --fix",
+    "prisma": "./scripts/shell/env.sh && prisma"
   },
   "dependencies": {
     "@next/third-parties": "^15.4.4",
+    "@prisma/client": "6.13.0",
     "framer-motion": "12.23.9",
     "lucide-react": "^0.525.0",
     "next": "15.4.4",
