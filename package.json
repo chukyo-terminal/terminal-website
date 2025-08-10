@@ -3,12 +3,13 @@
   "version": "0.1.1",
   "private": true,
   "scripts": {
-    "dev": "next dev --turbopack",
-    "build": "next build",
+    "dev": "npm run prisma:generate && next dev --turbopack",
+    "build": "npm run prisma:generate && next build",
     "start": "next start",
     "lint": "next lint",
     "lint:fix": "next lint --fix",
-    "prisma": "./scripts/shell/env.sh && prisma"
+    "prisma": "./scripts/shell/env.sh && prisma",
+    "prisma:generate": "./scripts/shell/env.sh && prisma generate"
   },
   "dependencies": {
     "@next/third-parties": "^15.4.4",
