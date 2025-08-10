@@ -4,8 +4,10 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
 
+
 import { motion } from 'framer-motion';
 import { Code, Menu, X } from 'lucide-react';
+import { signOut } from 'next-auth/react';
 
 import LogoImage from '@/public/logo.svg'
 
@@ -15,7 +17,7 @@ const navItems = [
   { name: '活動実績管理', href: '/admin/control/achievements' },
   { name: '投稿管理', href: '/admin/control/posts' },
   { name: 'お問い合わせ管理', href: '/admin/control/contact' },
-  { name: 'ログアウト', href: '/admin/logout' },
+  { name: 'ログアウト', href: '#', onClick: () => signOut() },
 ];
 
 
@@ -56,6 +58,7 @@ export default function Header() {
               >
                 <Link
                   href={item.href}
+                  onClick={item.onClick}
                   className="text-gray-300 hover:text-emerald-400 transition-colors duration-200 font-medium"
                 >
                   {item.name}
@@ -89,7 +92,7 @@ export default function Header() {
                   key={item.name}
                   href={item.href}
                   className="text-gray-300 hover:text-emerald-400 transition-colors duration-200 py-2 font-medium"
-                  onClick={() => setMobileMenuOpen(false)}
+                  onClick={item.onClick || (() => setMobileMenuOpen(false))}
                 >
                   {item.name}
                 </Link>
