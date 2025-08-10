@@ -10,7 +10,7 @@ export default function robots(): MetadataRoute.Robots {
     rules: {
       userAgent: '*',
       allow: '/',
-      disallow: '/contact/thanks',
+      disallow: ['/admin/', '/contact/thanks'],
     },
     sitemap: undefined, // TODO: サイトマップを自動生成
   };
