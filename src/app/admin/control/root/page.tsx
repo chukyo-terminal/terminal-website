@@ -2,6 +2,8 @@ import { prisma } from '@/lib/prisma';
 
 import type { JSX } from 'react';
 
+export const dynamic = 'force-dynamic';
+
 
 export default async function RootControlPage(): Promise<JSX.Element> {
   const sudoers = await prisma.sudoer.findMany({ orderBy: { id: 'asc' }, select: { cuId: true, createdAt: true } });
