@@ -53,3 +53,15 @@ body {
 .pulse-glow {
   animation: pulse-glow 3s infinite;
 }
+
+.ReactModal__Overlay {
+  opacity: 0;
+}
+
+.ReactModal__Overlay--after-open {
+  opacity: 1;
+}
+
+.ReactModal__Overlay--before-close {
+  opacity: 0;
+}
