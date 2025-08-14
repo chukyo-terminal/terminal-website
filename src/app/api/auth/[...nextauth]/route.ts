@@ -1,6 +1,8 @@
 import NextAuth, { NextAuthOptions } from 'next-auth';
 import GoogleProvider from 'next-auth/providers/google';
 
+import { prisma } from '@/lib/prisma';
+
 
 /**
  * NextAuthのプロバイダーの型定義。
@@ -34,10 +36,11 @@ const authOptions: NextAuthOptions = {
       return token;
     },
     async signIn({ user, account }) {
-      // Google SSOでログインしたアカウントが特定のアカウントか検証
+      // Google SSOでログインしたアカウントが登録されているか検証
       if (account?.provider === 'google' && user.email?.endsWith('@m.chukyo-u.ac.jp')) {
-        const sudoers = ['t325030']; // TODO: DBから取得するようにする
-        return sudoers.includes(user.email.split('@')[0]);
+        const cuId = user.email.split('@')[0];
+        const result = await prisma.sudoer.findUnique({ where: { cuId } });
+        return !!result;
       }
       // 許可しない場合はfalse
       return false;
