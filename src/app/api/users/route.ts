@@ -5,6 +5,7 @@ import { prisma } from '@/lib/prisma';
  * ユーザー情報の型定義。
  */
 export type usersApiGetResponse = {
+  id: number;
   userId: string;
   roles: string[];
   createdAt: string; // Date
@@ -20,7 +21,7 @@ export type usersApiGetResponse = {
 export async function GET(): Promise<Response> {
   const users = await prisma.user.findMany({
     orderBy: { id: 'asc' },
-    select: { userId: true, roles: true, createdAt: true, updatedAt: true },
+    select: { id: true, userId: true, roles: true, createdAt: true, updatedAt: true },
   });
   return new Response(JSON.stringify(users));
 }

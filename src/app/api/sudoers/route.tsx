@@ -5,6 +5,7 @@ import { prisma } from '@/lib/prisma';
  * sudoers情報の型定義。
  */
 export type sudoersApiGetResponse = {
+  id: number;
   cuId: string;
   createdAt: string; // Date
 }[];
@@ -18,7 +19,7 @@ export type sudoersApiGetResponse = {
 export async function GET(): Promise<Response> {
   const sudoers = await prisma.sudoer.findMany({
     orderBy: { id: 'asc' },
-    select: { cuId: true, createdAt: true },
+    select: { id: true, cuId: true, createdAt: true },
   });
   return new Response(JSON.stringify(sudoers));
 }
