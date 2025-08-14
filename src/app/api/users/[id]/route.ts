@@ -21,7 +21,7 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
     return new Response(JSON.stringify({ status: 400, message: 'ID is required' }), { status: 400 });
   }
 
-  if (!password_hash && !roles && roles.length === 0) {
+  if (!password_hash && (!roles || roles.length === 0)) {
     return new Response(JSON.stringify({ status: 400, message: 'Password or at least one role are required' }), { status: 400 });
   }
   try {
