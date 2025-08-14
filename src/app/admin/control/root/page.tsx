@@ -5,6 +5,7 @@ import { useEffect, useRef, useState } from 'react';
 import { Plus, Trash2, Pen } from 'lucide-react';
 
 import Modal from '@/components/elements/modal';
+import { sha256 } from '@/utils/hash';
 
 import type { JSX } from 'react';
 
@@ -38,7 +39,7 @@ export default function RootControlPage(): JSX.Element {
   // パスワード表示切替
   const [showPassword, setShowPassword] = useState(false);
   // 編集モーダル用
-  const [editPassword, setEditPassword] = useState("");
+  const [editPassword, setEditPassword] = useState('');
   const [editShowPassword, setEditShowPassword] = useState(false);
   const [editRoles, setEditRoles] = useState<string[]>([]);
 
@@ -75,11 +76,39 @@ export default function RootControlPage(): JSX.Element {
     <div className="mx-auto px-4 py-8">
       {modalType === ModalType.ADD_SUDOER &&
         <Modal isOpen={true} onRequestClose={() => setModalType(null)} contentLabel="Root管理者追加">
-          <form className="flex flex-col gap-4">
+          <form
+            onSubmit={async (event) => {
+              event.preventDefault();
+              const formData = new FormData(event.target as HTMLFormElement);
+              const cuId = formData.get('cuId') as string;
+              const response = await fetch('/api/sudoers', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ cuId }),
+              });
+              if (response.ok) {
+                console.info('Successfully added sudoer');
+                console.log(await response.json());
+                setReload(true);
+                setModalType(null);
+              } else {
+                console.error('Failed to add sudoer:', response.status, response.statusText);
+                const responseText = await response.text();
+                try {
+                  console.log(JSON.parse(responseText));
+                } catch {
+                  console.log(responseText);
+                }
+                alert('Root管理者の追加に失敗しました。');
+              }
+            }}
+            className="flex flex-col gap-4"
+          >
             <label className="block">
               <span className="text-sm font-medium">CU_ID</span>
               <input
                 type="text"
+                name="cuId"
                 className="mt-1 block w-full rounded border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-emerald-500"
                 placeholder="CU_IDを入力"
                 autoFocus
@@ -102,7 +131,30 @@ export default function RootControlPage(): JSX.Element {
       }
       {modalType === ModalType.REMOVE_SUDOER &&
         <Modal isOpen={true} onRequestClose={() => setModalType(null)} contentLabel="Root管理者削除">
-          <form className="flex flex-col gap-2">
+          <form
+            onSubmit={async (event) => {
+              event.preventDefault();
+              const response = await fetch(`/api/sudoers/${targetId.current}`, {
+                method: 'DELETE',
+              });
+              if (response.ok) {
+                console.info('Successfully removed sudoer');
+                console.log(await response.json());
+                setReload(true);
+                setModalType(null);
+              } else {
+                console.error('Failed to remove sudoer:', response.status, response.statusText);
+                const responseText = await response.text();
+                try {
+                  console.log(JSON.parse(responseText));
+                } catch {
+                  console.log(responseText);
+                }
+                alert('Root管理者の削除に失敗しました。');
+              }
+            }}
+            className="flex flex-col gap-2"
+          >
             <div className="mt-2 flex justify-center">
               <span className="relative inline-flex items-baseline">
                 <span className="absolute right-full mr-2 text-md whitespace-nowrap top-1/2 -translate-y-1/2">削除対象: </span>
@@ -126,11 +178,46 @@ export default function RootControlPage(): JSX.Element {
       }
       {modalType === ModalType.ADD_USER &&
         <Modal isOpen={true} onRequestClose={() => setModalType(null)} contentLabel="一般管理者追加">
-          <form className="flex flex-col gap-4">
+          <form
+            onSubmit={async (event) => {
+              event.preventDefault();
+              const formData = new FormData(event.target as HTMLFormElement);
+              const userId = formData.get('userId') as string;
+              const password = formData.get('password') as string;
+              const password_hash = await sha256(password);
+              const roles = [...formData.getAll('role')] as string[];
+              if (roles.length === 0) {
+                alert('少なくとも1つのロールを選択してください。');
+                return;
+              }
+              const response = await fetch('/api/users', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ userId, password_hash, roles }),
+              });
+              if (response.ok) {
+                console.info('Successfully added user');
+                console.log(await response.json());
+                setReload(true);
+                setModalType(null);
+              } else {
+                console.error('Failed to add user:', response.status, response.statusText);
+                const responseText = await response.text();
+                try {
+                  console.log(JSON.parse(responseText));
+                } catch {
+                  console.log(responseText);
+                }
+                alert('一般管理者の追加に失敗しました。');
+              }
+            }}
+            className="flex flex-col gap-4"
+          >
             <label className="block">
               <span className="text-sm font-medium">ID</span>
               <input
                 type="text"
+                name="userId"
                 className="mt-1 block w-full rounded border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-emerald-500"
                 placeholder="IDを入力"
                 autoFocus
@@ -140,7 +227,8 @@ export default function RootControlPage(): JSX.Element {
             <label className="block">
               <span className="text-sm font-medium">パスワード</span>
               <input
-                type={showPassword ? "text" : "password"}
+                type={showPassword ? 'text' : 'password'}
+                name="password"
                 className="mt-1 block w-full rounded border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-emerald-500"
                 placeholder="パスワードを入力"
                 required
@@ -162,6 +250,7 @@ export default function RootControlPage(): JSX.Element {
                   <label key={role} className="flex items-center gap-2">
                     <input
                       type="checkbox"
+                      name="role"
                       value={role}
                     />
                     <span className="text-sm">{role}</span>
@@ -189,11 +278,42 @@ export default function RootControlPage(): JSX.Element {
           if (!user) return null;
           return (
             <Modal isOpen={true} onRequestClose={() => setModalType(null)} contentLabel="一般管理者編集">
-              <form className="flex flex-col gap-4">
+              <form
+                onSubmit={async (event) => {
+                  event.preventDefault();
+                  const formData = new FormData(event.target as HTMLFormElement);
+                  const password = formData.get('password') as string;
+                  const password_hash = await sha256(password);
+                  const roles = editRoles;
+                  const response = await fetch(`/api/users/${user.id}`, {
+                    method: 'PATCH',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ password_hash: password?.length !== 0 ? password_hash : undefined, roles: roles?.length !== 0 ? roles : undefined }),
+                  });
+                  if (response.ok) {
+                    setEditPassword('');
+                    console.info('Successfully edited user');
+                    console.log(await response.json());
+                    setReload(true);
+                    setModalType(null);
+                  } else {
+                    console.error('Failed to edit user:', response.status, response.statusText);
+                    const responseText = await response.text();
+                    try {
+                      console.log(JSON.parse(responseText));
+                    } catch {
+                      console.log(responseText);
+                    }
+                    alert('一般管理者の編集に失敗しました。');
+                  }
+                }}
+                className="flex flex-col gap-4"
+              >
                 <label className="block">
                   <span className="text-sm font-medium">ID</span>
                   <input
                     type="text"
+                    name="userId"
                     className="mt-1 block w-full rounded border border-gray-500 px-3 py-2 text-gray-500 cursor-not-allowed"
                     value={user.userId}
                     readOnly
@@ -203,7 +323,8 @@ export default function RootControlPage(): JSX.Element {
                 <label className="block">
                   <span className="text-sm font-medium">パスワード</span>
                   <input
-                    type={editShowPassword ? "text" : "password"}
+                    type={editShowPassword ? 'text' : 'password'}
+                    name="password"
                     className="mt-1 block w-full rounded border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-emerald-500"
                     placeholder="新しいパスワードを入力"
                     value={editPassword}
@@ -222,17 +343,18 @@ export default function RootControlPage(): JSX.Element {
                 <label className="block">
                   <span className="text-sm font-medium">ロール</span>
                   <div className="mt-2 flex flex-col gap-2">
-                    {["ADMIN", "REVIEWER", "CONTRIBUTOR"].map(role => (
+                    {['ADMIN', 'REVIEWER', 'CONTRIBUTOR'].map(role => (
                       <label key={role} className="flex items-center gap-2">
                         <input
                           type="checkbox"
+                          name="role"
                           value={role}
                           checked={editRoles.includes(role)}
                           onChange={e => {
                             if (e.target.checked) {
                               setEditRoles([...editRoles, role]);
                             } else {
-                              setEditRoles(editRoles.filter(r => r !== role));
+                              setEditRoles(editRoles.filter(r => r !== role)); // eslint-disable-line sonarjs/no-nested-functions
                             }
                           }}
                         />
@@ -267,7 +389,30 @@ export default function RootControlPage(): JSX.Element {
       }
       {modalType === ModalType.REMOVE_USER &&
         <Modal isOpen={true} onRequestClose={() => setModalType(null)} contentLabel="一般管理者削除">
-          <form className="flex flex-col gap-2">
+          <form
+            onSubmit={async (event) => {
+              event.preventDefault();
+              const response = await fetch(`/api/users/${targetId.current}`, {
+                method: 'DELETE',
+              });
+              if (response.ok) {
+                console.info('Successfully removed user');
+                console.log(await response.json());
+                setReload(true);
+                setModalType(null);
+              } else {
+                console.error('Failed to remove user:', response.status, response.statusText);
+                const responseText = await response.text();
+                try {
+                  console.log(JSON.parse(responseText));
+                } catch {
+                  console.log(responseText);
+                }
+                alert('一般管理者の削除に失敗しました。');
+              }
+            }}
+            className="flex flex-col gap-2"
+          >
             <div className="mt-2 flex justify-center">
               <span className="relative inline-flex items-baseline">
                 <span className="absolute right-full mr-2 text-md whitespace-nowrap top-1/2 -translate-y-1/2">削除対象: </span>

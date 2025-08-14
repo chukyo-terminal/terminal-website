@@ -29,12 +29,12 @@ enum Role {
 }
 
 model User {
-  id        Int      @id @default(autoincrement())
-  userId    String   @unique @map("user_id")
-  password  String   @map("password_hash")
-  roles     Role[]   @default([])
-  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz()
-  updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz()
+  id            Int      @id @default(autoincrement())
+  userId        String   @unique @map("user_id")
+  password_hash String
+  roles         Role[]   @default([])
+  createdAt     DateTime @default(now()) @map("created_at") @db.Timestamptz()
+  updatedAt     DateTime @updatedAt @map("updated_at") @db.Timestamptz()
 
   @@map("users")
 }

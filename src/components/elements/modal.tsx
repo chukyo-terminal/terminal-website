@@ -6,7 +6,7 @@ import type { JSX } from 'react';
 /**
  * モーダルのプロパティを定義する。
  */
-type ModalProps = {
+type ModalProperties = {
   isOpen: boolean;
   onRequestClose: () => void;
   contentLabel: string;
@@ -23,7 +23,7 @@ type ModalProps = {
  * @param children モーダル内に表示するコンテンツ
  * @return モーダルコンポーネント
  */
-export default function Modal({ isOpen, onRequestClose, contentLabel, children }: ModalProps): JSX.Element {
+export default function Modal({ isOpen, onRequestClose, contentLabel, children }: ModalProperties): JSX.Element {
   return (
     <ReactModal
       isOpen={isOpen}
