@@ -11,7 +11,7 @@ export async function middleware(request: NextRequest) { // eslint-disable-line 
   if (request.nextUrl.pathname.startsWith('/admin')) {
     if (request.nextUrl.pathname === '/admin/login') {
       if (token) {
-        const controlPanelPath = token.provider === 'google' ? '/admin/control/root' : '/admin/control';
+        const controlPanelPath = token.mode === 'root' ? '/admin/control/root' : '/admin/control';
         return NextResponse.redirect(new URL(controlPanelPath, request.url));
       } else {
         return NextResponse.next();
@@ -19,7 +19,7 @@ export async function middleware(request: NextRequest) { // eslint-disable-line 
     } else if (request.nextUrl.pathname === '/admin/control/root') {
       if (!token) {
         return NextResponse.redirect(new URL('/admin/login', request.url));
-      } else if (token.provider === 'google') {
+      } else if (token.mode === 'root') {
         return NextResponse.next();
       } else {
         return NextResponse.redirect(new URL('/admin/control', request.url));
@@ -27,7 +27,7 @@ export async function middleware(request: NextRequest) { // eslint-disable-line 
     } else if (request.nextUrl.pathname.startsWith('/admin/control')) {
       if (!token) {
         return NextResponse.redirect(new URL('/admin/login', request.url));
-      } else if (token.provider === 'google') {
+      } else if (token.mode === 'root') {
         return NextResponse.redirect(new URL('/admin/control/root', request.url));
       } else {
         return NextResponse.next();
@@ -35,7 +35,7 @@ export async function middleware(request: NextRequest) { // eslint-disable-line 
     } else if (request.nextUrl.pathname.startsWith('/admin')) {
       if (!token) {
         return NextResponse.redirect(new URL('/admin/login', request.url));
-      } else if (token.provider === 'google') {
+      } else if (token.mode === 'root') {
         return NextResponse.redirect(new URL('/admin/control/root', request.url));
       } else {
         return NextResponse.redirect(new URL('/admin/control', request.url));

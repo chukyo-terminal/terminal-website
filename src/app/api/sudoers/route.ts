@@ -33,13 +33,17 @@ export async function GET(): Promise<Response> {
  */
 export async function POST(request: Request): Promise<Response> {
   const body = await request.json();
-  const { cuId } = body;
+  const { userId } = body;
 
-  if (!cuId) {
-    return new Response(JSON.stringify({ status: 400, message: 'CU_ID is required' }), { status: 400 });
+  if (!userId) {
+    return new Response(JSON.stringify({ status: 400, message: 'userId is required' }), { status: 400 });
   }
 
   try {
+    const cuId = (await prisma.user.findUnique({ where: { id: userId } }))?.cuId; // eslint-disable-line unicorn/no-await-expression-member
+    if (!cuId) {
+      return new Response(JSON.stringify({ status: 400, message: 'Invalid userId' }), { status: 400 });
+    }
     await prisma.sudoer.create({ data: { cuId } });
     return new Response(JSON.stringify({ status: 201, message: 'Successfully added sudoer' }), { status: 201 });
   } catch (e) {

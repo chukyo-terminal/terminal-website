@@ -16,16 +16,10 @@ import type { FormEvent, JSX } from 'react';
  */
 export default function LoginPage(): JSX.Element {
   const [uid, setUid] = useState('');
-  const [password, setPassword] = useState('');
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>): void => {
     event.preventDefault();
-    if (uid === 'root') {
-      signIn('google', undefined, { login_hint: password + '@m.chukyo-u.ac.jp', prompt: 'login' });
-    } else {
-      // TODO: APIを呼び出してログイン処理を行う
-      alert('未実装の機能です。');
-    }
+    signIn('google', undefined, { login_hint: uid + '@m.chukyo-u.ac.jp', prompt: 'login' });
   }
 
   return (
@@ -60,17 +54,6 @@ export default function LoginPage(): JSX.Element {
             />
           </div>
 
-          <div>
-            <label htmlFor="password" className="block text-sm font-medium text-gray-300 mb-1">パスワード</label>
-            <input
-              type={uid === 'root' ? 'text' : 'password'}
-              id="password"
-              value={password}
-              onChange={(event) => setPassword(event.target.value)}
-              required
-              className="w-full px-3 md:px-4 py-2 bg-gray-700 border border-gray-600 rounded-md text-gray-100 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent text-sm md:text-base"
-            />
-          </div>
           <div className="flex justify-end">
             <button
               type="submit"

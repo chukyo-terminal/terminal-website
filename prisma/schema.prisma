@@ -17,7 +17,9 @@ model Sudoer {
   id        Int      @id @default(autoincrement())
   cuId      String   @unique @map("cu_id")
   createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz()
-  updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz()
+  updatedAt DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamptz()
+
+  user User @relation(fields: [cuId], references: [cuId])
 
   @@map("sudoers")
 }
@@ -29,12 +31,15 @@ enum Role {
 }
 
 model User {
-  id            Int      @id @default(autoincrement())
-  userId        String   @unique @map("user_id")
-  password_hash String
-  roles         Role[]   @default([])
-  createdAt     DateTime @default(now()) @map("created_at") @db.Timestamptz()
-  updatedAt     DateTime @updatedAt @map("updated_at") @db.Timestamptz()
+  id          Int      @id @default(autoincrement())
+  cuId        String   @unique @map("cu_id")
+  name        String
+  displayName String?  @unique @map("display_name")
+  roles       Role[]   @default([])
+  createdAt   DateTime @default(now()) @map("created_at") @db.Timestamptz()
+  updatedAt   DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamptz()
+
+  sudoer Sudoer?
 
   @@map("users")
 }
