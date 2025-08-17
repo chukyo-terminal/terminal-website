@@ -30,7 +30,7 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
     if (roles && roles.length > 0) {
       updateData.roles = roles;
     }
-    updateData.displayName = displayName;
+    updateData.displayName = displayName || null;
 
     await prisma.user.update({
       where: { id },
