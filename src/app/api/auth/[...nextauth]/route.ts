@@ -4,6 +4,14 @@ import GoogleProvider from 'next-auth/providers/google';
 import { prisma } from '@/lib/prisma';
 
 
+// NextAuthのJWTトークンにmodeを追加するための型定義
+declare module 'next-auth/jwt' {
+  interface JWT {
+    mode?: 'user' | 'root';
+  }
+}
+
+
 /**
  * NextAuthのプロバイダーの型定義。
  */
