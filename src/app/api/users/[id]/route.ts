@@ -1,7 +1,5 @@
 import { prisma } from '@/lib/prisma';
 
-import { hashPassword } from '@/utils/password';
-
 import type { Prisma } from '@prisma/client';
 
 
@@ -15,23 +13,24 @@ import type { Prisma } from '@prisma/client';
 export async function PATCH(request: Request, { params }: { params: Promise<{ id: string }> }): Promise<Response> {
   const id = Number((await params).id); // eslint-disable-line unicorn/no-await-expression-member
   const body = await request.json();
-  const { password_hash, roles } = body;
+  const { name, displayName, roles } = body;
 
   if (!id) {
     return new Response(JSON.stringify({ status: 400, message: 'ID is required' }), { status: 400 });
   }
 
-  if (!password_hash && (!roles || roles.length === 0)) {
-    return new Response(JSON.stringify({ status: 400, message: 'Password or at least one role are required' }), { status: 400 });
+  if (!name || (!roles || roles.length === 0)) {
+    return new Response(JSON.stringify({ status: 400, message: 'Name and at least one role are required' }), { status: 400 });
   }
   try {
     const updateData: Prisma.UserUpdateInput = {};
-    if (password_hash) {
-      updateData.password_hash = await hashPassword(password_hash);
+    if (name) {
+      updateData.name = name;
     }
     if (roles && roles.length > 0) {
       updateData.roles = roles;
     }
+    updateData.displayName = displayName || null;
 
     await prisma.user.update({
       where: { id },
