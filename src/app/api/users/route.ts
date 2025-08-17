@@ -45,7 +45,7 @@ export async function POST(request: Request): Promise<Response> {
 
   try {
     await prisma.user.create({
-      data: { cuId, name, displayName, roles },
+      data: { cuId, name, displayName: displayName || null, roles },
     });
     return new Response(JSON.stringify({ status: 201, message: 'Successfully added user' }), { status: 201 });
   } catch (e) {
