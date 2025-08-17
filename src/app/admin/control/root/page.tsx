@@ -5,7 +5,6 @@ import { useEffect, useRef, useState } from 'react';
 import { Plus, Trash2, Pen } from 'lucide-react';
 
 import Modal from '@/components/elements/modal';
-import { sha256 } from '@/utils/hash';
 
 import type { JSX } from 'react';
 
@@ -35,12 +34,8 @@ export default function RootControlPage(): JSX.Element {
   const [modalType, setModalType] = useState<ModalType | null>(null);
   const targetId = useRef(0);
   const [sudoers, setSudoers] = useState<Array<{ id: number; cuId: string; createdAt: Date }>>([]);
-  const [users, setUsers] = useState<Array<{ id: number; userId: string; roles: string[]; createdAt: Date; updatedAt: Date }>>([]);
-  // パスワード表示切替
-  const [showPassword, setShowPassword] = useState(false);
+  const [users, setUsers] = useState<Array<{ id: number; cuId: string; name: string; displayName: string | null; roles: string[]; createdAt: Date; updatedAt: Date }>>([]);
   // 編集モーダル用
-  const [editPassword, setEditPassword] = useState('');
-  const [editShowPassword, setEditShowPassword] = useState(false);
   const [editRoles, setEditRoles] = useState<string[]>([]);
 
   // 編集対象ユーザー変更時にロール初期化
@@ -81,10 +76,16 @@ export default function RootControlPage(): JSX.Element {
               event.preventDefault();
               const formData = new FormData(event.target as HTMLFormElement);
               const cuId = formData.get('cuId') as string;
+              const user = users.find(u => u.cuId === cuId);
+              if (!user) {
+                alert('指定されたCU_IDのユーザーが見つかりません。');
+                return;
+              }
+              const userId = user.id;
               const response = await fetch('/api/sudoers', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ cuId }),
+                body: JSON.stringify({ userId }),
               });
               if (response.ok) {
                 console.info('Successfully added sudoer');
@@ -182,9 +183,9 @@ export default function RootControlPage(): JSX.Element {
             onSubmit={async (event) => {
               event.preventDefault();
               const formData = new FormData(event.target as HTMLFormElement);
-              const userId = formData.get('userId') as string;
-              const password = formData.get('password') as string;
-              const password_hash = await sha256(password);
+              const cuId = formData.get('cuId') as string;
+              const name = formData.get('name') as string;
+              const displayName = formData.get('displayName') as string | null;
               const roles = [...formData.getAll('role')] as string[];
               if (roles.length === 0) {
                 alert('少なくとも1つのロールを選択してください。');
@@ -193,7 +194,7 @@ export default function RootControlPage(): JSX.Element {
               const response = await fetch('/api/users', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ userId, password_hash, roles }),
+                body: JSON.stringify({ cuId, name, displayName, roles }),
               });
               if (response.ok) {
                 console.info('Successfully added user');
@@ -217,31 +218,31 @@ export default function RootControlPage(): JSX.Element {
               <span className="text-sm font-medium">ID</span>
               <input
                 type="text"
-                name="userId"
+                name="cuId"
                 className="mt-1 block w-full rounded border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-emerald-500"
-                placeholder="IDを入力"
+                placeholder="CU_IDを入力"
                 autoFocus
                 required
               />
             </label>
             <label className="block">
-              <span className="text-sm font-medium">パスワード</span>
+              <span className="text-sm font-medium">名前</span>
               <input
-                type={showPassword ? 'text' : 'password'}
-                name="password"
+                type="text"
+                name="name"
                 className="mt-1 block w-full rounded border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-emerald-500"
-                placeholder="パスワードを入力"
+                placeholder="名前を入力"
                 required
               />
-              <div className="mt-2 flex items-center gap-2 justify-end">
-                <input
-                  type="checkbox"
-                  id="showPasswordAddUser"
-                  checked={showPassword}
-                  onChange={e => setShowPassword(e.target.checked)}
-                />
-                <label htmlFor="showPasswordAddUser" className="text-sm select-none cursor-pointer">パスワードを表示</label>
-              </div>
+            </label>
+            <label className="block">
+              <span className="text-sm font-medium">表示名</span>
+              <input
+                type="text"
+                name="displayName"
+                className="mt-1 block w-full rounded border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                placeholder="表示名を入力"
+              />
             </label>
             <label className="block">
               <span className="text-sm font-medium">ロール</span>
@@ -282,16 +283,15 @@ export default function RootControlPage(): JSX.Element {
                 onSubmit={async (event) => {
                   event.preventDefault();
                   const formData = new FormData(event.target as HTMLFormElement);
-                  const password = formData.get('password') as string;
-                  const password_hash = await sha256(password);
+                  const name = formData.get('name') as string;
+                  const displayName = formData.get('displayName') as string | null;
                   const roles = editRoles;
                   const response = await fetch(`/api/users/${user.id}`, {
                     method: 'PATCH',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ password_hash: password?.length !== 0 ? password_hash : undefined, roles: roles?.length !== 0 ? roles : undefined }),
+                    body: JSON.stringify({ name, displayName, roles }),
                   });
                   if (response.ok) {
-                    setEditPassword('');
                     console.info('Successfully edited user');
                     console.log(await response.json());
                     setReload(true);
@@ -310,35 +310,35 @@ export default function RootControlPage(): JSX.Element {
                 className="flex flex-col gap-4"
               >
                 <label className="block">
-                  <span className="text-sm font-medium">ID</span>
+                  <span className="text-sm font-medium">CU_ID</span>
                   <input
                     type="text"
-                    name="userId"
+                    name="cuId"
                     className="mt-1 block w-full rounded border border-gray-500 px-3 py-2 text-gray-500 cursor-not-allowed"
-                    value={user.userId}
+                    value={user.cuId}
                     readOnly
                     disabled
                   />
                 </label>
                 <label className="block">
-                  <span className="text-sm font-medium">パスワード</span>
+                  <span className="text-sm font-medium">名前</span>
                   <input
-                    type={editShowPassword ? 'text' : 'password'}
-                    name="password"
+                    type="text"
+                    name="name"
                     className="mt-1 block w-full rounded border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-emerald-500"
-                    placeholder="新しいパスワードを入力"
-                    value={editPassword}
-                    onChange={e => setEditPassword(e.target.value)}
+                    placeholder="名前を入力"
+                    defaultValue={user.name ?? ''}
                   />
-                  <div className="mt-2 flex items-center gap-2 justify-end">
-                    <input
-                      type="checkbox"
-                      id="showPasswordEditUser"
-                      checked={editShowPassword}
-                      onChange={e => setEditShowPassword(e.target.checked)}
-                    />
-                    <label htmlFor="showPasswordEditUser" className="text-sm select-none cursor-pointer">パスワードを表示</label>
-                  </div>
+                </label>
+                <label className="block">
+                  <span className="text-sm font-medium">表示名</span>
+                  <input
+                    type="text"
+                    name="displayName"
+                    className="mt-1 block w-full rounded border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                    placeholder="表示名を入力"
+                    defaultValue={user.displayName ?? ''}
+                  />
                 </label>
                 <label className="block">
                   <span className="text-sm font-medium">ロール</span>
@@ -416,7 +416,7 @@ export default function RootControlPage(): JSX.Element {
             <div className="mt-2 flex justify-center">
               <span className="relative inline-flex items-baseline">
                 <span className="absolute right-full mr-2 text-md whitespace-nowrap top-1/2 -translate-y-1/2">削除対象: </span>
-                <span className="font-mono text-2xl text-red-700">{users.find(u => u.id === targetId.current)?.userId ?? ''}</span>
+                <span className="font-mono text-2xl text-red-700">{users.find(u => u.id === targetId.current)?.cuId ?? ''}</span>
               </span>
             </div>
             <div className="flex justify-end gap-2 mt-4">
@@ -492,7 +492,9 @@ export default function RootControlPage(): JSX.Element {
           <table className="ml-4 table-auto border-collapse border border-gray-600 min-w-max">
             <thead>
               <tr>
-                <th className="border-t border-b-4 border-l border-gray-600 border-r px-6 py-2 text-center border-solid">ID</th>
+                <th className="border-t border-b-4 border-l border-gray-600 border-r px-6 py-2 text-center border-solid">CU_ID</th>
+                <th className="border-t border-b-4 border-r border-gray-600 px-6 py-2 text-center border-solid">名前</th>
+                <th className="border-t border-b-4 border-r border-gray-600 px-6 py-2 text-center border-solid">表示名</th>
                 <th className="border-t border-b-4 border-r border-gray-600 px-6 py-2 text-center border-solid">ロール</th>
                 <th className="border-t border-b-4 border-r border-gray-600 px-6 py-2 text-center border-solid">登録日</th>
                 <th className="border-t border-b-4 border-r border-gray-600 px-6 py-2 text-center border-solid">最終更新日</th>
@@ -514,8 +516,10 @@ export default function RootControlPage(): JSX.Element {
             </thead>
             <tbody>
               {users.map((user) => (
-                <tr key={user.userId}>
-                  <td className="border-l border-b border-t border-r border-gray-600 px-6 py-2 text-center">{user.userId}</td>
+                <tr key={user.id}>
+                  <td className="border-l border-b border-t border-r border-gray-600 px-6 py-2 text-center">{user.cuId}</td>
+                  <td className="border-b border-t border-r border-gray-600 px-6 py-2 text-center">{user.name}</td>
+                  <td className="border-b border-t border-r border-gray-600 px-6 py-2 text-center">{user.displayName || ''}</td>
                   <td className="border-b border-t border-r border-gray-600 px-6 py-2 text-center">{user.roles.join(', ')}</td>
                   <td className="border-b border-t border-r border-gray-600 px-6 py-2 text-center">{user.createdAt.toLocaleString()}</td>
                   <td className="border-b border-t border-r border-gray-600 px-6 py-2 text-center">{user.updatedAt.toLocaleString()}</td>
