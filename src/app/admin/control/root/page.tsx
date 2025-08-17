@@ -519,7 +519,7 @@ export default function RootControlPage(): JSX.Element {
                 <tr key={user.id}>
                   <td className="border-l border-b border-t border-r border-gray-600 px-6 py-2 text-center">{user.cuId}</td>
                   <td className="border-b border-t border-r border-gray-600 px-6 py-2 text-center">{user.name}</td>
-                  <td className="border-b border-t border-r border-gray-600 px-6 py-2 text-center">{user.displayName}</td>
+                  <td className="border-b border-t border-r border-gray-600 px-6 py-2 text-center">{user.displayName || ''}</td>
                   <td className="border-b border-t border-r border-gray-600 px-6 py-2 text-center">{user.roles.join(', ')}</td>
                   <td className="border-b border-t border-r border-gray-600 px-6 py-2 text-center">{user.createdAt.toLocaleString()}</td>
                   <td className="border-b border-t border-r border-gray-600 px-6 py-2 text-center">{user.updatedAt.toLocaleString()}</td>
