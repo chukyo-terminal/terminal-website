@@ -14,7 +14,7 @@ type ClientType = {
 
 
 /**
- * NextAuthのオプションを設定する。
+ * NextAuthのオプション。
  */
 const authOptions: NextAuthOptions = {
   providers: [
@@ -29,9 +29,15 @@ const authOptions: NextAuthOptions = {
     maxAge: 4 * 60 * 60, // 4時間（秒単位）
   },
   callbacks: {
-    async jwt({ token, account }) {
-      if (account) {
-        token.provider = account.provider; // 認証方式をトークンに追加
+    async jwt({ token, trigger }) {
+      switch (trigger) {
+        case 'signIn': {
+          token.mode = 'user';
+          break;
+        }
+        case 'signUp': {
+          throw new Error('Sign up is not allowed');
+        }
       }
       return token;
     },
@@ -39,7 +45,7 @@ const authOptions: NextAuthOptions = {
       // Google SSOでログインしたアカウントが登録されているか検証
       if (account?.provider === 'google' && user.email?.endsWith('@m.chukyo-u.ac.jp')) {
         const cuId = user.email.split('@')[0];
-        const result = await prisma.sudoer.findUnique({ where: { cuId } });
+        const result = await prisma.user.findUnique({ where: { cuId } });
         return !!result;
       }
       // 許可しない場合はfalse
