@@ -76,7 +76,12 @@ export default function RootControlPage(): JSX.Element {
               event.preventDefault();
               const formData = new FormData(event.target as HTMLFormElement);
               const cuId = formData.get('cuId') as string;
-              const userId = users.find(u => u.cuId === cuId)?.id;
+              const user = users.find(u => u.cuId === cuId);
+              if (!user) {
+                alert('指定されたCU_IDのユーザーが見つかりません。');
+                return;
+              }
+              const userId = user.id;
               const response = await fetch('/api/sudoers', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
