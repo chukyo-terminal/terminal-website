@@ -7,23 +7,61 @@ import { useState, useEffect } from 'react';
 
 import { motion } from 'framer-motion';
 import { Code, Menu, X } from 'lucide-react';
-import { signOut } from 'next-auth/react';
+import { signOut, useSession } from 'next-auth/react';
 
 import LogoImage from '@/public/logo.svg'
 
 
-const navItems = [
-  { name: '概要管理', href: '/admin/control/index' },
-  { name: '活動実績管理', href: '/admin/control/achievements' },
-  { name: '投稿管理', href: '/admin/control/posts' },
-  { name: 'お問い合わせ管理', href: '/admin/control/contact' },
-  { name: 'ログアウト', href: '#', onClick: () => signOut() },
+type NavItem = {
+  name: string;
+  href: string;
+  onClick?: () => void;
+  mode: 'user' | 'root' | 'all';
+};
+
+
+const baseNavItems: NavItem[] = [
+  { name: '概要管理', href: '/admin/control/index', onClick: undefined, mode: 'user' },
+  { name: '活動実績管理', href: '/admin/control/achievements', onClick: undefined, mode: 'user' },
+  { name: '投稿管理', href: '/admin/control/posts', onClick: undefined, mode: 'user' },
+  { name: 'お問い合わせ管理', href: '/admin/control/contact', onClick: undefined, mode: 'user' },
+  { name: 'ログアウト', href: '#', onClick: () => signOut(), mode: 'all' },
 ];
 
 
-export default function Header() {
+export default function Header() { // eslint-disable-line sonarjs/cognitive-complexity
   const [isScrolled, setIsScrolled] = useState(false)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const { data: session, update } = useSession();
+
+  const privilegeEscalation = async (redirect?: string) => {
+    await update({ user: { mode: 'root' } });
+    globalThis.location.href = redirect || '/admin/control/root';
+  };
+
+  const privilegeDemotion = async (redirect?: string) => {
+    await update({ user: { mode: 'user' } });
+    globalThis.location.href = redirect || '/admin/control';
+  }
+
+  let navItems: NavItem[] = [];
+  if (session?.user) { // ログイン必須なので、session.userは必ず存在する
+    if (session.user.isSudoer) {
+      if (session.user.mode === 'root') {
+        navItems = [{ name: '権限降格', href: '#', onClick: () => privilegeDemotion(), mode: 'root' }, ...baseNavItems];
+        for (const item of navItems) {
+          if (item.mode === 'user') {
+            const href = item.href;
+            item.onClick = () => privilegeDemotion(href);
+          }
+        }
+      } else if (session.user.mode === 'user') {
+        navItems = [{ name: '権限昇格', href: '#', onClick: () => privilegeEscalation(), mode: 'user' }, ...baseNavItems];
+      }
+    } else {
+      navItems = baseNavItems;
+    }
+  }
 
   useEffect(() => {
     const handleScroll = () => {

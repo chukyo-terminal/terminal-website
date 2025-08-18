@@ -8,6 +8,19 @@ import { prisma } from '@/lib/prisma';
 declare module 'next-auth/jwt' {
   interface JWT {
     mode?: 'user' | 'root';
+    isSudoer?: boolean;
+  }
+}
+
+
+// NextAuthのセッションにmode, isSudoerを追加するための型定義
+// WARNING: この値をアクセス制限に使用しないこと
+declare module 'next-auth' {
+  interface Session {
+    user: {
+      mode?: 'user' | 'root';
+      isSudoer?: boolean;
+    };
   }
 }
 
@@ -37,18 +50,6 @@ const authOptions: NextAuthOptions = {
     maxAge: 4 * 60 * 60, // 4時間（秒単位）
   },
   callbacks: {
-    async jwt({ token, trigger }) {
-      switch (trigger) {
-        case 'signIn': {
-          token.mode = 'user';
-          break;
-        }
-        case 'signUp': {
-          throw new Error('Sign up is not allowed');
-        }
-      }
-      return token;
-    },
     async signIn({ user, account }) {
       // Google SSOでログインしたアカウントが登録されているか検証
       if (account?.provider === 'google' && user.email?.endsWith('@m.chukyo-u.ac.jp')) {
@@ -58,6 +59,35 @@ const authOptions: NextAuthOptions = {
       }
       // 許可しない場合はfalse
       return false;
+    },
+    async jwt({ token, trigger, session }) {
+      const cuId = token.email?.split('@')[0];
+      if (!cuId) {
+        throw new Error('Invalid user state');
+      }
+      const isSudoer = await prisma.sudoer.findUnique({ where: { cuId } }) !== null;
+      token.isSudoer = isSudoer;
+      switch (trigger) {
+        case 'signIn': {
+          token.mode = 'user';
+          token.isSudoer = isSudoer;
+          break;
+        }
+        case 'signUp': {
+          throw new Error('Sign up is not allowed');
+        }
+        case 'update': {
+          token.mode = session?.user?.mode === 'root' && isSudoer ? 'root' : 'user';
+        }
+      }
+      return token;
+    },
+    async session({ session, token }) {
+      if (session?.user) {
+        session.user.mode = token.mode;
+        session.user.isSudoer = token.isSudoer;
+      }
+      return session;
     },
   },
 };

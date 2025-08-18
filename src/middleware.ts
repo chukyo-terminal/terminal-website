@@ -46,11 +46,7 @@ export async function middleware(request: NextRequest) { // eslint-disable-line 
       return NextResponse.next();
     } else if (!token) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    } else if (request.nextUrl.pathname.startsWith('/api/sudoers')) {
-      if (token.provider !== 'google') {
-        return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
-      }
-    } else if (request.nextUrl.pathname.startsWith('/api/users') && token.provider !== 'google') {
+    } else if ((request.nextUrl.pathname.startsWith('/api/sudoers') || request.nextUrl.pathname.startsWith('/api/users')) && token.mode !== 'root') {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
   }
