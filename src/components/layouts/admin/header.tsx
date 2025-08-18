@@ -2,7 +2,7 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 
 
 import { motion } from 'framer-motion';
@@ -29,7 +29,7 @@ const baseNavItems: NavItem[] = [
 ];
 
 
-export default function Header() { // eslint-disable-line sonarjs/cognitive-complexity
+export default function Header() {  
   const [isScrolled, setIsScrolled] = useState(false)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const { data: session, update } = useSession();
@@ -44,24 +44,30 @@ export default function Header() { // eslint-disable-line sonarjs/cognitive-comp
     globalThis.location.href = redirect || '/admin/control';
   }
 
-  let navItems: NavItem[] = [];
-  if (session?.user) { // ログイン必須なので、session.userは必ず存在する
-    if (session.user.isSudoer) {
-      if (session.user.mode === 'root') {
-        navItems = [{ name: '権限降格', href: '#', onClick: () => privilegeDemotion(), mode: 'root' }, ...baseNavItems];
-        for (const item of navItems) {
-          if (item.mode === 'user') {
-            const href = item.href;
-            item.onClick = () => privilegeDemotion(href);
-          }
+  const navItems: NavItem[] = useMemo(() => {
+    if (session?.user) { // ログイン必須なので、session.userは必ず存在する
+      if (session.user.isSudoer) {
+        if (session.user.mode === 'root') {
+          return [
+            { name: '権限降格', href: '#', onClick: () => privilegeDemotion(), mode: 'root' },
+            ...baseNavItems.map(item =>
+              item.mode === 'user'
+                ? { ...item, onClick: () => privilegeDemotion(item.href) }
+                : { ...item }
+            ),
+          ];
+        } else if (session.user.mode === 'user') {
+          return [
+            { name: '権限昇格', href: '#', onClick: () => privilegeEscalation(), mode: 'user' },
+            ...baseNavItems.map(item => ({ ...item })),
+          ];
         }
-      } else if (session.user.mode === 'user') {
-        navItems = [{ name: '権限昇格', href: '#', onClick: () => privilegeEscalation(), mode: 'user' }, ...baseNavItems];
+      } else {
+        return baseNavItems.map(item => ({ ...item }));
       }
-    } else {
-      navItems = baseNavItems;
     }
-  }
+    return [];
+  }, [session]);
 
   useEffect(() => {
     const handleScroll = () => {
