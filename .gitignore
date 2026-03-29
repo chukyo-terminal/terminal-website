@@ -150,3 +150,8 @@ yarn.lock
 bun.lock
 
 /src/generated/prisma
+
+/compose.override.yaml
+!/compose.override.yaml.sample
+/.secrets/*
+!/.secrets/*.sample
