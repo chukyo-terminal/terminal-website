@@ -3,6 +3,7 @@
 :root {
   --foreground-rgb: 243, 244, 246; /* text-gray-100 */
   --background-rgb: 17, 24, 39; /* bg-gray-900 */
+  color-scheme: dark;
 }
 
 body {
