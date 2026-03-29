@@ -1,6 +1,5 @@
 import type { JSX } from 'react';
 
-
 /**
  * サイト管理ページを生成する。
  *

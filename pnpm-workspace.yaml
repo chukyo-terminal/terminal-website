@@ -1,7 +1,5 @@
-onlyBuiltDependencies:
-  - '@prisma/engines'
-  - '@tailwindcss/oxide'
-  - bcrypt
-  - prisma
-  - sharp
-  - unrs-resolver
+allowBuilds:
+  esbuild: true
+  libpq: true
+  sharp: true
+  unrs-resolver: true

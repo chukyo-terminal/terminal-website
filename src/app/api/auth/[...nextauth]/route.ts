@@ -1,7 +1,9 @@
+import { eq } from 'drizzle-orm';
 import NextAuth, { NextAuthOptions } from 'next-auth';
 import GoogleProvider from 'next-auth/providers/google';
 
-import { prisma } from '@/lib/prisma';
+import { sudoersTable, usersTable } from '@/db/schema';
+import { db } from '@/lib/drizzle';
 
 
 // NextAuthのJWTトークンにmodeを追加するための型定義
@@ -53,19 +55,19 @@ const authOptions: NextAuthOptions = {
     async signIn({ user, account }) {
       // Google SSOでログインしたアカウントが登録されているか検証
       if (account?.provider === 'google' && user.email?.endsWith('@m.chukyo-u.ac.jp')) {
-        const cuId = user.email.split('@')[0];
-        const result = await prisma.user.findUnique({ where: { cuId } });
+        const cuId = user.email.split('@')[0].toUpperCase();
+        const result = await db.select().from(usersTable).where(eq(usersTable.cuId, cuId)).limit(1);
         return !!result;
       }
       // 許可しない場合はfalse
       return false;
     },
     async jwt({ token, trigger, session }) {
-      const cuId = token.email?.split('@')[0];
+      const cuId = token.email?.split('@')[0].toUpperCase();
       if (!cuId) {
         throw new Error('Invalid user state');
       }
-      const isSudoer = await prisma.sudoer.findUnique({ where: { cuId } }) !== null;
+      const isSudoer = await db.select().from(sudoersTable).leftJoin(usersTable, eq(sudoersTable.id, usersTable.id)).where(eq(usersTable.cuId, cuId)).limit(1).then(rows => rows.length > 0);
       token.isSudoer = isSudoer;
       switch (trigger) {
         case 'signIn': {
