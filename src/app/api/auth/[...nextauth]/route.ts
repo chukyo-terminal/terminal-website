@@ -56,8 +56,20 @@ const authOptions: NextAuthOptions = {
       // Google SSOでログインしたアカウントが登録されているか検証
       if (account?.provider === 'google' && user.email?.endsWith('@m.chukyo-u.ac.jp')) {
         const cuId = user.email.split('@')[0].toUpperCase();
-        const result = await db.select().from(usersTable).where(eq(usersTable.cuId, cuId)).limit(1);
-        return !!result;
+        let canSignIn = false;
+        await db.transaction(async (tx) => {
+          const rows = await tx.select({ id: usersTable.id, name: usersTable.name, isActive: usersTable.isActive }).from(usersTable).where(eq(usersTable.cuId, cuId)).limit(1);
+          if (rows.length > 0) {
+            if (rows[0].isActive) {
+              canSignIn = true;
+            }
+            if (user.name && rows[0].name !== user.name) {
+              // 名前が一致しない場合は更新
+              await tx.update(usersTable).set({ name: user.name }).where(eq(usersTable.id, rows[0].id));
+            }
+          }
+        });
+        return canSignIn;
       }
       // 許可しない場合はfalse
       return false;
