@@ -1,0 +1,92 @@
+.loadingScreen {
+  --accent-green: #00ff41;
+  --accent-blue: #0080ff;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: #000;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: flex-start;
+  z-index: 9999;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+.bootLog {
+  font-size: 0.9em;
+  color: #ccc;
+  line-height: 1.4;
+  white-space: pre-wrap;
+  width: 100%;
+}
+
+.logLine {
+  display: block;
+}
+
+.logTimestamp {
+  color: var(--accent-green);
+  margin-right: 10px;
+}
+
+.logMessage {
+  color: #e0e0e0;
+}
+
+.logSuccess {
+  color: var(--accent-green);
+  font-weight: bold;
+}
+
+.logInfo {
+  color: var(--accent-blue);
+}
+
+.logWarning {
+  color: #ffcc00;
+}
+
+.logError {
+  color: #ff0000;
+  font-weight: bold;
+}
+
+.progressContainer {
+  width: 80%;
+  max-width: 600px;
+  margin-top: 20px;
+}
+
+.progressBarWrapper {
+  display: flex;
+  align-items: center;
+  color: var(--accent-green);
+}
+
+.progressLabel {
+  margin-right: 10px;
+}
+
+.progressBarBg {
+  flex-grow: 1;
+  height: 20px;
+  background: #333;
+  border: 1px solid var(--accent-green);
+  position: relative;
+}
+
+.progressBarFill {
+  height: 100%;
+  background: var(--accent-green);
+  transition: width 0.1s linear;
+}
+
+.progressPercent {
+  margin-left: 10px;
+  min-width: 40px;
+  text-align: right;
+}
