@@ -1,5 +1,5 @@
 import { sql } from 'drizzle-orm';
-import { boolean, char, check, integer, pgEnum, pgTable, primaryKey, text, timestamp, varchar } from 'drizzle-orm/pg-core';
+import { boolean, char, check, foreignKey, integer, pgEnum, pgTable, primaryKey, text, timestamp, varchar } from 'drizzle-orm/pg-core';
 
 
 /**
@@ -139,7 +139,7 @@ export const postContentsTable = pgTable(
   'post_contents',
   {
     /** 投稿ID */
-    postId: integer('post_id').references(() => postsTable.id, { onDelete: 'cascade' }),
+    postId: integer('post_id').notNull().references(() => postsTable.id, { onDelete: 'cascade' }),
     /** 識別子 */
     identifier: integer().notNull().generatedAlwaysAsIdentity(),
     /** タイトル */
@@ -172,9 +172,9 @@ export const postReviewsTable = pgTable(
   'post_reviews',
   {
     /** 投稿ID */
-    postId: integer('post_id').notNull().references(() => postsTable.id, { onDelete: 'cascade' }),
+    postId: integer('post_id').notNull(),
     /** 識別子 */
-    postIdentifier: integer('post_identifier').notNull().references(() => postContentsTable.identifier, { onDelete: 'cascade' }),
+    postIdentifier: integer('post_identifier').notNull(),
     /** レビュアー */
     reviewerId: integer('reviewer_id').notNull().references(() => usersTable.id, { onDelete: 'cascade' }),
     /** コメント */
@@ -185,6 +185,10 @@ export const postReviewsTable = pgTable(
     createdAt: timestamp('created_at', { mode: 'date', precision: 3, withTimezone: true }).notNull().defaultNow(),
   },
   (table) => [
+    foreignKey({
+      columns: [table.postId, table.postIdentifier],
+      foreignColumns: [postContentsTable.postId, postContentsTable.identifier],
+    }).onDelete('cascade'),
     primaryKey({ columns: [table.postId, table.postIdentifier, table.reviewerId] }),
     check('valid_review', sql`NOT (${table.isApproved} = false AND ${table.comment} IS NULL)`), // 承認されていない場合、コメントは必須
   ],
