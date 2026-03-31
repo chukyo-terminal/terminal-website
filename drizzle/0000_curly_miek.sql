@@ -1,4 +1,15 @@
 CREATE TYPE "public"."ROLE" AS ENUM('ADMIN', 'REVIEWER', 'CONTRIBUTOR');--> statement-breakpoint
+CREATE TABLE "achievements" (
+	"id" integer PRIMARY KEY GENERATED ALWAYS AS IDENTITY (sequence name "achievements_id_seq" INCREMENT BY 1 MINVALUE 1 MAXVALUE 2147483647 START WITH 1 CACHE 1),
+	"title" text NOT NULL,
+	"description" text,
+	"post_id" integer,
+	"date" date NOT NULL,
+	"created_at" timestamp (3) with time zone DEFAULT now() NOT NULL,
+	"updated_at" timestamp (3) with time zone DEFAULT now() NOT NULL,
+	CONSTRAINT "valid_achievement" CHECK (("achievements"."post_id" IS NOT NULL) OR ("achievements"."description" IS NOT NULL))
+);
+--> statement-breakpoint
 CREATE TABLE "post_contents" (
 	"post_id" integer NOT NULL,
 	"identifier" integer GENERATED ALWAYS AS IDENTITY (sequence name "post_contents_identifier_seq" INCREMENT BY 1 MINVALUE 1 MAXVALUE 2147483647 START WITH 1 CACHE 1),
@@ -74,6 +85,7 @@ CREATE TABLE "users" (
 	CONSTRAINT "valid_email" CHECK ("users"."email" IS NULL OR ("users"."email" ~* '^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$' AND "users"."email" NOT LIKE '%@m.chukyo-u.ac.jp'))
 );
 --> statement-breakpoint
+ALTER TABLE "achievements" ADD CONSTRAINT "achievements_post_id_posts_id_fk" FOREIGN KEY ("post_id") REFERENCES "public"."posts"("id") ON DELETE set null ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "post_contents" ADD CONSTRAINT "post_contents_post_id_posts_id_fk" FOREIGN KEY ("post_id") REFERENCES "public"."posts"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "post_reviews" ADD CONSTRAINT "post_reviews_reviewer_id_users_id_fk" FOREIGN KEY ("reviewer_id") REFERENCES "public"."users"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "post_reviews" ADD CONSTRAINT "post_reviews_post_id_post_identifier_post_contents_post_id_identifier_fk" FOREIGN KEY ("post_id","post_identifier") REFERENCES "public"."post_contents"("post_id","identifier") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
