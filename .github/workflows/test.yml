@@ -39,6 +39,8 @@ jobs:
             ${{ runner.os }}-node-
       - name: Install dependencies
         run: |
+          sudo apt-get update
+          sudo apt-get install libpq-dev python3 g++ make
           sudo npm install -g pnpm
           pnpm install
       - name: Run ESLint

@@ -21,7 +21,7 @@ export default function RootLayout({ children }: RootLayoutProps): JSX.Element {
       <body className={`${NunitoSans.className} ${IBMPlexSansJP.className} relative min-h-screen`}>
         {children}
       </body>
-      <GoogleAnalytics gaId="G-3N7LJC8NB4" />
+      {process.env.NODE_ENV === 'production' && <GoogleAnalytics gaId="G-3N7LJC8NB4" />}
     </html>
   );
 }

@@ -1,0 +1,60 @@
+# Recommended .dockerignore for a Next.js project
+# Keeps build context small by excluding local dev files, caches, and secrets.
+
+# Node modules and package manager logs
+node_modules
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# Next.js build output and caches
+.next
+.next/**
+.next/cache
+
+# Static export output
+out
+
+# Common build/artifact folders
+dist
+build
+coverage
+
+# Environment files (ignore all env files but allow an example file)
+.env*
+!.env.example
+
+# Editor and OS files
+.DS_Store
+.vscode
+.idea
+*.sublime-workspace
+*.sublime-project
+
+# Logs, temp files, and lock/editor swap files
+*.log
+*.tmp
+*.swp
+*.swo
+*.pid
+*.seed
+
+# TypeScript build cache
+*.tsbuildinfo
+
+# Vercel / serverless / local deployment artifacts
+.vercel
+.vercel/**
+
+# Misc
+coverage/
+cache/
+.cache/
+__pycache__/
+*.tgz
+
+# Docker-related (ignore if you keep local docker overrides outside build context)
+docker-compose.override.yml
+
+.env*

@@ -77,7 +77,9 @@ export default defineConfig([
         'warn',
         {
           allowList: {
+            'db': true,
             'e': true,
+            'str': true,
             'utils': true,
           }
         },
