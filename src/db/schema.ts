@@ -1,5 +1,5 @@
 import { sql } from 'drizzle-orm';
-import { boolean, char, check, foreignKey, integer, pgEnum, pgTable, primaryKey, text, timestamp, varchar } from 'drizzle-orm/pg-core';
+import { boolean, char, check, date, foreignKey, integer, pgEnum, pgTable, primaryKey, text, timestamp, varchar } from 'drizzle-orm/pg-core';
 
 
 /**
@@ -191,5 +191,33 @@ export const postReviewsTable = pgTable(
     }).onDelete('cascade'),
     primaryKey({ columns: [table.postId, table.postIdentifier, table.reviewerId] }),
     check('valid_review', sql`NOT (${table.isApproved} = false AND ${table.comment} IS NULL)`), // 承認されていない場合、コメントは必須
+  ],
+);
+
+
+/**
+ * 活動実績テーブル
+ */
+export const achievementsTable = pgTable(
+  'achievements',
+  {
+    /** 実績ID（自動生成連番） */
+    id: integer().primaryKey().generatedAlwaysAsIdentity(),
+    /** タイトル */
+    title: text().notNull(),
+    /** 説明 */
+    description: text(),
+    /** 関連投稿ID */
+    postId: integer('post_id').references(() => postsTable.id, { onDelete: 'set null' }),
+    /** 設定日 */
+    date: date().notNull(),
+    /** 作成日時 */
+    createdAt: timestamp('created_at', { mode: 'date', precision: 3, withTimezone: true }).notNull().defaultNow(),
+    /** 更新日時 */
+    updatedAt: timestamp('updated_at', { mode: 'date', precision: 3, withTimezone: true }).notNull().defaultNow().$onUpdateFn(() => new Date()),
+  },
+  (table) => [
+    // 投稿IDが設定されていない場合は説明が必須
+    check('valid_achievement', sql`(${table.postId} IS NOT NULL) OR (${table.description} IS NOT NULL)`),
   ],
 );
