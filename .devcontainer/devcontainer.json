@@ -20,10 +20,12 @@
 	"customizations": {
     "vscode": {
       "extensions": [
+        "bradlc.vscode-tailwindcss",
         "dbaeumer.vscode-eslint",
+        "dsznajder.es7-react-js-snippets",
         "editorconfig.editorconfig",
         "github.vscode-github-actions"
-      ]
+	    ]
     }
   }
 
