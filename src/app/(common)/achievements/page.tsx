@@ -5,9 +5,16 @@ import { achievementsTable, postsTable } from '@/db/schema';
 import { db } from '@/lib/drizzle';
 
 import type { JSX } from 'react';
+import type { Metadata } from 'next';
 
 
 export const dynamic = 'force-dynamic';
+
+
+export const metadata: Metadata = {
+  title: '活動実績 | Terminal',
+  description: 'Terminalの活動実績を紹介するページ',
+};
 
 
 /**

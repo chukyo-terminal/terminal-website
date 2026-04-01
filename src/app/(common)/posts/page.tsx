@@ -7,6 +7,13 @@ import { postContentsTable, postsTable, postTagsTable, tagsTable } from '@/db/sc
 import { db } from '@/lib/drizzle';
 
 import type { JSX } from 'react';
+import type { Metadata } from 'next';
+
+
+export const metadata: Metadata = {
+  title: '投稿一覧 | Terminal',
+  description: 'Terminalによる投稿記事の一覧ページ',
+};
 
 
 /**
