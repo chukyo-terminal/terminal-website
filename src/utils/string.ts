@@ -5,7 +5,7 @@
  * @returns 印刷できない文字が削除され、前後の空白がトリムされた文字列
  */
 export function trimUnprintableCharacters(value: string | null | undefined): string | null | undefined {
-  return value?.replace(/[\u200B-\u200D\uFEFF]/g, '').trim();
+  return value?.replaceAll(/[\u200B-\u200D\uFEFF]/g, '').trim();
 }
 
 
