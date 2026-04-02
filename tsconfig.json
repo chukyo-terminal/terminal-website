@@ -31,7 +31,8 @@
       ]
     },
     "strictBuiltinIteratorReturn": true,
-    "useUnknownInCatchVariables": true
+    "useUnknownInCatchVariables": true,
+    "noUncheckedSideEffectImports": false
   },
   "include": [
     "next-env.d.ts",
