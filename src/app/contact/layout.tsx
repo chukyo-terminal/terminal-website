@@ -2,7 +2,7 @@ import type React from 'react';
 import type { Metadata } from 'next';
 import '@/styles/globals.css';
 
-import Header from '@/components/layouts/contact/header';
+import Header from '@/components/layouts/form/header';
 
 import type { JSX } from 'react';
 import type { RootLayoutProps } from '@/types';

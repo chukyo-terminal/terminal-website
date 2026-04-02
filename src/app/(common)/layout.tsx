@@ -10,7 +10,7 @@ import type { RootLayoutProps } from '@/types';
 
 
 export const metadata: Metadata = {
-  title: 'Terminal | 中京大学公式エンジニアサークル',
+  title: 'Terminal | 中京大学公式プログラミングサークル',
   description: 'プログラミングに興味を持つ学生のためのサークル'
 };
 
@@ -23,12 +23,12 @@ export const metadata: Metadata = {
  */
 export default function RootLayout({ children }: RootLayoutProps): JSX.Element {
   return (
-    <>
+    <div className="flex flex-col min-h-screen">
       <Header />
       <main className="container mx-auto px-4 py-16 space-y-32">
         {children}
       </main>
-      <Footer />
-    </>
+      <Footer className="mt-auto" />
+    </div>
   );
 }

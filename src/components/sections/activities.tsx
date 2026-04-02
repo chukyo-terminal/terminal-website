@@ -1,5 +1,3 @@
-/* eslint-disable sonarjs/no-redundant-boolean */
-
 'use client';
 
 import { motion } from 'framer-motion';
@@ -18,7 +16,7 @@ export default function Activities() {
     {
       title: '勉強会の開催',
       description:
-        'サークル内のメンバーが講師となり、サークル外の学生向けにプログラミング勉強会を定期的に開催します。他人に教えることで自身の理解も深まります。',
+        'サークル内で、最新の技術やトピックに関する勉強会を定期的に開催します。コーディングはもちろん、資格試験の対策なども行います。',
       icon: <BookOpen className="h-10 w-10 text-emerald-400" />,
       image: '/placeholder.svg?height=200&width=400',
     },

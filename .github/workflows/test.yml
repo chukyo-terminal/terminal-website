@@ -3,8 +3,10 @@ name: Test
 on:
   push:
     paths:
+      - '!**.md'
+      - '!.github/**'
       - 'src/**'
-      - '.eslintrc.json'
+      - 'eslint.config.ts'
       - '.github/workflows/test.yml'
   workflow_dispatch:
     inputs:
@@ -21,13 +23,13 @@ jobs:
     permissions:
       contents: write
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - name: Install Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
-          node-version: '20'
+          node-version: '24'
       - name: Cache dependencies & build
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: |
             ~/.npm
@@ -39,6 +41,8 @@ jobs:
             ${{ runner.os }}-node-
       - name: Install dependencies
         run: |
+          sudo apt-get update
+          sudo apt-get install libpq-dev python3 g++ make
           sudo npm install -g pnpm
           pnpm install
       - name: Run ESLint
@@ -57,7 +61,7 @@ jobs:
           NODE_ENV: development
       - name: Push to GitHub
         if: ${{ inputs.autofix }}
-        uses: EndBug/add-and-commit@v9.1.4
+        uses: EndBug/add-and-commit@v10.0.0
         with:
           author_name: 'github-actions[bot]'
           author_email: 'action@github.com'

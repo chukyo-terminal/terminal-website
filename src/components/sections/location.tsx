@@ -1,5 +1,3 @@
-/* eslint-disable sonarjs/no-redundant-boolean */
-
 'use client'
 
 import { motion } from 'framer-motion'
@@ -35,9 +33,9 @@ export default function Location() {
             <div className="flex items-start space-x-3 mb-4">
               <MapPin className="h-6 w-6 text-emerald-400 mt-1 flex-shrink-0" />
               <div>
-                <h3 className="text-xl font-bold">17号館4階</h3>
+                <h3 className="text-xl font-bold">11号館4階</h3>
                 <p className="text-gray-400 mt-2">
-                  主な活動場所は17号館4階のコンピュータールームです。
+                  主な活動場所は11号館4階の共有スペースです。
                 </p>
               </div>
             </div>

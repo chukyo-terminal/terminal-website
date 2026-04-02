@@ -1,0 +1,20 @@
+name: terminal-website
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: always
+    environment:
+      NODE_ENV: production
+    env_file:
+      - .env
+    # ports:
+    #   - 3000:3000
+    networks:
+      - frontend
+
+networks:
+  frontend:
+    driver: bridge
+    internal: false

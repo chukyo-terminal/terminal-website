@@ -3,6 +3,7 @@
 :root {
   --foreground-rgb: 243, 244, 246; /* text-gray-100 */
   --background-rgb: 17, 24, 39; /* bg-gray-900 */
+  color-scheme: dark;
 }
 
 body {
@@ -52,4 +53,16 @@ body {
 
 .pulse-glow {
   animation: pulse-glow 3s infinite;
+}
+
+.ReactModal__Overlay {
+  opacity: 0;
+}
+
+.ReactModal__Overlay--after-open {
+  opacity: 1;
+}
+
+.ReactModal__Overlay--before-close {
+  opacity: 0;
 }

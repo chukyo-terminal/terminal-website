@@ -1,86 +1,87 @@
-/* eslint-disable sonarjs/no-redundant-boolean */
+import { desc, eq } from 'drizzle-orm';
+import { Code } from 'lucide-react';
 
-'use client';
-
-import Image from 'next/image';
-
-import { motion } from 'framer-motion';
-import { Code, Users, Trophy } from 'lucide-react';
+import { achievementsTable, postsTable } from '@/db/schema';
+import { db } from '@/lib/drizzle';
 
 import type { JSX } from 'react';
+import type { Metadata } from 'next';
 
 
-const achievements = [
-  {
-    title: 'Matsuriba vol.10 参加',
-    description:
-      '2025年7月4日に行われた、学生エンジニア同士の交流の機会を生み出すイベント「Matsuriba Vol.10」に、Terminalのメンバー数人で参加しました。',
-    icon: <Users className="h-10 w-10 text-emerald-400" />,
-    image: '/placeholder.svg?height=200&width=400',
-  },
-  {
-    title: '技育博 vol.2 CyberAgent賞 受賞',
-    description:
-      '2025年5月11日に行われた「技育博 vol.2」に、Terminalから1チームが参加し、CyberAgent賞を受賞しました。スマホの位置情報とコンパスを用いて、集合場所にGoogle MAP以上に簡単に合流できるアプリ「MATCHAI」を出展しました。',
-    icon: <Trophy className="h-10 w-10 text-emerald-400" />,
-    image: '/placeholder.svg?height=200&width=400',
-  },
-  {
-    title: 'サークル設立',
-    description:
-      '2025年5月9日にプログラミングサークル「Terminal」を設立し、活動を開始しました。',
-    icon: <Users className="h-10 w-10 text-emerald-400" />,
-    image: '/placeholder.svg?height=200&width=400',
-  },
-]
+export const dynamic = 'force-dynamic';
 
 
-export default function Achievements(): JSX.Element {
+export const metadata: Metadata = {
+  title: '活動実績 | Terminal',
+  description: 'Terminalの活動実績を紹介するページ',
+};
+
+
+/**
+ * 日付をフォーマットする。
+ */
+function formatDate(value: Date | string): string {
+  if (value instanceof Date) {
+    return value.toLocaleDateString('ja-JP');
+  }
+
+  const [year, month, day] = value.split('-').map(Number);
+  const date = new Date(year, (month ?? 1) - 1, day ?? 1);
+  return date.toLocaleDateString('ja-JP');
+}
+
+
+export default async function Achievements(): Promise<JSX.Element> {
+  const achievements = await db
+    .select({
+      id: achievementsTable.id,
+      title: achievementsTable.title,
+      description: achievementsTable.description,
+      date: achievementsTable.date,
+      postSlug: postsTable.slug,
+    })
+    .from(achievementsTable)
+    .leftJoin(postsTable, eq(achievementsTable.postId, postsTable.id))
+    .orderBy(desc(achievementsTable.date), desc(achievementsTable.id));
+
   return (
     <div className="space-y-8 z-50 pt-20">
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-        viewport={{ once: true }}
-        className="space-y-4"
-      >
+      <div className="space-y-4">
         <h2 className="text-4xl font-bold text-emerald-400 flex items-center">
           <Code className="mr-2 h-8 w-8" />
           活動実績
         </h2>
         <div className="h-1 w-20 bg-emerald-400 rounded"></div>
-      </motion.div>
+      </div>
+
+      {achievements.length === 0 && (
+        <p className="text-gray-400">表示できる活動実績はありません。</p>
+      )}
 
       <div className="space-y-16">
         {achievements.map((achievement, index) => (
-          <motion.div
-            key={achievement.title}
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: index * 0.2 }}
-            viewport={{ once: true }}
-            className={`flex flex-col ${index % 2 === 0 ? 'md:flex-row' : 'md:flex-row-reverse'} gap-8 items-center`}
+          <article
+            key={achievement.id}
+            className={
+              `flex flex-col md:items-stretch ${index % 2 === 0 ? 'md:flex-row' : 'md:flex-row-reverse'} ` +
+              'gap-8'
+            }
           >
-            <div className="w-full md:w-1/2 space-y-4">
-              <div className="flex items-center space-x-3">
-                {achievement.icon}
-                <h3 className="text-2xl font-bold">{achievement.title}</h3>
+            <div className="w-full md:w-1/2">
+              <div className="rounded-lg border border-gray-800 bg-gray-900/40 p-6 space-y-4 h-full">
+                <div className="space-y-2">
+                  <p className="text-sm text-emerald-300">{formatDate(achievement.date)}</p>
+                  <h3 className="text-2xl font-bold">{achievement.title}</h3>
+                </div>
+                {achievement.description && (
+                  <p className="text-gray-300 leading-relaxed whitespace-pre-wrap">
+                    {achievement.description}
+                  </p>
+                )}
               </div>
-              <p className="text-gray-300 leading-relaxed">{achievement.description}</p>
             </div>
-            {false && <div className="w-full md:w-1/2">
-              <div className="bg-gray-800 border border-gray-700 rounded-lg overflow-hidden shadow-lg">
-                <Image
-                  src={achievement.image || '/placeholder.svg'}
-                  alt={achievement.title}
-                  width={400}
-                  height={200}
-                  className="w-full h-auto object-cover"
-                />
-              </div>
-            </div>}
-          </motion.div>
+            <div className="hidden md:block md:w-1/2" aria-hidden="true" />
+          </article>
         ))}
       </div>
     </div>
