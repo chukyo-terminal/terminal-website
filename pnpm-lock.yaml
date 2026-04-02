@@ -12,8 +12,8 @@ importers:
         specifier: ^0.7.6
         version: 0.7.6(hono@4.12.9)(zod@4.3.6)
       '@next/third-parties':
-        specifier: ^15.4.4
-        version: 15.5.14(next@15.4.4(react-dom@19.2.4(react@19.2.4))(react@19.2.4))(react@19.2.4)
+        specifier: ^16.2.2
+        version: 16.2.2(next@15.4.4(react-dom@19.2.4(react@19.2.4))(react@19.2.4))(react@19.2.4)
       '@types/markdown-it':
         specifier: ^14.1.2
         version: 14.1.2
@@ -899,10 +899,10 @@ packages:
     cpu: [x64]
     os: [win32]
 
-  '@next/third-parties@15.5.14':
-    resolution: {integrity: sha512-fNCcA9zYZ/i4zxW0CdtINLvc+AhVJLXJhwobtEe+kOkaeNA+Hpw5SYLmRp/s9cqFm32sjebeP+ma8L8IwC22Ow==}
+  '@next/third-parties@16.2.2':
+    resolution: {integrity: sha512-1bDDNlv+a+F7/lLaYUOho3Cpd/xWQdBvlY8rM/hgO90cxYr1v8lB2SXyo9rfjc7hi6QTJ3gI1yyCpfd4a3jsqg==}
     peerDependencies:
-      next: ^13.0.0 || ^14.0.0 || ^15.0.0
+      next: ^13.0.0 || ^14.0.0 || ^15.0.0 || ^16.0.0-beta.0
       react: ^18.2.0 || 19.0.0-rc-de68d2f4-20241204 || ^19.0.0
 
   '@nodelib/fs.scandir@2.1.5':
@@ -3371,7 +3371,7 @@ snapshots:
   '@next/swc-win32-x64-msvc@15.4.4':
     optional: true
 
-  '@next/third-parties@15.5.14(next@15.4.4(react-dom@19.2.4(react@19.2.4))(react@19.2.4))(react@19.2.4)':
+  '@next/third-parties@16.2.2(next@15.4.4(react-dom@19.2.4(react@19.2.4))(react@19.2.4))(react@19.2.4)':
     dependencies:
       next: 15.4.4(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
       react: 19.2.4
