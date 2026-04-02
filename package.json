@@ -16,7 +16,7 @@
     "@hono/zod-validator": "^0.7.6",
     "@next/third-parties": "^15.4.4",
     "@types/markdown-it": "^14.1.2",
-    "drizzle-orm": "^0.45.1",
+    "drizzle-orm": "^0.45.2",
     "framer-motion": "12.38.0",
     "hono": "^4.12.9",
     "http-status-ts": "^2.0.1",
