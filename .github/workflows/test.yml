@@ -8,6 +8,8 @@ on:
       - 'src/**'
       - 'eslint.config.ts'
       - '.github/workflows/test.yml'
+      - 'package.json'
+      - 'pnpm-lock.yaml'
   workflow_dispatch:
     inputs:
       autofix:
