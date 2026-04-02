@@ -104,7 +104,7 @@ export default function RootControlPage(): JSX.Element {
                   // eslint-disable-next-line unicorn/no-await-expression-member
                   const createdAt = (await SudoersApiPostResponseSchema.parseAsync(await response.json())).data.createdAt;
                   console.info('Successfully added sudoer');
-                  setSudoers((previous) => [...previous, { id: selectedUserId, createdAt }].sort((a, b) => a.id - b.id));
+                  setSudoers((previous) => [...previous, { id: selectedUserId, createdAt }].toSorted((a, b) => a.id - b.id));
                   setModalType(null);
                 } else {
                   console.error('Failed to add sudoer:', response.status, response.statusText);
@@ -244,7 +244,7 @@ export default function RootControlPage(): JSX.Element {
                       createdAt: userData.createdAt,
                       updatedAt: userData.updatedAt,
                     },
-                  ].sort((a, b) => a.id - b.id));
+                  ].toSorted((a, b) => a.id - b.id));
                   setModalType(null);
                 } else {
                   console.error('Failed to add user:', createResponse.status, createResponse.statusText);

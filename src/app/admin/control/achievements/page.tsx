@@ -47,7 +47,7 @@ function toIsoDateTime(value: string): string {
  * 日付降順で実績を並べる。
  */
 function sortAchievementsByDateDesc(achievements: Achievement[]): Achievement[] {
-  return [...achievements].sort((a, b) => {
+  return [...achievements].toSorted((a, b) => {
     const dateDiff = b.date.getTime() - a.date.getTime();
     return dateDiff !== 0 ? dateDiff : b.id - a.id;
   });
