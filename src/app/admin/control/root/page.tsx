@@ -348,7 +348,6 @@ export default function RootControlPage(): JSX.Element {
                       // eslint-disable-next-line unicorn/no-await-expression-member
                       const updatedAt = (await UsersApiPatchResponseSchema.parseAsync(await response.json())).data.updatedAt;
                       console.info('Successfully edited user');
-                      // eslint-disable-next-line sonarjs/no-nested-functions
                       setUsers((previous) => previous.map((current) => {
                         if (current.id !== user.id) {
                           return current;
@@ -435,7 +434,7 @@ export default function RootControlPage(): JSX.Element {
                             if (e.target.checked) {
                               setEditRoles([...editRoles, role]);
                             } else {
-                              setEditRoles(editRoles.filter(r => r !== role)); // eslint-disable-line sonarjs/no-nested-functions
+                              setEditRoles(editRoles.filter(r => r !== role));
                             }
                           }}
                         />

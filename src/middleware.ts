@@ -35,11 +35,11 @@ class PathSegmentReader {
 }
 
 
-export async function middleware(request: NextRequest) { // eslint-disable-line sonarjs/cognitive-complexity
+export async function middleware(request: NextRequest) {
   const token = await getToken({ req: request, secret: process.env.NEXTAUTH_SECRET });
   const pathSegments = new PathSegmentReader(request.nextUrl.pathname);
 
-  switch (pathSegments.next()) { // eslint-disable-line sonarjs/no-small-switch
+  switch (pathSegments.next()) {
     case 'admin': {
       switch (pathSegments.next()) {
         case 'login': {
@@ -57,7 +57,7 @@ export async function middleware(request: NextRequest) { // eslint-disable-line 
             // ログインしていない場合はログインページへリダイレクト
             return NextResponse.redirect(new URL('/admin/login', request.url));
           } else {
-            switch (pathSegments.next()) { // eslint-disable-line sonarjs/no-small-switch
+            switch (pathSegments.next()) {
               case 'root': {
                 if (token.mode === 'root') { // eslint-disable-line unicorn/prefer-ternary
                   // 上級管理者はそのままアクセスを許可

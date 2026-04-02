@@ -260,7 +260,6 @@ export default function AchievementsControlPage(): JSX.Element {
                         await AchievementsApiPatchResponseSchema.parseAsync(await response.json());
                       const updatedAt = parsedResponse.data.updatedAt;
                       console.info('Successfully edited achievement');
-                      // eslint-disable-next-line sonarjs/no-nested-functions
                       setAchievements((previous) => sortAchievementsByDateDesc(previous.map((current) => {
                         if (current.id !== achievement.id) {
                           return current;

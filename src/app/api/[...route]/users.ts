@@ -83,7 +83,6 @@ const app = new Hono()
       throw e;
     }
   })
-  // eslint-disable-next-line sonarjs/cognitive-complexity
   .patch('/:userId', zValidator('json', UsersApiPatchRequestSchema), async (c) => {
     const userId = Number(c.req.param('userId'));
     if (Number.isNaN(userId)) {

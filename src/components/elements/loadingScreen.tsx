@@ -162,7 +162,6 @@ export default function LoadingScreen(): JSX.Element | null {
             clearInterval(intervalReference.current);
             intervalReference.current = null;
           }
-          // eslint-disable-next-line sonarjs/no-nested-functions
           scheduleTimeout(() => {
             if (!cancelled) {
               setVisible(false);

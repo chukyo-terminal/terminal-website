@@ -7,8 +7,7 @@ import { fixupConfigRules } from '@eslint/compat';
 import { FlatCompat } from '@eslint/eslintrc';
 
 // eslint plugins
-import stylistic from '@stylistic/eslint-plugin'
-import sonarjs from 'eslint-plugin-sonarjs';
+import stylistic from '@stylistic/eslint-plugin';
 import unicorn from 'eslint-plugin-unicorn';
 import * as globals from 'globals';
 
@@ -23,7 +22,6 @@ const compat = new FlatCompat({
 
 
 export default defineConfig([
-  sonarjs.configs.recommended,
   unicorn.configs.recommended,
   {
     files: ['**/*.{js,mjs,cjs,ts,tsx}'],
@@ -64,8 +62,6 @@ export default defineConfig([
           varsIgnorePattern: '^_',
         },
       ],
-
-      'sonarjs/todo-tag': 'warn',
 
       'unicorn/catch-error-name': ['error', { name: 'e' }],
       'unicorn/expiring-todo-comments': 'off',

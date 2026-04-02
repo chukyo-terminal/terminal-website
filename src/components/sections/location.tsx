@@ -1,5 +1,3 @@
-/* eslint-disable sonarjs/no-redundant-boolean */
-
 'use client'
 
 import { motion } from 'framer-motion'
