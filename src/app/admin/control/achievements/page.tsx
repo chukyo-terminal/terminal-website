@@ -397,7 +397,7 @@ export default function AchievementsControlPage(): JSX.Element {
                 if (response.ok) {
                   console.info('Successfully removed achievement');
                   setAchievements((previous) =>
-                    previous.filter((achievement) => achievement.id !== targetId.current)
+                    previous.filter((achievement) => achievement.id !== targetId.current),
                   );
                   setModalType(null);
                 } else {

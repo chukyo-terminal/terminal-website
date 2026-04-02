@@ -62,20 +62,9 @@ export default function Activities() {
               </div>
               <p className="text-gray-300 leading-relaxed">{activity.description}</p>
             </div>
-            {false && <div className="w-full md:w-1/2">
-              <div className="bg-gray-800 border border-gray-700 rounded-lg overflow-hidden shadow-lg">
-                <Image
-                  src={activity.image || '/placeholder.svg'}
-                  alt={activity.title}
-                  width={400}
-                  height={200}
-                  className="w-full h-auto object-cover"
-                />
-              </div>
-            </div>}
           </motion.div>
         ))}
       </div>
     </div>
-  )
+  );
 }

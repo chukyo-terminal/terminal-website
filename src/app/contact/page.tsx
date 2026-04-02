@@ -13,7 +13,7 @@ export default function FormPage() {
     event.preventDefault();
     const form = event.currentTarget;
     const formData = new FormData(form);
-    
+
     try {
       await fetch(form.action, {
         method: 'POST',
@@ -24,7 +24,7 @@ export default function FormPage() {
     } catch (e) {
       console.error('Error submitting form:', e);
     }
-  }
+  };
 
   return (
     <>
@@ -43,7 +43,7 @@ export default function FormPage() {
         </div>
 
         <div className="bg-gray-800 border border-gray-700 rounded-lg p-4 md:p-6 shadow-lg">
-          <form 
+          <form
             action="https://docs.google.com/forms/u/0/d/e/1FAIpQLScCFupV2yb6V7iLx8bnvn1fxKvoX56R6qtfhYf-62PhLZmg8Q/formResponse"
             method="POST"
             onSubmit={handleSubmit}
@@ -107,5 +107,5 @@ export default function FormPage() {
         </div>
       </motion.div>
     </>
-  )
-} 
+  );
+}

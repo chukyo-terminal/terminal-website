@@ -47,16 +47,17 @@ jobs:
           sudo apt-get install libpq-dev python3 g++ make
           sudo npm install -g pnpm
           pnpm install
+          pnpm run next:typegen
       - name: Run ESLint
         if: ${{ !inputs.autofix }}
-        run: pnpm lint
+        run: pnpm run lint
         env:
           CI: true
           NODE_ENV: development
       - name: Run ESLint (autofix)
         id: eslint_autofix
         if: ${{ inputs.autofix }}
-        run: pnpm lint --fix
+        run: pnpm run lint:fix
         continue-on-error: true
         env:
           CI: true

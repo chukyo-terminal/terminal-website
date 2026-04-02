@@ -1,8 +1,8 @@
-'use client'
+'use client';
 
-import { motion } from 'framer-motion'
-import { MapPin, Code } from 'lucide-react'
-import Image from 'next/image'
+import { motion } from 'framer-motion';
+import { MapPin, Code } from 'lucide-react';
+import Image from 'next/image';
 
 export default function Location() {
   return (
@@ -44,7 +44,7 @@ export default function Location() {
               <div className="flex items-center space-x-2">
                 <div className="w-2 h-2 bg-emerald-400 rounded-full"></div>
                 <p className="text-gray-300">金曜日: 17:00から</p>
-              </div>              
+              </div>
             </div>
 
             <div className="mt-6 p-4 bg-gray-900 rounded border border-gray-700">
@@ -55,23 +55,7 @@ export default function Location() {
             </div>
           </div>
         </motion.div>
-
-        {false && <motion.div
-          initial={{ opacity: 0, x: 30 }}
-          whileInView={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.6, delay: 0.2 }}
-          viewport={{ once: true }}
-          className="bg-gray-800 border border-gray-700 rounded-lg overflow-hidden shadow-lg"
-        >
-          <Image
-            src="/placeholder.svg?height=400&width=600"
-            alt="17号館4階 活動場所"
-            width={600}
-            height={400}
-            className="w-full h-auto object-cover"
-          />
-        </motion.div>}
       </div>
     </div>
-  )
+  );
 }

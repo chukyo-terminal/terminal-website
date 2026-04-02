@@ -37,5 +37,6 @@ jobs:
           sudo apt-get install libpq-dev python3 g++ make
           sudo npm install -g pnpm
           pnpm install
+          pnpm run next:typegen
       - name: Run build
-        run: pnpm build --debug --no-lint
+        run: pnpm run build:dev

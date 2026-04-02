@@ -3,10 +3,10 @@ import { z } from 'zod';
 
 /**
  * APIエラーのレスポンスのスキーマ定義
- * 
+ *
  * このスキーマは、RFC 9457に準拠している。
  * このレスポンスを返す場合は、Content-Typeを `application/problem+json` にすべきである。
- * 
+ *
  * @see https://tex2e.github.io/rfc-translater/html/rfc9457.html
  */
 export const ApiErrorResponseSchema = z.object({
@@ -20,10 +20,10 @@ export const ApiErrorResponseSchema = z.object({
 
 /**
  * APIリクエストが成功した場合に返すレスポンスのベースとなるスキーマ定義
- * 
+ *
  * このスキーマは、RFC 9457と同じような形式を採用しているが、エラーレスポンスに用いるものではない。
  * このレスポンスを返す場合は、Content-Typeが `application/problem+json` であってはならないことに注意すること。
- * 
+ *
  * なお、`data` フィールドは、APIごとに異なるレスポンスの内容を表すためのものである。
  * 必要に応じて、APIごとにこのスキーマを拡張して使用することが想定されている。
  */

@@ -5,7 +5,7 @@ import Image from 'next/image';
 
 export default function ScrollGear() {
   const [rotation, setRotation] = useState(0);
-  const containerReference = useRef<HTMLDivElement>(null)
+  const containerReference = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -38,4 +38,4 @@ export default function ScrollGear() {
       </div>
     </div>
   );
-} 
+}

@@ -35,7 +35,7 @@ class PathSegmentReader {
 }
 
 
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   const token = await getToken({ req: request, secret: process.env.NEXTAUTH_SECRET });
   const pathSegments = new PathSegmentReader(request.nextUrl.pathname);
 

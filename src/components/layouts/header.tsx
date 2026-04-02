@@ -8,7 +8,7 @@ import { motion } from 'framer-motion';
 import { Code, Menu, X } from 'lucide-react';
 
 
-import LogoImage from '@/public/logo.svg'
+import LogoImage from '@/public/logo.svg';
 
 
 const navItems = [
@@ -20,17 +20,17 @@ const navItems = [
 
 
 export default function Header() {
-  const [isScrolled, setIsScrolled] = useState(false)
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const [isScrolled, setIsScrolled] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
-      setIsScrolled(window.scrollY > 10)
-    }
+      setIsScrolled(window.scrollY > 10);
+    };
 
-    window.addEventListener('scroll', handleScroll)
-    return () => window.removeEventListener('scroll', handleScroll)
-  }, [])
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   return (
     <header
@@ -101,5 +101,5 @@ export default function Header() {
         </motion.div>
       )}
     </header>
-  )
+  );
 }

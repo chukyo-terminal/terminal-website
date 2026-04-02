@@ -11,7 +11,7 @@ import type { RootLayoutProps } from '@/types';
 
 export const metadata: Metadata = {
   title: 'Terminal | 中京大学公式プログラミングサークル',
-  description: 'プログラミングに興味を持つ学生のためのサークル'
+  description: 'プログラミングに興味を持つ学生のためのサークル',
 };
 
 

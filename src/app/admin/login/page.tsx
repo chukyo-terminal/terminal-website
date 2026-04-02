@@ -20,7 +20,7 @@ export default function LoginPage(): JSX.Element {
   const handleSubmit = (event: FormEvent<HTMLFormElement>): void => {
     event.preventDefault();
     signIn('google', undefined, { login_hint: uid + '@m.chukyo-u.ac.jp', prompt: 'login' });
-  }
+  };
 
   return (
     <motion.div

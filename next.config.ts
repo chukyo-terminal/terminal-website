@@ -1,13 +1,9 @@
-import type { NextConfig } from 'next'
+import type { NextConfig } from 'next';
 
 
 export default {
   reactStrictMode: true,
   output: 'standalone',
-
-  eslint: {
-    ignoreDuringBuilds: false,
-  },
 
   typescript: {
     ignoreBuildErrors: false,

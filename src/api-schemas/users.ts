@@ -18,7 +18,7 @@ export const UsersApiGetResponseSchema = ApiGenericSuccessResponseSchema.extend(
       isActive: z.boolean(),
       createdAt: TransformableDateSchema,
       updatedAt: TransformableDateSchema,
-    }))
+    })),
   }),
 });
 
@@ -64,7 +64,7 @@ export const UsersApiPatchRequestSchema = z.object({
  * `/api/users/:userId` のPATCHレスポンスのスキーマ定義
  */
 export const UsersApiPatchResponseSchema = ApiGenericSuccessResponseSchema.extend({
-  data: z.object({ 
+  data: z.object({
     updatedAt: TransformableDateSchema,
   }),
 });

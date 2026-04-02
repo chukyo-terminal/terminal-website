@@ -1,8 +1,8 @@
-'use client'
+'use client';
 
-import { motion } from 'framer-motion'
-import { Code, Mail, ExternalLink } from 'lucide-react'
-import Link from 'next/link'
+import { motion } from 'framer-motion';
+import { Code, Mail, ExternalLink } from 'lucide-react';
+import Link from 'next/link';
 
 export default function Contact() {
   return (
@@ -62,5 +62,5 @@ export default function Contact() {
         </div>
       </motion.div>
     </div>
-  )
+  );
 }

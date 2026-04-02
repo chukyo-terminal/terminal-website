@@ -4,7 +4,7 @@ import { zValidator } from '@hono/zod-validator';
 
 import {
   AchievementsApiGetResponseSchema, AchievementsApiPostRequestSchema, AchievementsApiPostResponseSchema,
-  AchievementsApiPatchRequestSchema, AchievementsApiPatchResponseSchema, AchievementsApiDeleteResponseSchema
+  AchievementsApiPatchRequestSchema, AchievementsApiPatchResponseSchema, AchievementsApiDeleteResponseSchema,
 } from '@/api-schemas/achievements';
 import { achievementsTable, postsTable } from '@/db/schema';
 import { db } from '@/lib/drizzle';

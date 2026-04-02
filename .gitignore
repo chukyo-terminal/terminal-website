@@ -155,3 +155,5 @@ bun.lock
 !/compose.override.yaml.sample
 /.secrets/*
 !/.secrets/*.sample
+
+next-env.d.ts

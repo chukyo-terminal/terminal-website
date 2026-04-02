@@ -2,14 +2,15 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
-import { useState, useEffect, useMemo } from 'react';
+import { useRouter } from 'next/navigation';
+import { useState, useEffect } from 'react';
 
 
 import { motion } from 'framer-motion';
 import { Code, Menu, X } from 'lucide-react';
 import { signOut, useSession } from 'next-auth/react';
 
-import LogoImage from '@/public/logo.svg'
+import LogoImage from '@/public/logo.svg';
 
 
 type NavItem = {
@@ -29,22 +30,23 @@ const baseNavItems: NavItem[] = [
 ];
 
 
-export default function Header() {  
-  const [isScrolled, setIsScrolled] = useState(false)
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+export default function Header() {
+  const [isScrolled, setIsScrolled] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const { data: session, update } = useSession();
+  const router = useRouter();
 
   const privilegeEscalation = async (redirect?: string) => {
     await update({ user: { mode: 'root' } });
-    globalThis.location.href = redirect || '/admin/control/root';
+    router.push(redirect || '/admin/control/root');
   };
 
   const privilegeDemotion = async (redirect?: string) => {
     await update({ user: { mode: 'user' } });
-    globalThis.location.href = redirect || '/admin/control';
-  }
+    router.push(redirect || '/admin/control');
+  };
 
-  const navItems: NavItem[] = useMemo(() => {
+  const navItems: NavItem[] = (() => {
     if (session?.user) { // ログイン必須なので、session.userは必ず存在する
       if (session.user.isSudoer) {
         if (session.user.mode === 'root') {
@@ -53,7 +55,7 @@ export default function Header() {
             ...baseNavItems.map(item =>
               item.mode === 'user'
                 ? { ...item, onClick: () => privilegeDemotion(item.href) }
-                : { ...item }
+                : { ...item },
             ),
           ];
         } else if (session.user.mode === 'user') {
@@ -67,16 +69,16 @@ export default function Header() {
       }
     }
     return [];
-  }, [session]);
+  })();
 
   useEffect(() => {
     const handleScroll = () => {
-      setIsScrolled(window.scrollY > 10)
-    }
+      setIsScrolled(window.scrollY > 10);
+    };
 
-    window.addEventListener('scroll', handleScroll)
-    return () => window.removeEventListener('scroll', handleScroll)
-  }, [])
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   return (
     <header
@@ -146,5 +148,5 @@ export default function Header() {
         </motion.div>
       )}
     </header>
-  )
+  );
 }

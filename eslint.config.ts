@@ -1,56 +1,40 @@
-import * as path from 'node:path';
-import { fileURLToPath } from 'node:url';
-
-import * as js from '@eslint/js';
 import { defineConfig } from 'eslint/config';
-import { fixupConfigRules } from '@eslint/compat';
-import { FlatCompat } from '@eslint/eslintrc';
 
-// eslint plugins
+// ESLint plugins
+import js from '@eslint/js';
+import nextVitals from 'eslint-config-next/core-web-vitals';
+import nextTs from 'eslint-config-next/typescript';
+
 import stylistic from '@stylistic/eslint-plugin';
+import tsdoc from 'eslint-plugin-tsdoc';
 import unicorn from 'eslint-plugin-unicorn';
-import * as globals from 'globals';
-
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-const compat = new FlatCompat({
-  baseDirectory: __dirname,
-  recommendedConfig: js.configs.recommended,
-  allConfig: js.configs.all
-});
-
 
 export default defineConfig([
+  js.configs.recommended,
   unicorn.configs.recommended,
+  ...nextVitals,
+  ...nextTs,
   {
-    files: ['**/*.{js,mjs,cjs,ts,tsx}'],
-
-    extends: fixupConfigRules(compat.extends(
-      'next/core-web-vitals',
-      'next/typescript',
-    )),
-
+    files: ['src/**/*.{js,mjs,cjs,ts,tsx}', 'eslint.config.ts'],
     plugins: {
       '@stylistic': stylistic,
+      'tsdoc': tsdoc,
     },
-
-    languageOptions: {
-      globals: {
-        ...globals.node,
-      },
-      ecmaVersion: 2024,
-      sourceType: 'module',
-    },
-
-    settings: {
-    },
-
     rules: {
+      'arrow-spacing': 'error',
+      'comma-dangle': ['error', 'always-multiline'],
+      'comma-spacing': 'error',
+      'keyword-spacing': 'error',
       'max-len': ['warn', { code: 120 }],
       'new-cap': ['error', { capIsNew: false }],
+      'no-extra-semi': 'error',
+      'no-trailing-spaces': 'error',
       'object-curly-spacing': ['error', 'always'],
-      'require-jsdoc': 'off',
+      'require-jsdoc': 'off', // 経過措置
+      'semi': ['error', 'always'],
+      'space-before-blocks': 'error',
+      'space-in-parens': ['error', 'never'],
+      'space-infix-ops': 'error',
 
       '@stylistic/indent': ['error', 2],
       '@stylistic/quotes': ['error', 'single'],
@@ -63,10 +47,17 @@ export default defineConfig([
         },
       ],
 
+      'react/jsx-tag-spacing': ['error', { beforeSelfClosing: 'always' }],
+
+      'react-hooks/set-state-in-effect': 'off',
+
+      'sonarjs/no-unused-vars': 'off', // 競合回避のため
+
+      'tsdoc/syntax': 'error',
+
       'unicorn/catch-error-name': ['error', { name: 'e' }],
       'unicorn/expiring-todo-comments': 'off',
       'unicorn/filename-case': ['error', { cases: { camelCase: true } }],
-      'unicorn/no-empty-file': 'off',
       'unicorn/no-negated-condition': 'off',
       'unicorn/no-null': 'off',
       'unicorn/prevent-abbreviations': [
@@ -77,7 +68,7 @@ export default defineConfig([
             'e': true,
             'str': true,
             'utils': true,
-          }
+          },
         },
       ],
     },

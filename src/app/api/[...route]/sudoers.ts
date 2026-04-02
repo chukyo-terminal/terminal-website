@@ -7,7 +7,7 @@ import { PostgresError } from 'pg-error-enum';
 
 import {
   SudoersApiDeleteResponseSchema, SudoersApiGetResponseSchema,
-  SudoersApiPostRequestSchema, SudoersApiPostResponseSchema
+  SudoersApiPostRequestSchema, SudoersApiPostResponseSchema,
 } from '@/api-schemas/sudoers';
 import { sudoersTable } from '@/db/schema';
 import { db } from '@/lib/drizzle';
@@ -69,5 +69,5 @@ const app = new Hono()
     }));
   });
 
-  
+
 export default app;

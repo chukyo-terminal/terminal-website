@@ -17,11 +17,11 @@ type ModalProperties = {
 /**
  * モーダルコンポーネントを定義する。
  *
- * @param isOpen モーダルが開いているかどうか
- * @param onRequestClose モーダルを閉じるための関数
- * @param contentLabel モーダルの内容を説明するラベル
- * @param children モーダル内に表示するコンテンツ
- * @return モーダルコンポーネント
+ * @param isOpen - モーダルが開いているかどうか
+ * @param onRequestClose - モーダルを閉じるための関数
+ * @param contentLabel - モーダルの内容を説明するラベル
+ * @param children - モーダル内に表示するコンテンツ
+ * @returns モーダルコンポーネント
  */
 export default function Modal({ isOpen, onRequestClose, contentLabel, children }: ModalProperties): JSX.Element {
   return (
