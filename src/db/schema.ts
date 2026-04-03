@@ -221,3 +221,55 @@ export const achievementsTable = pgTable(
     check('valid_achievement', sql`(${table.postId} IS NOT NULL) OR (${table.description} IS NOT NULL)`),
   ],
 );
+
+
+/**
+ * 問い合わせテーブル
+ */
+export const contactsTable = pgTable(
+  'contacts',
+  {
+    /** 問い合わせID（自動生成連番） */
+    id: integer().primaryKey().generatedAlwaysAsIdentity(),
+    /** 名前 */
+    name: text().notNull(),
+    /** メールアドレス */
+    email: varchar({ length: 254 }).notNull(),
+    /** 件名 */
+    subject: text().notNull(),
+    /** 内容 */
+    content: text().notNull(),
+    /** 担当者 */
+    assignedTo: integer('assigned_to').references(() => usersTable.id, { onDelete: 'set null' }),
+    /** 完了日時 */
+    completedAt: timestamp('completed_at', { mode: 'date', precision: 3, withTimezone: true }),
+    /** 作成日時 */
+    createdAt: timestamp('created_at', { mode: 'date', precision: 3, withTimezone: true }).notNull().defaultNow(),
+    /** 更新日時 */
+    updatedAt: timestamp('updated_at', { mode: 'date', precision: 3, withTimezone: true }).notNull().defaultNow().$onUpdateFn(() => new Date()),
+  },
+);
+
+
+/**
+ * 問い合わせ返信テーブル
+ */
+export const contactRepliesTable = pgTable(
+  'contact_replies',
+  {
+    /** 問い合わせ返信ID（自動生成連番） */
+    id: integer().primaryKey().generatedAlwaysAsIdentity(),
+    /** 問い合わせID */
+    contactId: integer('contact_id').notNull().references(() => contactsTable.id, { onDelete: 'cascade' }),
+    /** 返信者（nullの場合は問い合わせを行なったものであることを示す） */
+    authorId: integer('author_id').references(() => usersTable.id, { onDelete: 'set null' }),
+    /** 件名 */
+    subject: text().notNull(),
+    /** 内容 */
+    content: text().notNull(),
+    /** 作成日時 */
+    createdAt: timestamp('created_at', { mode: 'date', precision: 3, withTimezone: true }).notNull().defaultNow(),
+    /** 更新日時 */
+    updatedAt: timestamp('updated_at', { mode: 'date', precision: 3, withTimezone: true }).notNull().defaultNow().$onUpdateFn(() => new Date()),
+  },
+);

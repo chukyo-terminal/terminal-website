@@ -10,6 +10,28 @@ CREATE TABLE "achievements" (
 	CONSTRAINT "valid_achievement" CHECK (("achievements"."post_id" IS NOT NULL) OR ("achievements"."description" IS NOT NULL))
 );
 --> statement-breakpoint
+CREATE TABLE "contact_replies" (
+	"id" integer PRIMARY KEY GENERATED ALWAYS AS IDENTITY (sequence name "contact_replies_id_seq" INCREMENT BY 1 MINVALUE 1 MAXVALUE 2147483647 START WITH 1 CACHE 1),
+	"contact_id" integer NOT NULL,
+	"author_id" integer,
+	"subject" text NOT NULL,
+	"content" text NOT NULL,
+	"created_at" timestamp (3) with time zone DEFAULT now() NOT NULL,
+	"updated_at" timestamp (3) with time zone DEFAULT now() NOT NULL
+);
+--> statement-breakpoint
+CREATE TABLE "contacts" (
+	"id" integer PRIMARY KEY GENERATED ALWAYS AS IDENTITY (sequence name "contacts_id_seq" INCREMENT BY 1 MINVALUE 1 MAXVALUE 2147483647 START WITH 1 CACHE 1),
+	"name" text NOT NULL,
+	"email" varchar(254) NOT NULL,
+	"subject" text NOT NULL,
+	"content" text NOT NULL,
+	"assigned_to" integer,
+	"completed_at" timestamp (3) with time zone,
+	"created_at" timestamp (3) with time zone DEFAULT now() NOT NULL,
+	"updated_at" timestamp (3) with time zone DEFAULT now() NOT NULL
+);
+--> statement-breakpoint
 CREATE TABLE "post_contents" (
 	"post_id" integer NOT NULL,
 	"identifier" integer GENERATED ALWAYS AS IDENTITY (sequence name "post_contents_identifier_seq" INCREMENT BY 1 MINVALUE 1 MAXVALUE 2147483647 START WITH 1 CACHE 1),
@@ -86,6 +108,9 @@ CREATE TABLE "users" (
 );
 --> statement-breakpoint
 ALTER TABLE "achievements" ADD CONSTRAINT "achievements_post_id_posts_id_fk" FOREIGN KEY ("post_id") REFERENCES "public"."posts"("id") ON DELETE set null ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "contact_replies" ADD CONSTRAINT "contact_replies_contact_id_contacts_id_fk" FOREIGN KEY ("contact_id") REFERENCES "public"."contacts"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "contact_replies" ADD CONSTRAINT "contact_replies_author_id_users_id_fk" FOREIGN KEY ("author_id") REFERENCES "public"."users"("id") ON DELETE set null ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "contacts" ADD CONSTRAINT "contacts_assigned_to_users_id_fk" FOREIGN KEY ("assigned_to") REFERENCES "public"."users"("id") ON DELETE set null ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "post_contents" ADD CONSTRAINT "post_contents_post_id_posts_id_fk" FOREIGN KEY ("post_id") REFERENCES "public"."posts"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "post_reviews" ADD CONSTRAINT "post_reviews_reviewer_id_users_id_fk" FOREIGN KEY ("reviewer_id") REFERENCES "public"."users"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "post_reviews" ADD CONSTRAINT "post_reviews_post_id_post_identifier_post_contents_post_id_identifier_fk" FOREIGN KEY ("post_id","post_identifier") REFERENCES "public"."post_contents"("post_id","identifier") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
