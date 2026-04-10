@@ -2,9 +2,9 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
 
-import { and, asc, desc, eq, isNotNull, sql } from 'drizzle-orm';
+import { eq } from 'drizzle-orm';
 
-import { postContentsTable, postsTable, postTagsTable, tagsTable, usersTable } from '@/db/schema';
+import { publishedPostsView } from '@/db/schema';
 import { db } from '@/lib/drizzle';
 import { markdownIt } from '@/lib/markdown-it';
 import './styles.css';
@@ -19,20 +19,12 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const { slug } = await params;
   const postMeta = await db
     .select({
-      title: postContentsTable.title,
-      description: postContentsTable.description,
+      title: publishedPostsView.title,
+      description: publishedPostsView.description,
     })
-    .from(postsTable)
-    .innerJoin(postContentsTable, eq(postsTable.id, postContentsTable.postId))
-    .where(and(
-      eq(postsTable.slug, slug),
-      eq(postsTable.isPrivate, false),
-      eq(postContentsTable.isPrivate, false),
-      isNotNull(postContentsTable.publishedAt),
-    ))
-    .orderBy(desc(postContentsTable.identifier))
-    .limit(1)
-    .then((result) => result.at(0));
+    .from(publishedPostsView)
+    .where(eq(publishedPostsView.slug, slug))
+    .then((result) => result.at(0)); // XXX: `result[0]` とすると型が `T | undefined` にならないため、`result.at(0)` としている
 
   if (!postMeta) {
     return {
@@ -57,53 +49,29 @@ const formatDate = (date: Date | null): string => date ? date.toLocaleDateString
 
 export default async function Post({ params }: { params: Promise<{ slug: string }> }): Promise<JSX.Element> {
   const { slug } = await params;
-  const tagJsonAgg = sql<{ name: string; slug: string }[]>`json_agg(json_build_object('name', ${tagsTable.name}, 'slug', ${tagsTable.slug}))`.as('tags');
-  const tagQuery = db
-    .select({ tags: tagJsonAgg })
-    .from(postTagsTable)
-    .innerJoin(tagsTable, eq(postTagsTable.tagId, tagsTable.id))
-    .where(eq(postTagsTable.postId, postsTable.id))
-    .as('tags');
-  const originalPostContentQuery = db
-    .select({ publishedAt: postContentsTable.publishedAt })
-    .from(postContentsTable)
-    .where(eq(postContentsTable.postId, postsTable.id))
-    .orderBy(asc(postContentsTable.identifier))
-    .limit(1)
-    .as('original_post_contents');
   const post = await db
     .select({
-      id: postsTable.id,
-      slug: postsTable.slug,
-      authorName: usersTable.name,
-      authorDisplayName: usersTable.displayName,
-      title: postContentsTable.title,
-      description: postContentsTable.description,
-      content: postContentsTable.content,
-      publishedAt: originalPostContentQuery.publishedAt,
-      lastUpdatedAt: postContentsTable.publishedAt,
-      tags: tagQuery.tags,
+      id: publishedPostsView.id,
+      slug: publishedPostsView.slug,
+      author: {
+        id: publishedPostsView.authorId,
+        name: publishedPostsView.authorName,
+        displayName: publishedPostsView.authorDisplayName,
+      },
+      title: publishedPostsView.title,
+      description: publishedPostsView.description,
+      content: publishedPostsView.content,
+      tags: publishedPostsView.tags,
+      publishedAt: publishedPostsView.publishedAt,
+      updatedAt: publishedPostsView.updatedAt,
+      hasDraft: publishedPostsView.hasDraft,
     })
-    .from(postsTable)
-    .innerJoin(usersTable, eq(postsTable.authorId, usersTable.id))
-    .innerJoin(postContentsTable, eq(postsTable.id, postContentsTable.postId))
-    .leftJoinLateral(tagQuery, sql`TRUE`)
-    .leftJoinLateral(originalPostContentQuery, sql`TRUE`)
-    .where(and(
-      eq(postsTable.slug, slug),
-      eq(postsTable.isPrivate, false),
-      eq(postContentsTable.isPrivate, false),
-      isNotNull(postContentsTable.publishedAt),
-    ))
-    .orderBy(desc(postContentsTable.identifier))
-    .limit(1)
+    .from(publishedPostsView)
+    .where(eq(publishedPostsView.slug, slug))
     .then((result) => result.at(0)); // XXX: `result[0]` とすると型が `T | undefined` にならないため、`result.at(0)` としている
   if (!post) {
     notFound();
   }
-
-  const author = post.authorDisplayName ?? post.authorName;
-  const tags = Array.isArray(post.tags) ? post.tags : [];
 
   return (
     <div className="space-y-8 z-50 pt-20">
@@ -112,15 +80,15 @@ export default async function Post({ params }: { params: Promise<{ slug: string 
           {post.title}
         </h1>
         <div className="text-sm text-gray-400 ml-4">
-          <p className="mt-0! mb-1!">著者: {author}</p>
+          <p className="mt-0! mb-1!">著者: {post.author.displayName || post.author.name}</p>
           <div className="flex space-x-4">
             <p className="my-0!">投稿日: {formatDate(post.publishedAt)}</p>
-            <p className="my-0!">最終更新日: {formatDate(post.lastUpdatedAt)}</p>
+            <p className="my-0!">最終更新日: {formatDate(post.updatedAt)}</p>
           </div>
         </div>
       </div>
       <div className="flex flex-wrap gap-x-3 gap-y-1">
-        {tags.map((tag) => (
+        {post.tags.map((tag) => (
           <Link key={tag.slug} href={`/posts?tags=${tag.slug}`} className="text-emerald-300 hover:text-emerald-200 hover:underline">
             #{tag.name}
           </Link>
