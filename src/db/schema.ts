@@ -1,5 +1,10 @@
-import { sql } from 'drizzle-orm';
-import { boolean, char, check, date, foreignKey, integer, pgEnum, pgTable, primaryKey, text, timestamp, varchar } from 'drizzle-orm/pg-core';
+import { and, asc, desc, eq, isNull, isNotNull, sql, ne } from 'drizzle-orm';
+import {
+  boolean, char, check, date, foreignKey, integer,
+  pgEnum, pgTable, pgView, primaryKey, text, timestamp, varchar,
+} from 'drizzle-orm/pg-core';
+
+import { as } from '@/lib/drizzle';
 
 
 /**
@@ -221,3 +226,59 @@ export const achievementsTable = pgTable(
     check('valid_achievement', sql`(${table.postId} IS NOT NULL) OR (${table.description} IS NOT NULL)`),
   ],
 );
+
+
+/**
+ * 公開済み投稿ビュー
+ */
+export const publishedPostsView = pgView('published_posts_view').as((qb) => {
+  const tagJsonAgg = sql<{ name: string; slug: string }[]>`COALESCE(JSONB_AGG(JSONB_BUILD_OBJECT('name', ${tagsTable.name}, 'slug', ${tagsTable.slug})), '[]'::JSONB)`.as('tag_agg');
+  const tagQuery = qb
+    .select({ tags: tagJsonAgg })
+    .from(postTagsTable)
+    .innerJoin(tagsTable, eq(postTagsTable.tagId, tagsTable.id))
+    .where(eq(postTagsTable.postId, postsTable.id))
+    .as('tags');
+  const originalPostContentQuery = qb
+    .select({ publishedAt: postContentsTable.publishedAt })
+    .from(postContentsTable)
+    .where(eq(postContentsTable.postId, postsTable.id))
+    .orderBy(asc(postContentsTable.identifier))
+    .limit(1)
+    .as('original_post_contents');
+  const draftQuery = qb
+    .select({ hasDraft: isNull(postContentsTable.publishedAt).as('has_draft') })
+    .from(postContentsTable)
+    .where(eq(postContentsTable.postId, postsTable.id))
+    .orderBy(desc(postContentsTable.identifier))
+    .limit(1)
+    .as('draft_query');
+  return (
+    qb.selectDistinctOn([postsTable.id], {
+      id: postsTable.id,
+      slug: postsTable.slug,
+      authorId: as(usersTable.id, 'author_id'),
+      authorName: as(usersTable.name, 'author_name'),
+      authorDisplayName: as(usersTable.displayName, 'author_display_name'),
+      title: as(postContentsTable.title, 'title'), // XXX: asしないとDrizzle側でundefinedになる
+      description: as(postContentsTable.description, 'description'), // XXX: asしないとDrizzle側でundefinedになる
+      content: as(postContentsTable.content, 'content'),
+      tags: tagQuery.tags,
+      publishedAt: originalPostContentQuery.publishedAt,
+      updatedAt: as(postContentsTable.publishedAt, 'updated_at'),
+      hasDraft: draftQuery.hasDraft,
+    })
+      .from(postsTable)
+      .innerJoin(usersTable, eq(postsTable.authorId, usersTable.id))
+      .innerJoin(postContentsTable, eq(postsTable.id, postContentsTable.postId))
+      .leftJoinLateral(tagQuery, sql`TRUE`)
+      .leftJoinLateral(originalPostContentQuery, sql`TRUE`)
+      .leftJoinLateral(draftQuery, sql`TRUE`)
+      .where(and(
+        ne(postsTable.isPrivate, true),
+        ne(postContentsTable.isPrivate, true),
+        isNotNull(postContentsTable.publishedAt),
+      ))
+      .orderBy(desc(postsTable.id), desc(postContentsTable.identifier))
+  );
+});
