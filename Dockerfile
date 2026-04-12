@@ -1,5 +1,5 @@
 # ビルド環境
-FROM node:krypton-trixie@sha256:dcc3e56b82427ddc3b91ca2b18499450d670fc58251d944e5107d8ef2899f841 AS builder
+FROM node:krypton-trixie@sha256:e4ceb04a1f1dd4823a1ab6ef8d2182c09d6299b507c70f20bd0eb9921a78354d AS builder
 
 WORKDIR /app
 
