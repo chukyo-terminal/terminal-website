@@ -40,11 +40,19 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 
 
 /**
- * 日付をフォーマットする。
- * @param date - フォーマットする日付。
- * @returns フォーマットされた日付文字列。nullの場合は `-` を返す。
+ * 日時をフォーマットする。
+ * @param date - フォーマットする日時。
+ * @returns フォーマット済みの日時文字列。null の場合は `-` を返す。
  */
-const formatDate = (date: Date | null): string => date ? date.toLocaleDateString('ja-JP') : '-';
+const formatDate = (date: Date | null): string => date ? (
+  new Intl.DateTimeFormat('ja-JP', {
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+  }).format(date)
+) : '-';
 
 
 export default async function Post({ params }: { params: Promise<{ slug: string }> }): Promise<JSX.Element> {
@@ -82,8 +90,14 @@ export default async function Post({ params }: { params: Promise<{ slug: string 
         <div className="text-sm text-gray-400 ml-4">
           <p className="mt-0! mb-1!">著者: {post.author.displayName || post.author.name}</p>
           <div className="flex space-x-4">
-            <p className="my-0!">投稿日: {formatDate(post.publishedAt)}</p>
-            <p className="my-0!">最終更新日: {formatDate(post.updatedAt)}</p>
+            <p className="my-0!">
+              投稿日: <time dateTime={post.publishedAt!.toISOString()}>{formatDate(post.publishedAt)}</time>
+            </p>
+            {post.publishedAt!.getTime() !== post.updatedAt!.getTime() && (
+              <p className="my-0!">
+                最終更新日: <time dateTime={post.updatedAt!.toISOString()}>{formatDate(post.updatedAt)}</time>
+              </p>
+            )}
           </div>
         </div>
       </div>

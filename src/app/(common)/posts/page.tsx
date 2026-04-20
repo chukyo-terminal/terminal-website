@@ -1,9 +1,9 @@
 import Link from 'next/link';
 
-import { and, arrayContains, desc, eq, exists, inArray, isNotNull, sql } from 'drizzle-orm';
+import { arrayContains, inArray, sql } from 'drizzle-orm';
 import { Code } from 'lucide-react';
 
-import { postContentsTable, postsTable, postTagsTable, tagsTable, publishedPostsView } from '@/db/schema';
+import { tagsTable, publishedPostsView } from '@/db/schema';
 import { db } from '@/lib/drizzle';
 
 import type { JSX } from 'react';
@@ -17,11 +17,19 @@ export const metadata: Metadata = {
 
 
 /**
- * 日付をフォーマットする。
- * @param date - フォーマットする日付。
- * @returns フォーマット済みの日付文字列。null の場合は `-` を返す。
+ * 日時をフォーマットする。
+ * @param date - フォーマットする日時。
+ * @returns フォーマット済みの日時文字列。null の場合は `-` を返す。
  */
-const formatDate = (date: Date | null): string => date ? date.toLocaleDateString('ja-JP') : '-';
+const formatDate = (date: Date | null): string => date ? (
+  new Intl.DateTimeFormat('ja-JP', {
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+  }).format(date)
+) : '-';
 
 
 type SearchParameters = {
