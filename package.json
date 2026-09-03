@@ -22,7 +22,7 @@
     "framer-motion": "13.1.1",
     "hono": "^4.13.5",
     "http-status-ts": "^2.0.1",
-    "lucide-react": "^1.37.0",
+    "lucide-react": "^1.38.0",
     "markdown-it": "^15.0.1",
     "next": "16.3.3",
     "next-auth": "^4.24.15",
