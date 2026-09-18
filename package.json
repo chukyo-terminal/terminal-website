@@ -19,7 +19,7 @@
     "@next/third-parties": "^16.3.3",
     "@types/markdown-it": "^14.2.0",
     "drizzle-orm": "^0.45.2",
-    "framer-motion": "13.1.1",
+    "framer-motion": "13.3.0",
     "hono": "^4.13.5",
     "http-status-ts": "^2.0.1",
     "lucide-react": "^1.37.0",
