@@ -7,7 +7,7 @@ export default function Footer({ className }: { className?: string }): JSX.Eleme
   return (
     <footer className={`bottom-0 w-full border-t border-gray-800 py-6 bg-gray-900 ${className}`}>
       <div className="container mx-auto px-4 text-center text-gray-400">
-        <p>&copy; 2025 Terminal. All rights reserved.</p>
+        <p>&copy; 2025-2026 Terminal. All rights reserved.</p>
       </div>
       <ScrollGear />
     </footer>
