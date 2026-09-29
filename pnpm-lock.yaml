@@ -10,7 +10,7 @@ importers:
     dependencies:
       '@hono/zod-validator':
         specifier: ^0.9.0
-        version: 0.9.0(hono@4.13.5)(zod@4.5.4)
+        version: 0.9.0(hono@4.13.9)(zod@4.5.4)
       '@next/third-parties':
         specifier: ^16.3.3
         version: 16.3.3(next@16.3.3(@babel/core@7.29.7(supports-color@7.2.0))(@types/node@24.12.0)(react-dom@19.2.8(react@19.2.8))(react@19.2.8))(react@19.2.8)
@@ -27,8 +27,8 @@ importers:
         specifier: 13.1.1
         version: 13.1.1(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
       hono:
-        specifier: ^4.13.5
-        version: 4.13.5
+        specifier: ^4.13.9
+        version: 4.13.9
       http-status-ts:
         specifier: ^2.0.1
         version: 2.0.1
@@ -2154,8 +2154,8 @@ packages:
   hermes-parser@0.25.1:
     resolution: {integrity: sha512-6pEjquH3rqaI6cYAXYPcz9MS4rY6R4ngRgrgfDshRptUZIc3lw0MCIJIGDj9++mfySOuPTHB4nrSW99BCvOPIA==}
 
-  hono@4.13.5:
-    resolution: {integrity: sha512-O6+/eCYRkzzzy0rPWwKLiGBR1nFuUPZynnwjxN1MBA62NNqbT0wQEzQyK2gSO5yDIDB336sXQleAhOHrzlYyKw==}
+  hono@4.13.9:
+    resolution: {integrity: sha512-7dMkQmZoC4E6F7AtaQSPhlWAdnBti+j7rreMZl8QB4jFiEhP9TWbGWUMi8WYzBCgmgulxuvLQupKqo+Co6Omyg==}
     engines: {node: '>=16.9.0'}
 
   http-status-ts@2.0.1:
@@ -3601,9 +3601,9 @@ snapshots:
       '@eslint/core': 0.17.0
       levn: 0.4.1
 
-  '@hono/zod-validator@0.9.0(hono@4.13.5)(zod@4.5.4)':
+  '@hono/zod-validator@0.9.0(hono@4.13.9)(zod@4.5.4)':
     dependencies:
-      hono: 4.13.5
+      hono: 4.13.9
       zod: 4.5.4
 
   '@humanfs/core@0.19.1': {}
@@ -5093,7 +5093,7 @@ snapshots:
     dependencies:
       hermes-estree: 0.25.1
 
-  hono@4.13.5: {}
+  hono@4.13.9: {}
 
   http-status-ts@2.0.1: {}
 
