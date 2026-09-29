@@ -16,7 +16,7 @@ RUN pnpm run build
 
 
 # 実行環境
-FROM gcr.io/distroless/nodejs24-debian13:nonroot@sha256:1e2c4183b84122745dc2236b9b43bee09c54db091044d593eb8f755a954ad22a AS runner
+FROM gcr.io/distroless/nodejs24-debian13:nonroot@sha256:774b7d020b24214835769e24c3544835526cd0288f0b094eae48e8b2c2429a79 AS runner
 
 WORKDIR /app
 
