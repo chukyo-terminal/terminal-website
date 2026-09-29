@@ -1,0 +1,2470 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Copyright (c) 2026 Chukyo University Terminal -->
+<Law
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:noNamespaceSchemaLocation="https://laws.e-gov.go.jp/file/XMLSchemaForJapaneseLaw_v3.xsd"
+  Era="Reiwa"
+  Year="8"
+  Num="1"
+  LawType="Act"
+  Lang="ja">
+  <LawNum>中京大学プログラミングサークルTerminal令和八年規則第一号</LawNum>
+  <LawBody>
+    <LawTitle
+      Abbrev="中京大学Terminal会則,CuT会則"
+    >中京大学プログラミングサークルTerminal会則</LawTitle>
+    <MainProvision Extract="false">
+      <Chapter Num="1">
+        <ChapterTitle>第一章　総則</ChapterTitle>
+        <Article Num="1">
+          <ArticleCaption>（名称）</ArticleCaption>
+          <ArticleTitle>第一条</ArticleTitle>
+          <Paragraph Num="1">
+            <ParagraphNum/>
+            <ParagraphSentence>
+              <Sentence Num="1">本会は、「中京大学プログラミングサークルTerminal」（以下「本会」という。）と称する。</Sentence>
+            </ParagraphSentence>
+          </Paragraph>
+          <Paragraph Num="2">
+            <ParagraphNum>２</ParagraphNum>
+            <ParagraphSentence>
+              <Sentence Num="1">本会の英語名称は、「Chukyo University Terminal」とする。</Sentence>
+            </ParagraphSentence>
+          </Paragraph>
+          <Paragraph Num="3">
+            <ParagraphNum>３</ParagraphNum>
+            <ParagraphSentence>
+              <Sentence Num="1">本会の略称は、「中京大学Terminal」及び「CuT」とする。</Sentence>
+            </ParagraphSentence>
+          </Paragraph>
+        </Article>
+        <Article Num="2">
+          <ArticleCaption>（目的）</ArticleCaption>
+          <ArticleTitle>第ニ条</ArticleTitle>
+          <Paragraph Num="1">
+            <ParagraphNum/>
+            <ParagraphSentence>
+              <Sentence Num="1">本会は、情報技術その他これに関連する分野について、会員相互の協力及び交流を通じて知識及び技術の向上を図るとともに、共同開発、技術情報の発信、各種イベントへの参加及び主催等を行い、もって会員の自主的な活動及び技術文化の発展に寄与することを目的とする。</Sentence>
+            </ParagraphSentence>
+          </Paragraph>
+        </Article>
+        <Article Num="3">
+          <ArticleCaption>（活動）</ArticleCaption>
+          <ArticleTitle>第三条</ArticleTitle>
+          <Paragraph Num="1">
+            <ParagraphNum/>
+            <ParagraphSentence>
+              <Sentence Num="1">本会は、前条の目的を達成するため、次に掲げる活動を行う。</Sentence>
+            </ParagraphSentence>
+            <Item Num="1">
+              <ItemTitle>一</ItemTitle>
+              <ItemSentence>
+                <Sentence Num="1">プログラミングその他情報技術に関する研究及び学習</Sentence>
+              </ItemSentence>
+            </Item>
+            <Item Num="2">
+              <ItemTitle>二</ItemTitle>
+              <ItemSentence>
+                <Sentence Num="1">ソフトウェア、ゲーム、Webサービスその他の成果物の共同開発</Sentence>
+              </ItemSentence>
+            </Item>
+            <Item Num="3">
+              <ItemTitle>三</ItemTitle>
+              <ItemSentence>
+                <Sentence Num="1">技術記事、解説記事、資料その他の技術情報の作成及び公開</Sentence>
+              </ItemSentence>
+            </Item>
+            <Item Num="4">
+              <ItemTitle>四</ItemTitle>
+              <ItemSentence>
+                <Sentence Num="1">勉強会、講演会、展示会、競技会、ハッカソンその他のイベントへの参加</Sentence>
+              </ItemSentence>
+            </Item>
+            <Item Num="5">
+              <ItemTitle>五</ItemTitle>
+              <ItemSentence>
+                <Sentence Num="1">技術交流会、勉強会、ハッカソンその他のイベントの企画及び主催</Sentence>
+              </ItemSentence>
+            </Item>
+            <Item Num="6">
+              <ItemTitle>六</ItemTitle>
+              <ItemSentence>
+                <Sentence Num="1">他の団体、教育機関、企業その他の組織との交流及び協力</Sentence>
+              </ItemSentence>
+            </Item>
+            <Item Num="7">
+              <ItemTitle>七</ItemTitle>
+              <ItemSentence>
+                <Sentence Num="1">前各号に掲げるもののほか、本会の目的を達成するために必要な活動</Sentence>
+              </ItemSentence>
+            </Item>
+          </Paragraph>
+        </Article>
+        <Article Num="4">
+          <ArticleCaption>（活動方針）</ArticleCaption>
+          <ArticleTitle>第四条</ArticleTitle>
+          <Paragraph Num="1">
+            <ParagraphNum/>
+            <ParagraphSentence>
+              <Sentence Num="1">本会は、会員の自主性を尊重し、営利を主たる目的とせず、会員相互の協力及び交流を重視して活動するものとする。</Sentence>
+            </ParagraphSentence>
+          </Paragraph>
+          <Paragraph Num="2">
+            <ParagraphNum>２</ParagraphNum>
+            <ParagraphSentence>
+              <Sentence Num="1">本会の活動においては、法令、大学その他の関係機関の規則及び本会則その他の規程を遵守しなければならない。</Sentence>
+            </ParagraphSentence>
+          </Paragraph>
+        </Article>
+        <Article Num="5">
+          <ArticleCaption>（本部）</ArticleCaption>
+          <ArticleTitle>第五条</ArticleTitle>
+          <Paragraph Num="1">
+            <ParagraphNum/>
+            <ParagraphSentence>
+              <Sentence Num="1">本会の本部は、中京大学豊田キャンパス（愛知県豊田市貝津町床立101）11号館4階コンピュータガーデンに置く。</Sentence>
+            </ParagraphSentence>
+          </Paragraph>
+        </Article>
+      </Chapter>
+      <Chapter Num="1">
+        <ChapterTitle>第二章　会員</ChapterTitle>
+        <Article Num="6">
+          <ArticleCaption>（会員資格）</ArticleCaption>
+          <ArticleTitle>第六条</ArticleTitle>
+          <Paragraph Num="1">
+            <ParagraphNum/>
+            <ParagraphSentence>
+              <Sentence Num="1">本会は、次の各号のすべてを満たし、本会の目的に賛同し、本会則を遵守する者を会員とする。</Sentence>
+            </ParagraphSentence>
+            <Item Num="1">
+              <ItemTitle>一</ItemTitle>
+              <ItemSentence>
+                <Sentence Num="1" Function="main">中京大学に学籍を有すること。</Sentence>
+                <Sentence Num="2" Function="proviso">ただし、課程、学年その他の在籍区分を問わない。</Sentence>
+              </ItemSentence>
+            </Item>
+            <Item Num="2">
+              <ItemTitle>二</ItemTitle>
+              <ItemSentence>
+                <Sentence Num="1">情報技術を主体的に学ぶ意思を有すること。</Sentence>
+              </ItemSentence>
+            </Item>
+          </Paragraph>
+          <Paragraph Num="2">
+            <ParagraphNum>２</ParagraphNum>
+            <ParagraphSentence>
+              <Sentence Num="1">会員は、活動会員、休眠会員又は制限会員のいずれかに区分する。</Sentence>
+            </ParagraphSentence>
+          </Paragraph>
+          <Paragraph Num="3">
+            <ParagraphNum>３</ParagraphNum>
+            <ParagraphSentence>
+              <Sentence Num="1">会員は、第一項に定める会員資格を有する限り、その会員資格を維持するものとする。</Sentence>
+            </ParagraphSentence>
+          </Paragraph>
+        </Article>
+        <Article Num="7">
+          <ArticleCaption>（入会）</ArticleCaption>
+          <ArticleTitle>第七条</ArticleTitle>
+          <Paragraph Num="1">
+            <ParagraphNum/>
+            <ParagraphSentence>
+              <Sentence Num="1">本会への入会を希望する者は、所定の方法により入会を申し込み、会長の承認を受けるものとする。</Sentence>
+            </ParagraphSentence>
+          </Paragraph>
+          <Paragraph Num="2">
+            <ParagraphNum>２</ParagraphNum>
+            <ParagraphSentence>
+              <Sentence Num="1">本会への入会を希望する者は、申込みの時点において、次の各号のすべてを満たしていなければならない。</Sentence>
+            </ParagraphSentence>
+            <Item Num="1">
+              <ItemTitle>一</ItemTitle>
+              <ItemSentence>
+                <Sentence Num="1">前条第一項に定める会員資格の要件を満たしていること。</Sentence>
+              </ItemSentence>
+            </Item>
+            <Item Num="2">
+              <ItemTitle>二</ItemTitle>
+              <ItemSentence>
+                <Sentence Num="1">休学していないこと。</Sentence>
+              </ItemSentence>
+            </Item>
+            <Item Num="3">
+              <ItemTitle>三</ItemTitle>
+              <ItemSentence>
+                <Sentence Num="1" Function="main">卒業直前学期でないこと。</Sentence>
+                <Sentence Num="2" Function="proviso">ただし、次年度に中京大学の上級課程に進学する見込みである者及び留年が確定している者を除く。</Sentence>
+              </ItemSentence>
+            </Item>
+            <Item Num="4">
+              <ItemTitle>四</ItemTitle>
+              <ItemSentence>
+                <Sentence Num="1">大学から受けた懲戒処分が継続中でないこと。</Sentence>
+              </ItemSentence>
+            </Item>
+            <Item Num="5">
+              <ItemTitle>五</ItemTitle>
+              <ItemSentence>
+                <Sentence Num="1">本会則その他の規程により制限会員となる事由又は除名事由に該当しないこと。</Sentence>
+              </ItemSentence>
+            </Item>
+            <Item Num="6">
+              <ItemTitle>六</ItemTitle>
+              <ItemSentence>
+                <Sentence Num="1">以前に本会を除名されていないこと。</Sentence>
+              </ItemSentence>
+            </Item>
+          </Paragraph>
+          <Paragraph Num="3">
+            <ParagraphNum>３</ParagraphNum>
+            <ParagraphSentence>
+              <Sentence Num="1">会長は、前項各号の要件を満たす者について、正当な理由なく入会を拒んではならない。</Sentence>
+            </ParagraphSentence>
+          </Paragraph>
+          <Paragraph Num="4">
+            <ParagraphNum>４</ParagraphNum>
+            <ParagraphSentence>
+              <Sentence Num="1">前項の規定にかかわらず、入会希望者が他団体（中京大学公認サークル及び部活動に限る。）に参加しており、その者の入会を認めることにより、他団体との重複所属者が本会の活動会員の過半数を占めると見込まれる場合には、会長は、入会を保留することができる。</Sentence>
+            </ParagraphSentence>
+          </Paragraph>
+          <Paragraph Num="5">
+            <ParagraphNum>５</ParagraphNum>
+            <ParagraphSentence>
+              <Sentence Num="1">前項により入会が保留となった事由が解消したときは、会長は、速やかに入会審査を再開するものとする。</Sentence>
+            </ParagraphSentence>
+          </Paragraph>
+        </Article>
+        <Article Num="8">
+          <ArticleCaption>（休眠会員）</ArticleCaption>
+          <ArticleTitle>第八条</ArticleTitle>
+          <Paragraph Num="1">
+            <ParagraphNum/>
+            <ParagraphSentence>
+              <Sentence Num="1">会員は、学業、就業、長期不在その他の事情により、本会の活動への継続的な参加が困難となった場合、所定の手続により休眠会員となることができる。</Sentence>
+            </ParagraphSentence>
+          </Paragraph>
+          <Paragraph Num="2">
+            <ParagraphNum>２</ParagraphNum>
+            <ParagraphSentence>
+              <Sentence Num="1">会員が12週間以上、本会が実施する活動に出席していない場合、執行委員会は、その会員の届出の有無にかかわらず、決議により当該会員を休眠会員とすることができる。</Sentence>
+            </ParagraphSentence>
+          </Paragraph>
+          <Paragraph Num="3">
+            <ParagraphNum>３</ParagraphNum>
+            <ParagraphSentence>
+              <Sentence Num="1">前項の規定により休眠会員とする場合、執行委員会は、当該会員に対し、その旨を通知するものとする。</Sentence>
+            </ParagraphSentence>
+          </Paragraph>
+          <Paragraph Num="4">
+            <ParagraphNum>４</ParagraphNum>
+            <ParagraphSentence>
+              <Sentence Num="1">休眠会員は、会員としての資格を維持するものとする。</Sentence>
+            </ParagraphSentence>
+          </Paragraph>
+          <Paragraph Num="5">
+            <ParagraphNum>５</ParagraphNum>
+            <ParagraphSentence>
+              <Sentence Num="1" Function="main">休眠会員は、原則として本会の通常の活動に参加し、又は執行委員会の委員その他の役職に就任することができない。</Sentence>
+              <Sentence Num="2" Function="proviso">ただし、執行委員会が認めた場合は、この限りでない。</Sentence>
+            </ParagraphSentence>
+          </Paragraph>
+          <Paragraph Num="6">
+            <ParagraphNum>６</ParagraphNum>
+            <ParagraphSentence>
+              <Sentence Num="1">休眠会員は、総会における議決権を有しない。</Sentence>
+            </ParagraphSentence>
+          </Paragraph>
+          <Paragraph Num="7">
+            <ParagraphNum>７</ParagraphNum>
+            <ParagraphSentence>
+              <Sentence Num="1">休眠会員は、総会の定足数の算定における会員数に含めない。</Sentence>
+            </ParagraphSentence>
+          </Paragraph>
+          <Paragraph Num="8">
+            <ParagraphNum>８</ParagraphNum>
+            <ParagraphSentence>
+              <Sentence Num="1">休眠会員は、本人の申出その他本会が定める手続により、活動会員に復帰することができる。</Sentence>
+            </ParagraphSentence>
+          </Paragraph>
+          <Paragraph Num="9">
+            <ParagraphNum>９</ParagraphNum>
+            <ParagraphSentence>
+              <Sentence Num="1">休眠会員の要件、申請、復帰その他必要な事項は、別に定める。</Sentence>
+            </ParagraphSentence>
+          </Paragraph>
+        </Article>
+        <Article Num="9">
+          <ArticleCaption>（制限会員）</ArticleCaption>
+          <ArticleTitle>第九条</ArticleTitle>
+          <Paragraph Num="1">
+            <ParagraphNum/>
+            <ParagraphSentence>
+              <Sentence Num="1">会員が次の各号のいずれかに該当するときは、執行委員会は、決議により、当該会員を制限会員とすることができる。</Sentence>
+            </ParagraphSentence>
+            <Item Num="1">
+              <ItemTitle>一</ItemTitle>
+              <ItemSentence>
+                <Sentence Num="1">中京大学から懲戒処分を受けたとき。</Sentence>
+              </ItemSentence>
+            </Item>
+            <Item Num="2">
+              <ItemTitle>二</ItemTitle>
+              <ItemSentence>
+                <Sentence Num="1">刑事裁判において、拘留又は拘禁刑に処する判決が確定したとき。</Sentence>
+              </ItemSentence>
+            </Item>
+            <Item Num="3">
+              <ItemTitle>三</ItemTitle>
+              <ItemSentence>
+                <Sentence Num="1">本会則その他本会の規程に違反し、執行委員会において活動の制限が必要であると決議されたとき。</Sentence>
+              </ItemSentence>
+            </Item>
+          </Paragraph>
+          <Paragraph Num="2">
+            <ParagraphNum>２</ParagraphNum>
+            <ParagraphSentence>
+              <Sentence Num="1">制限会員に対する活動の制限は、事案の内容、重大性、再発防止その他の事情を考慮して、執行委員会が決議により定める。</Sentence>
+            </ParagraphSentence>
+          </Paragraph>
+          <Paragraph Num="3">
+            <ParagraphNum>３</ParagraphNum>
+            <ParagraphSentence>
+              <Sentence Num="1">制限会員は、制限の内容に応じ、本会の活動への参加、役職への就任、情報システムその他本会の資産の利用、成果物へのアクセスその他の権利又は活動について制限を受ける。</Sentence>
+            </ParagraphSentence>
+          </Paragraph>
+          <Paragraph Num="4">
+            <ParagraphNum>４</ParagraphNum>
+            <ParagraphSentence>
+              <Sentence Num="1" Function="main">制限会員とする決議を行う場合、執行委員会は、原則として、当該会員に事前に通知し、弁明の機会を与えなければならない。</Sentence>
+              <Sentence Num="2" Function="proviso">ただし、緊急に制限を行う必要があると認められる場合は、この限りでない。</Sentence>
+            </ParagraphSentence>
+          </Paragraph>
+          <Paragraph Num="5">
+            <ParagraphNum>５</ParagraphNum>
+            <ParagraphSentence>
+              <Sentence Num="1">前項ただし書の規定により弁明の機会を与えずに制限した場合、執行委員会は、速やかに当該会員に弁明の機会を与え、その内容を踏まえて、制限の継続、変更又は解除について決議するものとする。</Sentence>
+            </ParagraphSentence>
+          </Paragraph>
+          <Paragraph Num="6">
+            <ParagraphNum>６</ParagraphNum>
+            <ParagraphSentence>
+              <Sentence Num="1">制限会員の期間は、決議の日から1年を超えることができない。</Sentence>
+            </ParagraphSentence>
+          </Paragraph>
+          <Paragraph Num="7">
+            <ParagraphNum>７</ParagraphNum>
+            <ParagraphSentence>
+              <Sentence Num="1">制限会員となった事由が消滅した場合、又は制限を継続する必要がないと執行委員会が認めた場合、執行委員会は、決議により制限を解除することができる。</Sentence>
+            </ParagraphSentence>
+          </Paragraph>
+          <Paragraph Num="8">
+            <ParagraphNum>８</ParagraphNum>
+            <ParagraphSentence>
+              <Sentence Num="1">制限の解除を求める会員は、執行委員会に対して解除を申請することができる。</Sentence>
+            </ParagraphSentence>
+          </Paragraph>
+          <Paragraph Num="9">
+            <ParagraphNum>９</ParagraphNum>
+            <ParagraphSentence>
+              <Sentence Num="1">執行委員会は、前項の申請を受けたときは、制限の必要性その他の事情を審査し、解除、変更又は継続について決議するものとする。</Sentence>
+            </ParagraphSentence>
+          </Paragraph>
+          <Paragraph Num="10">
+            <ParagraphNum>１０</ParagraphNum>
+            <ParagraphSentence>
+              <Sentence Num="1">制限会員となった日から1年を経過した場合、当該会員は、次条の規定により除名される。</Sentence>
+            </ParagraphSentence>
+          </Paragraph>
+          <Paragraph Num="11">
+            <ParagraphNum>１１</ParagraphNum>
+            <ParagraphSentence>
+              <Sentence Num="1">制限会員となった事由に係る事実認定に疑義があり、又は制限会員とする決議の過程において適切な手続が行われていなかった場合、執行委員会は、当該措置の撤回を決議することができる。</Sentence>
+            </ParagraphSentence>
+          </Paragraph>
+          <Paragraph Num="12">
+            <ParagraphNum>１２</ParagraphNum>
+            <ParagraphSentence>
+              <Sentence Num="1">制限の撤回を求める会員は、執行委員会に対して、当該措置の撤回を1回に限り請求することができる。</Sentence>
+            </ParagraphSentence>
+          </Paragraph>
+          <Paragraph Num="13">
+            <ParagraphNum>１３</ParagraphNum>
+            <ParagraphSentence>
+              <Sentence Num="1">執行委員会は、前項の請求を受けたときは、制限の必要性その他の事情を審査し、撤回について決議するものとする。</Sentence>
+            </ParagraphSentence>
+          </Paragraph>
+          <Paragraph Num="14">
+            <ParagraphNum>１４</ParagraphNum>
+            <ParagraphSentence>
+              <Sentence Num="1">前項により執行委員会が当該措置の撤回請求を却下したときは、当該会員は、総会に対して、当該措置の撤回を1回に限り請求することができる。</Sentence>
+            </ParagraphSentence>
+          </Paragraph>
+          <Paragraph Num="15">
+            <ParagraphNum>１５</ParagraphNum>
+            <ParagraphSentence>
+              <Sentence Num="1">総会は、前項の請求を受けたときは、制限の必要性その他の事情を審査し、撤回について決議するものとする。</Sentence>
+            </ParagraphSentence>
+          </Paragraph>
+        </Article>
+        <Article Num="10">
+          <ArticleCaption>（除名）</ArticleCaption>
+          <ArticleTitle>第十条</ArticleTitle>
+          <Paragraph Num="1">
+            <ParagraphNum/>
+            <ParagraphSentence>
+              <Sentence Num="1">会員が次の各号のいずれかに該当するときは、総会の決議により除名することができる。</Sentence>
+            </ParagraphSentence>
+            <Item Num="1">
+              <ItemTitle>一</ItemTitle>
+              <ItemSentence>
+                <Sentence Num="1">本会則その他の規程に重大に違反したとき。</Sentence>
+              </ItemSentence>
+            </Item>
+            <Item Num="2">
+              <ItemTitle>二</ItemTitle>
+              <ItemSentence>
+                <Sentence Num="1">本会の名誉又は信用を著しく損なったとき。</Sentence>
+              </ItemSentence>
+            </Item>
+            <Item Num="3">
+              <ItemTitle>三</ItemTitle>
+              <ItemSentence>
+                <Sentence Num="1">本会の活動を著しく妨害したとき。</Sentence>
+              </ItemSentence>
+            </Item>
+            <Item Num="4">
+              <ItemTitle>四</ItemTitle>
+              <ItemSentence>
+                <Sentence Num="1">制限会員となった日から1年を経過したとき。</Sentence>
+              </ItemSentence>
+            </Item>
+            <Item Num="5">
+              <ItemTitle>五</ItemTitle>
+              <ItemSentence>
+                <Sentence Num="1">制限会員とする措置の撤回を総会に対して請求し、その請求が却下されたとき。</Sentence>
+              </ItemSentence>
+            </Item>
+            <Item Num="6">
+              <ItemTitle>六</ItemTitle>
+              <ItemSentence>
+                <Sentence Num="1">大学の懲戒処分により中京大学の学籍を失ったとき。</Sentence>
+              </ItemSentence>
+            </Item>
+            <Item Num="7">
+              <ItemTitle>七</ItemTitle>
+              <ItemSentence>
+                <Sentence Num="1">刑事裁判において死刑の判決が確定したとき。</Sentence>
+              </ItemSentence>
+            </Item>
+            <Item Num="8">
+              <ItemTitle>八</ItemTitle>
+              <ItemSentence>
+                <Sentence Num="1">次に掲げる罪について有罪判決が確定したとき。</Sentence>
+              </ItemSentence>
+              <Subitem1 Num="1">
+                <Subitem1Title>イ</Subitem1Title>
+                <Subitem1Sentence>
+                  <Sentence Num="1">著作権法（昭和四十五年法律第四十八号）に規定する罪</Sentence>
+                </Subitem1Sentence>
+              </Subitem1>
+              <Subitem1 Num="2">
+                <Subitem1Title>ロ</Subitem1Title>
+                <Subitem1Sentence>
+                  <Sentence Num="1">不正アクセス行為の禁止等に関する法律（平成十一年法律第百二十八号）に規定する罪</Sentence>
+                </Subitem1Sentence>
+              </Subitem1>
+              <Subitem1 Num="3">
+                <Subitem1Title>ハ</Subitem1Title>
+                <Subitem1Sentence>
+                  <Sentence Num="1">刑法（明治四十年法律第四十五号）第二百三十四条の二に規定する電子計算機損壊等業務妨害罪</Sentence>
+                </Subitem1Sentence>
+              </Subitem1>
+              <Subitem1 Num="4">
+                <Subitem1Title>ニ</Subitem1Title>
+                <Subitem1Sentence>
+                  <Sentence Num="1">刑法（明治四十年法律第四十五号）第二百四十六条の二に規定する電子計算機使用詐欺罪</Sentence>
+                </Subitem1Sentence>
+              </Subitem1>
+            </Item>
+          </Paragraph>
+          <Paragraph Num="2">
+            <ParagraphNum>２</ParagraphNum>
+            <ParagraphSentence>
+              <Sentence Num="1">前項の決議を行う場合は、当該会員に弁明の機会を与えなければならない。</Sentence>
+            </ParagraphSentence>
+          </Paragraph>
+          <Paragraph Num="3">
+            <ParagraphNum>３</ParagraphNum>
+            <ParagraphSentence>
+              <Sentence Num="1">第一項の規定にかかわらず、第一項第四号又は第五号に該当した場合は、総会の追加の決議を要せず、当該会員は除名されたものとする。</Sentence>
+            </ParagraphSentence>
+          </Paragraph>
+          <Paragraph Num="4">
+            <ParagraphNum>４</ParagraphNum>
+            <ParagraphSentence>
+              <Sentence Num="1">第一項の規定により除名となった場合、執行委員会は、当該会員にその旨を通知するものとする。</Sentence>
+            </ParagraphSentence>
+          </Paragraph>
+          <Paragraph Num="5">
+            <ParagraphNum>５</ParagraphNum>
+            <ParagraphSentence>
+              <Sentence Num="1">第一項第八号の規定は、当該犯罪行為が本会の活動、設備、情報システム、成果物、会員その他本会と関係する事項に関連するか否かを問わず適用する。</Sentence>
+            </ParagraphSentence>
+          </Paragraph>
+        </Article>
+        <Article Num="11">
+          <ArticleCaption>（退会）</ArticleCaption>
+          <ArticleTitle>第十一条</ArticleTitle>
+          <Paragraph Num="1">
+            <ParagraphNum/>
+            <ParagraphSentence>
+              <Sentence Num="1">会員は、所定の方法により退会を届け出ることにより、任意に退会することができる。</Sentence>
+            </ParagraphSentence>
+          </Paragraph>
+        </Article>
+        <Article Num="12">
+          <ArticleCaption>（会員資格の喪失）</ArticleCaption>
+          <ArticleTitle>第十二条</ArticleTitle>
+          <Paragraph Num="1">
+            <ParagraphNum/>
+            <ParagraphSentence>
+              <Sentence Num="1">会員は、次の各号のいずれかに該当したとき、その資格を失う。</Sentence>
+            </ParagraphSentence>
+            <Item Num="1">
+              <ItemTitle>一</ItemTitle>
+              <ItemSentence>
+                <Sentence Num="1">中京大学の学籍を失ったとき。</Sentence>
+              </ItemSentence>
+            </Item>
+            <Item Num="2">
+              <ItemTitle>二</ItemTitle>
+              <ItemSentence>
+                <Sentence Num="1">退会したとき。</Sentence>
+              </ItemSentence>
+            </Item>
+            <Item Num="3">
+              <ItemTitle>三</ItemTitle>
+              <ItemSentence>
+                <Sentence Num="1">除名されたとき。</Sentence>
+              </ItemSentence>
+            </Item>
+            <Item Num="4">
+              <ItemTitle>四</ItemTitle>
+              <ItemSentence>
+                <Sentence Num="1">第六条第一項に定める会員資格の要件を満たさなくなったとき。</Sentence>
+              </ItemSentence>
+            </Item>
+          </Paragraph>
+          <Paragraph Num="2">
+            <ParagraphNum>２</ParagraphNum>
+            <ParagraphSentence>
+              <Sentence Num="1">会員資格の喪失は、前項各号に該当した時点において効力を生ずる。</Sentence>
+            </ParagraphSentence>
+          </Paragraph>
+        </Article>
+      </Chapter>
+      <Chapter Num="3">
+        <ChapterTitle>第三章　組織</ChapterTitle>
+        <Article Num="13">
+          <ArticleCaption>（組織）</ArticleCaption>
+          <ArticleTitle>第十三条</ArticleTitle>
+          <Paragraph Num="1">
+            <ParagraphNum/>
+            <ParagraphSentence>
+              <Sentence Num="1">本会に、次の機関及び組織を置く。</Sentence>
+            </ParagraphSentence>
+            <Item Num="1">
+              <ItemTitle>一</ItemTitle>
+              <ItemSentence>
+                <Sentence Num="1">総会</Sentence>
+              </ItemSentence>
+            </Item>
+            <Item Num="2">
+              <ItemTitle>二</ItemTitle>
+              <ItemSentence>
+                <Sentence Num="1">監査委員会</Sentence>
+              </ItemSentence>
+            </Item>
+            <Item Num="3">
+              <ItemTitle>三</ItemTitle>
+              <ItemSentence>
+                <Sentence Num="1">執行委員会</Sentence>
+              </ItemSentence>
+            </Item>
+            <Item Num="4">
+              <ItemTitle>四</ItemTitle>
+              <ItemSentence>
+                <Sentence Num="1">総務局</Sentence>
+              </ItemSentence>
+            </Item>
+            <Item Num="5">
+              <ItemTitle>五</ItemTitle>
+              <ItemSentence>
+                <Sentence Num="1">情報基盤局</Sentence>
+              </ItemSentence>
+            </Item>
+            <Item Num="6">
+              <ItemTitle>六</ItemTitle>
+              <ItemSentence>
+                <Sentence Num="1">開発局</Sentence>
+              </ItemSentence>
+            </Item>
+          </Paragraph>
+          <Paragraph Num="2">
+            <ParagraphNum>２</ParagraphNum>
+            <ParagraphSentence>
+              <Sentence Num="1">監査委員会及び執行委員会は、総会の下に置く。</Sentence>
+            </ParagraphSentence>
+          </Paragraph>
+          <Paragraph Num="3">
+            <ParagraphNum>３</ParagraphNum>
+            <ParagraphSentence>
+              <Sentence Num="1">総務局、情報基盤局及び開発局は、執行委員会の下に置く。</Sentence>
+            </ParagraphSentence>
+          </Paragraph>
+          <Paragraph Num="4">
+            <ParagraphNum>４</ParagraphNum>
+            <ParagraphSentence>
+              <Sentence Num="1">各局の下に課を置き、各課の下に班を置くことができる。</Sentence>
+            </ParagraphSentence>
+          </Paragraph>
+          <Paragraph Num="5">
+            <ParagraphNum>５</ParagraphNum>
+            <ParagraphSentence>
+              <Sentence Num="1">本会の組織は、総会の監督の下に運営され、各下部組織は、上位の機関又は組織の監督及び決議に従うものとする。</Sentence>
+            </ParagraphSentence>
+          </Paragraph>
+        </Article>
+        <Article Num="14">
+          <ArticleCaption>（総会）</ArticleCaption>
+          <ArticleTitle>第十四条</ArticleTitle>
+          <Paragraph Num="1">
+            <ParagraphNum/>
+            <ParagraphSentence>
+              <Sentence Num="1">総会は、本会の最高意思決定機関とする。</Sentence>
+            </ParagraphSentence>
+          </Paragraph>
+          <Paragraph Num="2">
+            <ParagraphNum>２</ParagraphNum>
+            <ParagraphSentence>
+              <Sentence Num="1">総会は、通常総会及び臨時総会とする。</Sentence>
+            </ParagraphSentence>
+          </Paragraph>
+          <Paragraph Num="3">
+            <ParagraphNum>３</ParagraphNum>
+            <ParagraphSentence>
+              <Sentence Num="1">通常総会は、各会計年度の4月及び1月に開催する。</Sentence>
+            </ParagraphSentence>
+          </Paragraph>
+          <Paragraph Num="4">
+            <ParagraphNum>４</ParagraphNum>
+            <ParagraphSentence>
+              <Sentence Num="1">臨時総会は、会長が必要と認めたとき、又は活動会員の5分の2以上から請求があったときに開催する。</Sentence>
+            </ParagraphSentence>
+          </Paragraph>
+          <Paragraph Num="5">
+            <ParagraphNum>５</ParagraphNum>
+            <ParagraphSentence>
+              <Sentence Num="1">会長は、前項の請求があった場合、遅滞なく臨時総会を招集しなければならない。</Sentence>
+            </ParagraphSentence>
+          </Paragraph>
+          <Paragraph Num="6">
+            <ParagraphNum>６</ParagraphNum>
+            <ParagraphSentence>
+              <Sentence Num="1">会長が正当な理由なく前項の招集を行わない場合は、請求を行った活動会員は、そのうちから総会を招集する者を定めることができる。</Sentence>
+            </ParagraphSentence>
+          </Paragraph>
+          <Paragraph Num="7">
+            <ParagraphNum>７</ParagraphNum>
+            <ParagraphSentence>
+              <Sentence Num="1">総会は、長期休暇並びに感染症及び災害を始めとする対面での開催が望ましくない状況を除き、原則として対面により行う。</Sentence>
+            </ParagraphSentence>
+          </Paragraph>
+        </Article>
+        <Article Num="15">
+          <ArticleCaption>（総会の権限）</ArticleCaption>
+          <ArticleTitle>第十五条</ArticleTitle>
+          <Paragraph Num="1">
+            <ParagraphNum/>
+            <ParagraphSentence>
+              <Sentence Num="1">総会は、次に掲げる事項を決議する。</Sentence>
+            </ParagraphSentence>
+            <Item Num="1">
+              <ItemTitle>一</ItemTitle>
+              <ItemSentence>
+                <Sentence Num="1">事業計画及び活動方針に関する事項</Sentence>
+              </ItemSentence>
+            </Item>
+            <Item Num="2">
+              <ItemTitle>二</ItemTitle>
+              <ItemSentence>
+                <Sentence Num="1">予算及び決算に関する事項</Sentence>
+              </ItemSentence>
+            </Item>
+            <Item Num="3">
+              <ItemTitle>三</ItemTitle>
+              <ItemSentence>
+                <Sentence Num="1">役員の選任及び解任</Sentence>
+              </ItemSentence>
+            </Item>
+            <Item Num="4">
+              <ItemTitle>四</ItemTitle>
+              <ItemSentence>
+                <Sentence Num="1">本会則の制定及び改廃</Sentence>
+              </ItemSentence>
+            </Item>
+            <Item Num="5">
+              <ItemTitle>五</ItemTitle>
+              <ItemSentence>
+                <Sentence Num="1">会員の除名</Sentence>
+              </ItemSentence>
+            </Item>
+            <Item Num="6">
+              <ItemTitle>六</ItemTitle>
+              <ItemSentence>
+                <Sentence Num="1">本会の解散</Sentence>
+              </ItemSentence>
+            </Item>
+            <Item Num="7">
+              <ItemTitle>七</ItemTitle>
+              <ItemSentence>
+                <Sentence Num="1">その他、本会の運営上重要な事項</Sentence>
+              </ItemSentence>
+            </Item>
+          </Paragraph>
+          <Paragraph Num="2">
+            <ParagraphNum>２</ParagraphNum>
+            <ParagraphSentence>
+              <Sentence Num="1" Function="main">執行委員会の決議事項は、総会の決議をもって代えることができる。</Sentence>
+              <Sentence Num="2" Function="proviso">ただし、本会則により執行委員会に専属的に認められた権限の行使を妨げない。</Sentence>
+            </ParagraphSentence>
+          </Paragraph>
+        </Article>
+        <Article Num="16">
+          <ArticleCaption>（総会の招集及び議長）</ArticleCaption>
+          <ArticleTitle>第十六条</ArticleTitle>
+          <Paragraph Num="1">
+            <ParagraphNum/>
+            <ParagraphSentence>
+              <Sentence Num="1" Function="main">総会は、会長が招集する。</Sentence>
+              <Sentence Num="2" Function="proviso">会長が欠け、又は職務を行うことができないときは、副会長がこれを代行する。</Sentence>
+            </ParagraphSentence>
+          </Paragraph>
+          <Paragraph Num="2">
+            <ParagraphNum>２</ParagraphNum>
+            <ParagraphSentence>
+              <Sentence Num="1">会長は、総会を開催する場合、その日時、場所及び議題を、原則として開催日の7日前までに会員に通知しなければならない。</Sentence>
+            </ParagraphSentence>
+          </Paragraph>
+          <Paragraph Num="3">
+            <ParagraphNum>３</ParagraphNum>
+            <ParagraphSentence>
+              <Sentence Num="1" Function="main">総会の議長は、議決権を有する出席活動会員のうちから、総会が選出する。</Sentence>
+              <Sentence Num="2" Function="proviso">ただし、議長選出までの議事進行は、会長が代行する。</Sentence>
+            </ParagraphSentence>
+          </Paragraph>
+          <Paragraph Num="4">
+            <ParagraphNum>４</ParagraphNum>
+            <ParagraphSentence>
+              <Sentence Num="1">会長が欠け、又は会長が議長代行を務めることができないときは、副会長が議長代行を務める。</Sentence>
+            </ParagraphSentence>
+          </Paragraph>
+          <Paragraph Num="5">
+            <ParagraphNum>５</ParagraphNum>
+            <ParagraphSentence>
+              <Sentence Num="1">会長及び副会長がともに議長代行を務めることができない場合は、総会において出席した役員のいずれかが議長代行を務める。</Sentence>
+            </ParagraphSentence>
+          </Paragraph>
+          <Paragraph Num="6">
+            <ParagraphNum>６</ParagraphNum>
+            <ParagraphSentence>
+              <Sentence Num="1" Function="main">議長については、執行委員会が推薦することができる。</Sentence>
+              <Sentence Num="2" Function="proviso">ただし、総会は、当該推薦に拘束されず議長を選出することができる。</Sentence>
+            </ParagraphSentence>
+          </Paragraph>
+          <Paragraph Num="7">
+            <ParagraphNum>７</ParagraphNum>
+            <ParagraphSentence>
+              <Sentence Num="1">議長が欠けたとき、又は議長に関する議案を審議するときは、別に選出された者が議長を務める。</Sentence>
+            </ParagraphSentence>
+          </Paragraph>
+        </Article>
+        <Article Num="17">
+          <ArticleCaption>（総会の成立及び議決）</ArticleCaption>
+          <ArticleTitle>第十七条</ArticleTitle>
+          <Paragraph Num="1">
+            <ParagraphNum/>
+            <ParagraphSentence>
+              <Sentence Num="1">総会は、活動会員の過半数の出席により成立する。</Sentence>
+            </ParagraphSentence>
+          </Paragraph>
+          <Paragraph Num="2">
+            <ParagraphNum>２</ParagraphNum>
+            <ParagraphSentence>
+              <Sentence Num="1">前項の出席には、総会の開催方法として認められた電磁的方法により参加した場合を含む。</Sentence>
+            </ParagraphSentence>
+          </Paragraph>
+          <Paragraph Num="3">
+            <ParagraphNum>３</ParagraphNum>
+            <ParagraphSentence>
+              <Sentence Num="1">休眠会員及び制限会員は、前項の定足数の算定に含めない。</Sentence>
+            </ParagraphSentence>
+          </Paragraph>
+          <Paragraph Num="4">
+            <ParagraphNum>４</ParagraphNum>
+            <ParagraphSentence>
+              <Sentence Num="1">総会の議事は、議決権を有する出席活動会員の過半数をもって決する。</Sentence>
+            </ParagraphSentence>
+          </Paragraph>
+          <Paragraph Num="5">
+            <ParagraphNum>５</ParagraphNum>
+            <ParagraphSentence>
+              <Sentence Num="1" Function="main">休眠会員及び制限会員は、総会に出席することができる。</Sentence>
+              <Sentence Num="2" Function="proviso">ただし、議決権を有せず、前項の議決における出席会員数に含まない。</Sentence>
+            </ParagraphSentence>
+          </Paragraph>
+          <Paragraph Num="6">
+            <ParagraphNum>６</ParagraphNum>
+            <ParagraphSentence>
+              <Sentence Num="1">議長は、通常の議決権を有しない。</Sentence>
+            </ParagraphSentence>
+          </Paragraph>
+          <Paragraph Num="7">
+            <ParagraphNum>７</ParagraphNum>
+            <ParagraphSentence>
+              <Sentence Num="1">可否同数の場合は、議長が決する。</Sentence>
+            </ParagraphSentence>
+          </Paragraph>
+          <Paragraph Num="8">
+            <ParagraphNum>８</ParagraphNum>
+            <ParagraphSentence>
+              <Sentence Num="1">前各項の規定にかかわらず、本会則の変更及び除名に関する議決は、議決権を有する出席活動会員の3分の2以上の賛成を必要とする。</Sentence>
+            </ParagraphSentence>
+          </Paragraph>
+          <Paragraph Num="9">
+            <ParagraphNum>９</ParagraphNum>
+            <ParagraphSentence>
+              <Sentence Num="1">前各項の規定にかかわらず、解散に関する議決は、議決権を有する出席活動会員の5分の4以上の賛成を必要とする。</Sentence>
+            </ParagraphSentence>
+          </Paragraph>
+          <Paragraph Num="10">
+            <ParagraphNum>１０</ParagraphNum>
+            <ParagraphSentence>
+              <Sentence Num="1" Function="main">議決は、挙手による投票を基本とする。</Sentence>
+              <Sentence Num="2" Function="proviso">ただし、役員及び議長に関する議決は、無記名投票による。</Sentence>
+            </ParagraphSentence>
+          </Paragraph>
+          <Paragraph Num="11">
+            <ParagraphNum>１１</ParagraphNum>
+            <ParagraphSentence>
+              <Sentence Num="1" Function="main">挙手による投票については、投票者ごとの投票内容を記録しないものとし、賛成又は反対のいずれかが必要な表決数に達していることが明らかな場合は、正確な投票数を計数しないことができる。</Sentence>
+              <Sentence Num="2" Function="proviso">ただし、議長が必要と認めた場合は、この限りでない。</Sentence>
+            </ParagraphSentence>
+          </Paragraph>
+          <Paragraph Num="12">
+            <ParagraphNum>１２</ParagraphNum>
+            <ParagraphSentence>
+              <Sentence Num="1">代理人による投票及び事前投票の方法その他必要な事項は、別に定める。</Sentence>
+              <Sentence Num="2">これらの投票の集計は、会場又は電磁的方法による出席者の投票のみでは可否が明らかとならない場合に限り行うものとする。</Sentence>
+            </ParagraphSentence>
+          </Paragraph>
+        </Article>
+        <Article Num="18">
+          <ArticleCaption>（総会の議事）</ArticleCaption>
+          <ArticleTitle>第十八条</ArticleTitle>
+          <Paragraph Num="1">
+            <ParagraphNum/>
+            <ParagraphSentence>
+              <Sentence Num="1">総会の開会後、出席数並びに定足数及び表決数の確認を行う。</Sentence>
+            </ParagraphSentence>
+          </Paragraph>
+          <Paragraph Num="2">
+            <ParagraphNum>２</ParagraphNum>
+            <ParagraphSentence>
+              <Sentence Num="1">前項の後、議長の選出を行う。</Sentence>
+            </ParagraphSentence>
+          </Paragraph>
+          <Paragraph Num="3">
+            <ParagraphNum>３</ParagraphNum>
+            <ParagraphSentence>
+              <Sentence Num="1">総会の議案は、執行委員会が事前に作成するものとし、その内容は、原則として総会開催日の7日前までに会員に共有しなければならない。</Sentence>
+            </ParagraphSentence>
+          </Paragraph>
+          <Paragraph Num="4">
+            <ParagraphNum>４</ParagraphNum>
+            <ParagraphSentence>
+              <Sentence Num="1">総会開催中の議案の追加若しくは修正並びに休会は、動議として議長に提出し、当該事項に必要な議決をもって決定するものとする。</Sentence>
+              <Sentence Num="2">動議の提出は、総会開催中に限り、口頭で行うことができる。</Sentence>
+            </ParagraphSentence>
+          </Paragraph>
+          <Paragraph Num="5">
+            <ParagraphNum>５</ParagraphNum>
+            <ParagraphSentence>
+              <Sentence Num="1" Function="main">議長は、必要に応じて休会を宣言することができる。</Sentence>
+              <Sentence Num="2" Function="proviso">ただし、翌日以降にわたる休会は、動議によらなければならない。</Sentence>
+            </ParagraphSentence>
+          </Paragraph>
+          <Paragraph Num="6">
+            <ParagraphNum>６</ParagraphNum>
+            <ParagraphSentence>
+              <Sentence Num="1">議長は、すべての議案及び動議の議決が終了したときは、閉会を宣言する。</Sentence>
+            </ParagraphSentence>
+          </Paragraph>
+        </Article>
+        <Article Num="19">
+          <ArticleCaption>（総会の議事録）</ArticleCaption>
+          <ArticleTitle>第十九条</ArticleTitle>
+          <Paragraph Num="1">
+            <ParagraphNum/>
+            <ParagraphSentence>
+              <Sentence Num="1">総会を開催したときは、議事録を作成しなければならない。</Sentence>
+            </ParagraphSentence>
+          </Paragraph>
+          <Paragraph Num="2">
+            <ParagraphNum>２</ParagraphNum>
+            <ParagraphSentence>
+              <Sentence Num="1">議事録には、開催日時、開催場所、出席者、議事の経過及び決議事項その他必要な事項を記載する。</Sentence>
+            </ParagraphSentence>
+          </Paragraph>
+          <Paragraph Num="3">
+            <ParagraphNum>３</ParagraphNum>
+            <ParagraphSentence>
+              <Sentence Num="1">議事録は、電磁的記録によるものを正本とする。</Sentence>
+            </ParagraphSentence>
+          </Paragraph>
+          <Paragraph Num="4">
+            <ParagraphNum>４</ParagraphNum>
+            <ParagraphSentence>
+              <Sentence Num="1" Function="main">議事録には、議長及び総会において選任された議事録署名人2名が、電磁的記録に対して電子署名を行う方法により署名する。</Sentence>
+              <Sentence Num="2" Function="proviso">ただし、出席した活動会員が2名未満の場合は、議事録署名人を1名とすることができる。</Sentence>
+            </ParagraphSentence>
+          </Paragraph>
+        </Article>
+        <Article Num="20">
+          <ArticleCaption>（監査委員会）</ArticleCaption>
+          <ArticleTitle>第二十条</ArticleTitle>
+          <Paragraph Num="1">
+            <ParagraphNum/>
+            <ParagraphSentence>
+              <Sentence Num="1">監査委員会は、総会の下に置かれ、本会の会計及び運営を監査する。</Sentence>
+            </ParagraphSentence>
+          </Paragraph>
+          <Paragraph Num="2">
+            <ParagraphNum>２</ParagraphNum>
+            <ParagraphSentence>
+              <Sentence Num="1">監査委員会に、会計監査2名及び運営監査2名を置く。</Sentence>
+            </ParagraphSentence>
+          </Paragraph>
+          <Paragraph Num="3">
+            <ParagraphNum>３</ParagraphNum>
+            <ParagraphSentence>
+              <Sentence Num="1">会計監査及び運営監査は、それぞれ独立してその担当する事項を監査する。</Sentence>
+            </ParagraphSentence>
+          </Paragraph>
+          <Paragraph Num="4">
+            <ParagraphNum>４</ParagraphNum>
+            <ParagraphSentence>
+              <Sentence Num="1">会計監査相互間及び運営監査相互間には、職務上の上下関係を設けない。</Sentence>
+            </ParagraphSentence>
+          </Paragraph>
+          <Paragraph Num="5">
+            <ParagraphNum>５</ParagraphNum>
+            <ParagraphSentence>
+              <Sentence Num="1">会計監査は、本会の収支、財産、会計処理、予算及び決算その他会計に関する事項を監査する。</Sentence>
+            </ParagraphSentence>
+          </Paragraph>
+          <Paragraph Num="6">
+            <ParagraphNum>６</ParagraphNum>
+            <ParagraphSentence>
+              <Sentence Num="1">運営監査は、本会の活動、組織運営、本会則及び規程の遵守状況、総会及び執行委員会その他の機関の運営その他会計に属さない事項を監査する。</Sentence>
+            </ParagraphSentence>
+          </Paragraph>
+          <Paragraph Num="7">
+            <ParagraphNum>７</ParagraphNum>
+            <ParagraphSentence>
+              <Sentence Num="1">監査委員は、監査に必要な範囲において、本会の各機関及び組織に対し、資料の提出、報告その他必要な協力を求めることができる。</Sentence>
+            </ParagraphSentence>
+          </Paragraph>
+          <Paragraph Num="8">
+            <ParagraphNum>８</ParagraphNum>
+            <ParagraphSentence>
+              <Sentence Num="1">監査委員は、監査の結果、改善その他の措置が必要であると認めたときは、その内容を総会又は執行委員会に報告し、必要な措置を求めることができる。</Sentence>
+            </ParagraphSentence>
+          </Paragraph>
+          <Paragraph Num="9">
+            <ParagraphNum>９</ParagraphNum>
+            <ParagraphSentence>
+              <Sentence Num="1">監査委員は、その監査の独立性を害するおそれのある職務を兼ねてはならない。</Sentence>
+            </ParagraphSentence>
+          </Paragraph>
+          <Paragraph Num="10">
+            <ParagraphNum>１０</ParagraphNum>
+            <ParagraphSentence>
+              <Sentence Num="1">監査委員会の監査結果は、少なくとも各会計年度に1回、総会に報告するものとする。</Sentence>
+            </ParagraphSentence>
+          </Paragraph>
+        </Article>
+        <Article Num="21">
+          <ArticleCaption>（執行委員会）</ArticleCaption>
+          <ArticleTitle>第二十一条</ArticleTitle>
+          <Paragraph Num="1">
+            <ParagraphNum/>
+            <ParagraphSentence>
+              <Sentence Num="1">執行委員会は、総会の下に置かれ、本会の日常的な運営及び総会の決議に基づく事項を執行する。</Sentence>
+            </ParagraphSentence>
+          </Paragraph>
+          <Paragraph Num="2">
+            <ParagraphNum>２</ParagraphNum>
+            <ParagraphSentence>
+              <Sentence Num="1">執行委員会に、次の委員を置く。</Sentence>
+            </ParagraphSentence>
+            <Item Num="1">
+              <ItemTitle>一</ItemTitle>
+              <ItemSentence>
+                <Column Num="1">
+                  <Sentence Num="1">会長</Sentence>
+                </Column>
+                <Column Num="2">
+                  <Sentence Num="1">1名</Sentence>
+                </Column>
+              </ItemSentence>
+            </Item>
+            <Item Num="2">
+              <ItemTitle>二</ItemTitle>
+              <ItemSentence>
+                <Column Num="1">
+                  <Sentence Num="1">副会長</Sentence>
+                </Column>
+                <Column Num="2">
+                  <Sentence Num="1">若干名</Sentence>
+                </Column>
+              </ItemSentence>
+            </Item>
+            <Item Num="3">
+              <ItemTitle>三</ItemTitle>
+              <ItemSentence>
+                <Column Num="1">
+                  <Sentence Num="1">法務</Sentence>
+                </Column>
+                <Column Num="2">
+                  <Sentence Num="1">1名</Sentence>
+                </Column>
+              </ItemSentence>
+            </Item>
+            <Item Num="4">
+              <ItemTitle>四</ItemTitle>
+              <ItemSentence>
+                <Column Num="1">
+                  <Sentence Num="1">会計</Sentence>
+                </Column>
+                <Column Num="2">
+                  <Sentence Num="1">1名</Sentence>
+                </Column>
+              </ItemSentence>
+            </Item>
+            <Item Num="5">
+              <ItemTitle>五</ItemTitle>
+              <ItemSentence>
+                <Column Num="1">
+                  <Sentence Num="1">総務局長</Sentence>
+                </Column>
+                <Column Num="2">
+                  <Sentence Num="1">1名</Sentence>
+                </Column>
+              </ItemSentence>
+            </Item>
+            <Item Num="6">
+              <ItemTitle>六</ItemTitle>
+              <ItemSentence>
+                <Column Num="1">
+                  <Sentence Num="1">情報基盤局長</Sentence>
+                </Column>
+                <Column Num="2">
+                  <Sentence Num="1">1名</Sentence>
+                </Column>
+              </ItemSentence>
+            </Item>
+            <Item Num="7">
+              <ItemTitle>七</ItemTitle>
+              <ItemSentence>
+                <Column Num="1">
+                  <Sentence Num="1">開発局長</Sentence>
+                </Column>
+                <Column Num="2">
+                  <Sentence Num="1">1名</Sentence>
+                </Column>
+              </ItemSentence>
+            </Item>
+            <Item Num="8">
+              <ItemTitle>八</ItemTitle>
+              <ItemSentence>
+                <Column Num="1">
+                  <Sentence Num="1">参与</Sentence>
+                </Column>
+                <Column Num="2">
+                  <Sentence Num="1">若干名</Sentence>
+                </Column>
+              </ItemSentence>
+            </Item>
+          </Paragraph>
+          <Paragraph Num="3">
+            <ParagraphNum>３</ParagraphNum>
+            <ParagraphSentence>
+              <Sentence Num="1">参与は、執行委員会の議決権を有しない。</Sentence>
+            </ParagraphSentence>
+          </Paragraph>
+          <Paragraph Num="4">
+            <ParagraphNum>４</ParagraphNum>
+            <ParagraphSentence>
+              <Sentence Num="1">参与は、執行委員会の求めに応じて、助言、調査その他必要な事項を行う。</Sentence>
+            </ParagraphSentence>
+          </Paragraph>
+          <Paragraph Num="5">
+            <ParagraphNum>５</ParagraphNum>
+            <ParagraphSentence>
+              <Sentence Num="1">執行委員会は、執行委員会の意思決定を行うため、運営会議を開催する。</Sentence>
+            </ParagraphSentence>
+          </Paragraph>
+        </Article>
+        <Article Num="22">
+          <ArticleCaption>（執行委員会の権限）</ArticleCaption>
+          <ArticleTitle>第二十二条</ArticleTitle>
+          <Paragraph Num="1">
+            <ParagraphNum/>
+            <ParagraphSentence>
+              <Sentence Num="1">執行委員会は、次に掲げる事項を処理する。</Sentence>
+            </ParagraphSentence>
+            <Item Num="1">
+              <ItemTitle>一</ItemTitle>
+              <ItemSentence>
+                <Sentence Num="1">総会の決議事項の執行</Sentence>
+              </ItemSentence>
+            </Item>
+            <Item Num="2">
+              <ItemTitle>二</ItemTitle>
+              <ItemSentence>
+                <Sentence Num="1">本会の日常的な活動の企画及び運営</Sentence>
+              </ItemSentence>
+            </Item>
+            <Item Num="3">
+              <ItemTitle>三</ItemTitle>
+              <ItemSentence>
+                <Sentence Num="1">活動に必要な予算の執行</Sentence>
+              </ItemSentence>
+            </Item>
+            <Item Num="4">
+              <ItemTitle>四</ItemTitle>
+              <ItemSentence>
+                <Sentence Num="1">各種イベントの企画及び運営</Sentence>
+              </ItemSentence>
+            </Item>
+            <Item Num="5">
+              <ItemTitle>五</ItemTitle>
+              <ItemSentence>
+                <Sentence Num="1">本会が公開する記事、資料その他の成果物に関する事項</Sentence>
+              </ItemSentence>
+            </Item>
+            <Item Num="6">
+              <ItemTitle>六</ItemTitle>
+              <ItemSentence>
+                <Sentence Num="1">会員の休眠会員への区分及び活動会員への復帰に関する事項</Sentence>
+              </ItemSentence>
+            </Item>
+            <Item Num="7">
+              <ItemTitle>七</ItemTitle>
+              <ItemSentence>
+                <Sentence Num="1">会員の制限会員への区分、制限内容の決定及び制限の解除に関する事項</Sentence>
+              </ItemSentence>
+            </Item>
+            <Item Num="8">
+              <ItemTitle>八</ItemTitle>
+              <ItemSentence>
+                <Sentence Num="1">各局及び各課の設置、改廃その他の組織に関する事項</Sentence>
+              </ItemSentence>
+            </Item>
+            <Item Num="9">
+              <ItemTitle>九</ItemTitle>
+              <ItemSentence>
+                <Sentence Num="1">その他、総会から委任された事項</Sentence>
+              </ItemSentence>
+            </Item>
+          </Paragraph>
+        </Article>
+        <Article Num="23">
+          <ArticleCaption>（運営会議の議決）</ArticleCaption>
+          <ArticleTitle>第二十三条</ArticleTitle>
+          <Paragraph Num="1">
+            <ParagraphNum/>
+            <ParagraphSentence>
+              <Sentence Num="1">運営会議は、議決権を有する委員の過半数の出席により成立する。</Sentence>
+            </ParagraphSentence>
+          </Paragraph>
+          <Paragraph Num="2">
+            <ParagraphNum>２</ParagraphNum>
+            <ParagraphSentence>
+              <Sentence Num="1">運営会議の議事は、出席した議決権を有する委員の過半数をもって決する。</Sentence>
+            </ParagraphSentence>
+          </Paragraph>
+          <Paragraph Num="3">
+            <ParagraphNum>３</ParagraphNum>
+            <ParagraphSentence>
+              <Sentence Num="1">可否同数の場合は、否とする。</Sentence>
+            </ParagraphSentence>
+          </Paragraph>
+          <Paragraph Num="4">
+            <ParagraphNum>４</ParagraphNum>
+            <ParagraphSentence>
+              <Sentence Num="1" Function="main">参与は、運営会議に出席し、意見を述べることができる。</Sentence>
+              <Sentence Num="2" Function="proviso">ただし、議決に参加することができない。</Sentence>
+            </ParagraphSentence>
+          </Paragraph>
+          <Paragraph Num="5">
+            <ParagraphNum>５</ParagraphNum>
+            <ParagraphSentence>
+              <Sentence Num="1">議決の対象となる事項について直接の利害関係を有する委員は、当該議決に参加することができない。</Sentence>
+              <Sentence Num="2">この場合、当該委員は、当該議決に係る議決権を有する出席委員数に含めない。</Sentence>
+            </ParagraphSentence>
+          </Paragraph>
+        </Article>
+        <Article Num="24">
+          <ArticleCaption>（運営会議の議事録）</ArticleCaption>
+          <ArticleTitle>第二十四条</ArticleTitle>
+          <Paragraph Num="1">
+            <ParagraphNum/>
+            <ParagraphSentence>
+              <Sentence Num="1">運営会議を開催したときは、議事録を作成しなければならない。</Sentence>
+            </ParagraphSentence>
+          </Paragraph>
+          <Paragraph Num="2">
+            <ParagraphNum>２</ParagraphNum>
+            <ParagraphSentence>
+              <Sentence Num="1">議事録には、開催日時、開催場所、出席者、議事の経過及び決議事項その他必要な事項を記載する。</Sentence>
+            </ParagraphSentence>
+          </Paragraph>
+          <Paragraph Num="3">
+            <ParagraphNum>３</ParagraphNum>
+            <ParagraphSentence>
+              <Sentence Num="1">議事録は、電磁的記録によるものを正本とする。</Sentence>
+            </ParagraphSentence>
+          </Paragraph>
+          <Paragraph Num="4">
+            <ParagraphNum>４</ParagraphNum>
+            <ParagraphSentence>
+              <Sentence Num="1">議事録には、会長及び参加した委員のうち会長を除く1名が、電磁的記録に対して電子署名を行う方法により署名する。</Sentence>
+            </ParagraphSentence>
+          </Paragraph>
+        </Article>
+        <Article Num="25">
+          <ArticleCaption>（局）</ArticleCaption>
+          <ArticleTitle>第二十五条</ArticleTitle>
+          <Paragraph Num="1">
+            <ParagraphNum/>
+            <ParagraphSentence>
+              <Sentence Num="1">執行委員会の下に、次の局を置く。</Sentence>
+            </ParagraphSentence>
+            <Item Num="1">
+              <ItemTitle>一</ItemTitle>
+              <ItemSentence>
+                <Sentence Num="1">総務局</Sentence>
+              </ItemSentence>
+            </Item>
+            <Item Num="2">
+              <ItemTitle>二</ItemTitle>
+              <ItemSentence>
+                <Sentence Num="1">情報基盤局</Sentence>
+              </ItemSentence>
+            </Item>
+            <Item Num="3">
+              <ItemTitle>三</ItemTitle>
+              <ItemSentence>
+                <Sentence Num="1">開発局</Sentence>
+              </ItemSentence>
+            </Item>
+          </Paragraph>
+          <Paragraph Num="2">
+            <ParagraphNum>２</ParagraphNum>
+            <ParagraphSentence>
+              <Sentence Num="1">各局に、局長1名及び副局長1名を置く。</Sentence>
+            </ParagraphSentence>
+          </Paragraph>
+          <Paragraph Num="3">
+            <ParagraphNum>３</ParagraphNum>
+            <ParagraphSentence>
+              <Sentence Num="1">局長は、第三十条に定める役員として総会が選任する。</Sentence>
+            </ParagraphSentence>
+          </Paragraph>
+          <Paragraph Num="4">
+            <ParagraphNum>４</ParagraphNum>
+            <ParagraphSentence>
+              <Sentence Num="1">副局長は、執行委員会が任免する。</Sentence>
+            </ParagraphSentence>
+          </Paragraph>
+          <Paragraph Num="5">
+            <ParagraphNum>５</ParagraphNum>
+            <ParagraphSentence>
+              <Sentence Num="1">局長は、当該局を統括し、執行委員会の指示及び決議に基づき、所管する活動を執行する。</Sentence>
+            </ParagraphSentence>
+          </Paragraph>
+          <Paragraph Num="6">
+            <ParagraphNum>６</ParagraphNum>
+            <ParagraphSentence>
+              <Sentence Num="1">副局長は、局長を補佐し、局長に事故があるとき又は局長が職務を行うことができないときは、その職務を代行する。</Sentence>
+            </ParagraphSentence>
+          </Paragraph>
+          <Paragraph Num="7">
+            <ParagraphNum>７</ParagraphNum>
+            <ParagraphSentence>
+              <Sentence Num="1">各局長は、執行委員会の委員となる。</Sentence>
+            </ParagraphSentence>
+          </Paragraph>
+          <Paragraph Num="8">
+            <ParagraphNum>８</ParagraphNum>
+            <ParagraphSentence>
+              <Sentence Num="1">各局の所管業務は、次のとおりとする。</Sentence>
+            </ParagraphSentence>
+            <Item Num="1">
+              <ItemTitle>一</ItemTitle>
+              <ItemSentence>
+                <Sentence Num="1">総務局</Sentence>
+              </ItemSentence>
+              <Subitem1 Num="1">
+                <Subitem1Title>イ</Subitem1Title>
+                <Subitem1Sentence>
+                  <Sentence Num="1">本会の庶務及び組織運営に関する事項</Sentence>
+                </Subitem1Sentence>
+              </Subitem1>
+              <Subitem1 Num="2">
+                <Subitem1Title>ロ</Subitem1Title>
+                <Subitem1Sentence>
+                  <Sentence Num="1">会員に関する事務</Sentence>
+                </Subitem1Sentence>
+              </Subitem1>
+              <Subitem1 Num="3">
+                <Subitem1Title>ハ</Subitem1Title>
+                <Subitem1Sentence>
+                  <Sentence Num="1">広報及び情報発信に関する事項</Sentence>
+                </Subitem1Sentence>
+              </Subitem1>
+              <Subitem1 Num="4">
+                <Subitem1Title>ニ</Subitem1Title>
+                <Subitem1Sentence>
+                  <Sentence Num="1">他の団体、大学、企業その他の外部組織との連絡及び調整</Sentence>
+                </Subitem1Sentence>
+              </Subitem1>
+              <Subitem1 Num="5">
+                <Subitem1Title>ホ</Subitem1Title>
+                <Subitem1Sentence>
+                  <Sentence Num="1">本会が主催するイベントの企画及び運営</Sentence>
+                </Subitem1Sentence>
+              </Subitem1>
+              <Subitem1 Num="6">
+                <Subitem1Title>ヘ</Subitem1Title>
+                <Subitem1Sentence>
+                  <Sentence Num="1">その他、情報基盤局及び開発局に属さない本会の運営に関する事項</Sentence>
+                </Subitem1Sentence>
+              </Subitem1>
+            </Item>
+            <Item Num="2">
+              <ItemTitle>二</ItemTitle>
+              <ItemSentence>
+                <Sentence Num="1">情報基盤局</Sentence>
+              </ItemSentence>
+              <Subitem1 Num="1">
+                <Subitem1Title>イ</Subitem1Title>
+                <Subitem1Sentence>
+                  <Sentence Num="1">本会が利用又は管理する情報システムの企画、構築、運用及び保守</Sentence>
+                </Subitem1Sentence>
+              </Subitem1>
+              <Subitem1 Num="2">
+                <Subitem1Title>ロ</Subitem1Title>
+                <Subitem1Sentence>
+                  <Sentence Num="1">ネットワーク、サーバーその他の情報通信基盤の管理及び運用</Sentence>
+                </Subitem1Sentence>
+              </Subitem1>
+              <Subitem1 Num="3">
+                <Subitem1Title>ハ</Subitem1Title>
+                <Subitem1Sentence>
+                  <Sentence Num="1">会員及び関係者の認証、アカウント並びにアクセス権限の管理</Sentence>
+                </Subitem1Sentence>
+              </Subitem1>
+              <Subitem1 Num="4">
+                <Subitem1Title>ニ</Subitem1Title>
+                <Subitem1Sentence>
+                  <Sentence Num="1">情報セキュリティ及び情報資産の管理</Sentence>
+                </Subitem1Sentence>
+              </Subitem1>
+              <Subitem1 Num="5">
+                <Subitem1Title>ホ</Subitem1Title>
+                <Subitem1Sentence>
+                  <Sentence Num="1">本会の情報基盤に関する技術的な支援</Sentence>
+                </Subitem1Sentence>
+              </Subitem1>
+              <Subitem1 Num="6">
+                <Subitem1Title>ヘ</Subitem1Title>
+                <Subitem1Sentence>
+                  <Sentence Num="1">その他、本会の情報基盤に関する事項</Sentence>
+                </Subitem1Sentence>
+              </Subitem1>
+            </Item>
+            <Item Num="3">
+              <ItemTitle>三</ItemTitle>
+              <ItemSentence>
+                <Sentence Num="1">開発局</Sentence>
+              </ItemSentence>
+              <Subitem1 Num="1">
+                <Subitem1Title>イ</Subitem1Title>
+                <Subitem1Sentence>
+                  <Sentence Num="1">ソフトウェア、Webサービス、ゲームその他の成果物の企画及び開発</Sentence>
+                </Subitem1Sentence>
+              </Subitem1>
+              <Subitem1 Num="2">
+                <Subitem1Title>ロ</Subitem1Title>
+                <Subitem1Sentence>
+                  <Sentence Num="1">共同開発その他の開発活動の管理及び支援</Sentence>
+                </Subitem1Sentence>
+              </Subitem1>
+              <Subitem1 Num="3">
+                <Subitem1Title>ハ</Subitem1Title>
+                <Subitem1Sentence>
+                  <Sentence Num="1">開発に必要な技術の研究、調査及び普及</Sentence>
+                </Subitem1Sentence>
+              </Subitem1>
+              <Subitem1 Num="4">
+                <Subitem1Title>ニ</Subitem1Title>
+                <Subitem1Sentence>
+                  <Sentence Num="1">ソースコード、開発環境その他開発資産の管理</Sentence>
+                </Subitem1Sentence>
+              </Subitem1>
+              <Subitem1 Num="5">
+                <Subitem1Title>ホ</Subitem1Title>
+                <Subitem1Sentence>
+                  <Sentence Num="1">開発成果物の公開及び提供に関する技術的事項</Sentence>
+                </Subitem1Sentence>
+              </Subitem1>
+              <Subitem1 Num="6">
+                <Subitem1Title>ヘ</Subitem1Title>
+                <Subitem1Sentence>
+                  <Sentence Num="1">その他、本会の開発活動に関する事項</Sentence>
+                </Subitem1Sentence>
+              </Subitem1>
+            </Item>
+          </Paragraph>
+        </Article>
+        <Article Num="26">
+          <ArticleCaption>（課）</ArticleCaption>
+          <ArticleTitle>第二十六条</ArticleTitle>
+          <Paragraph Num="1">
+            <ParagraphNum/>
+            <ParagraphSentence>
+              <Sentence Num="1">各課に、課長1名及び副課長1名を置く。</Sentence>
+            </ParagraphSentence>
+          </Paragraph>
+          <Paragraph Num="2">
+            <ParagraphNum>２</ParagraphNum>
+            <ParagraphSentence>
+              <Sentence Num="1">課を設置しようとする場合、当該局の局長は、局の名称、設置目的、所管する業務その他必要な事項を記載した申請を執行委員会に提出するものとする。</Sentence>
+            </ParagraphSentence>
+          </Paragraph>
+          <Paragraph Num="3">
+            <ParagraphNum>３</ParagraphNum>
+            <ParagraphSentence>
+              <Sentence Num="1">執行委員会は、前項の申請について、当該課の設置が本会の活動及び組織運営上適切であると認めた場合、これを認可することができる。</Sentence>
+            </ParagraphSentence>
+          </Paragraph>
+          <Paragraph Num="4">
+            <ParagraphNum>４</ParagraphNum>
+            <ParagraphSentence>
+              <Sentence Num="1">課は、執行委員会の認可をもって設置されるものとする。</Sentence>
+            </ParagraphSentence>
+          </Paragraph>
+          <Paragraph Num="5">
+            <ParagraphNum>５</ParagraphNum>
+            <ParagraphSentence>
+              <Sentence Num="1">課長及び副課長は、執行委員会が任免する。</Sentence>
+            </ParagraphSentence>
+          </Paragraph>
+          <Paragraph Num="6">
+            <ParagraphNum>６</ParagraphNum>
+            <ParagraphSentence>
+              <Sentence Num="1">課長は、当該課を統括し、所属する班及び会員の活動を指揮監督する。</Sentence>
+            </ParagraphSentence>
+          </Paragraph>
+          <Paragraph Num="7">
+            <ParagraphNum>７</ParagraphNum>
+            <ParagraphSentence>
+              <Sentence Num="1">副課長は、課長を補佐し、課長に事故があるとき又は課長が職務を行うことができないときは、その職務を代行する。</Sentence>
+            </ParagraphSentence>
+          </Paragraph>
+          <Paragraph Num="8">
+            <ParagraphNum>８</ParagraphNum>
+            <ParagraphSentence>
+              <Sentence Num="1">副課長は、必要に応じて空席とすることができる。</Sentence>
+            </ParagraphSentence>
+          </Paragraph>
+          <Paragraph Num="9">
+            <ParagraphNum>９</ParagraphNum>
+            <ParagraphSentence>
+              <Sentence Num="1">課長は、所管する課の業務について、局長の指示及び決定に従うものとする。</Sentence>
+            </ParagraphSentence>
+          </Paragraph>
+          <Paragraph Num="10">
+            <ParagraphNum>１０</ParagraphNum>
+            <ParagraphSentence>
+              <Sentence Num="1">課の設置、廃止、名称変更その他課の運営に必要な事項は、本会則に反しない範囲で、別に定めることができる。</Sentence>
+            </ParagraphSentence>
+          </Paragraph>
+        </Article>
+        <Article Num="27">
+          <ArticleCaption>（班）</ArticleCaption>
+          <ArticleTitle>第二十七条</ArticleTitle>
+          <Paragraph Num="1">
+            <ParagraphNum/>
+            <ParagraphSentence>
+              <Sentence Num="1">各課は、その業務を遂行するため必要がある場合、課の下に班を置くことができる。</Sentence>
+            </ParagraphSentence>
+          </Paragraph>
+          <Paragraph Num="2">
+            <ParagraphNum>２</ParagraphNum>
+            <ParagraphSentence>
+              <Sentence Num="1">班を設置しようとする場合、当該課の課長は、班の名称、設置目的、所管する業務その他必要な事項を記載した申請を局長に提出するものとする。</Sentence>
+            </ParagraphSentence>
+          </Paragraph>
+          <Paragraph Num="3">
+            <ParagraphNum>３</ParagraphNum>
+            <ParagraphSentence>
+              <Sentence Num="1">局長は、前項の申請について、当該班の設置が本会の活動及び組織運営上適切であると認めた場合、これを認可することができる。</Sentence>
+            </ParagraphSentence>
+          </Paragraph>
+          <Paragraph Num="4">
+            <ParagraphNum>４</ParagraphNum>
+            <ParagraphSentence>
+              <Sentence Num="1">班は、局長の認可をもって設置されるものとする。</Sentence>
+            </ParagraphSentence>
+          </Paragraph>
+          <Paragraph Num="5">
+            <ParagraphNum>５</ParagraphNum>
+            <ParagraphSentence>
+              <Sentence Num="1">班に、班長1名及び副班長1名を置く。</Sentence>
+            </ParagraphSentence>
+          </Paragraph>
+          <Paragraph Num="6">
+            <ParagraphNum>６</ParagraphNum>
+            <ParagraphSentence>
+              <Sentence Num="1">班長及び副班長は、当該課の課長が任免する。</Sentence>
+            </ParagraphSentence>
+          </Paragraph>
+          <Paragraph Num="7">
+            <ParagraphNum>７</ParagraphNum>
+            <ParagraphSentence>
+              <Sentence Num="1">班長は、当該班を統括し、課長の指示及び監督に従い、班の活動を遂行する。</Sentence>
+            </ParagraphSentence>
+          </Paragraph>
+          <Paragraph Num="8">
+            <ParagraphNum>８</ParagraphNum>
+            <ParagraphSentence>
+              <Sentence Num="1">副班長は、班長を補佐し、班長に事故があるとき又は班長が職務を行うことができないときは、その職務を代行する。</Sentence>
+            </ParagraphSentence>
+          </Paragraph>
+          <Paragraph Num="9">
+            <ParagraphNum>９</ParagraphNum>
+            <ParagraphSentence>
+              <Sentence Num="1">副班長は、必要に応じて空席とすることができる。</Sentence>
+            </ParagraphSentence>
+          </Paragraph>
+          <Paragraph Num="10">
+            <ParagraphNum>１０</ParagraphNum>
+            <ParagraphSentence>
+              <Sentence Num="1">班の設置、廃止、名称変更その他班の運営に必要な事項は、本会則に反しない範囲で、別に定めることができる。</Sentence>
+            </ParagraphSentence>
+          </Paragraph>
+        </Article>
+        <Article Num="28">
+          <ArticleCaption>（組織間の指揮監督）</ArticleCaption>
+          <ArticleTitle>第二十八条</ArticleTitle>
+          <Paragraph Num="1">
+            <ParagraphNum/>
+            <ParagraphSentence>
+              <Sentence Num="1">本会の組織における指揮監督関係は、原則として次のとおりとする。</Sentence>
+            </ParagraphSentence>
+            <Item Num="1">
+              <ItemTitle>一</ItemTitle>
+              <ItemSentence>
+                <Sentence Num="1">総会は、監査委員会及び執行委員会を監督する。</Sentence>
+              </ItemSentence>
+            </Item>
+            <Item Num="2">
+              <ItemTitle>二</ItemTitle>
+              <ItemSentence>
+                <Sentence Num="1">執行委員会は、総務局、情報基盤局及び開発局を監督する。</Sentence>
+              </ItemSentence>
+            </Item>
+            <Item Num="3">
+              <ItemTitle>三</ItemTitle>
+              <ItemSentence>
+                <Sentence Num="1">局長は、当該局に属する課を監督する。</Sentence>
+              </ItemSentence>
+            </Item>
+            <Item Num="4">
+              <ItemTitle>四</ItemTitle>
+              <ItemSentence>
+                <Sentence Num="1">課長は、当該課に属する班を監督する。</Sentence>
+              </ItemSentence>
+            </Item>
+            <Item Num="5">
+              <ItemTitle>五</ItemTitle>
+              <ItemSentence>
+                <Sentence Num="1">班長は、当該班を統括する。</Sentence>
+              </ItemSentence>
+            </Item>
+          </Paragraph>
+          <Paragraph Num="2">
+            <ParagraphNum>２</ParagraphNum>
+            <ParagraphSentence>
+              <Sentence Num="1">前項の規定は、監査委員会がその監査を行うに当たり、監査対象となる執行委員会その他の組織から独立して職務を行うことを妨げない。</Sentence>
+            </ParagraphSentence>
+          </Paragraph>
+          <Paragraph Num="3">
+            <ParagraphNum>３</ParagraphNum>
+            <ParagraphSentence>
+              <Sentence Num="1">監査委員会は、執行委員会その他の下部組織に対して、通常の指揮命令を行わない。</Sentence>
+            </ParagraphSentence>
+          </Paragraph>
+        </Article>
+        <Article Num="29">
+          <ArticleCaption>（顧問）</ArticleCaption>
+          <ArticleTitle>第二十九条</ArticleTitle>
+          <Paragraph Num="1">
+            <ParagraphNum/>
+            <ParagraphSentence>
+              <Sentence Num="1">顧問として、中京大学専任教員を1名置く。</Sentence>
+            </ParagraphSentence>
+          </Paragraph>
+          <Paragraph Num="2">
+            <ParagraphNum>２</ParagraphNum>
+            <ParagraphSentence>
+              <Sentence Num="1">顧問は、本会の活動について助言を行う。</Sentence>
+            </ParagraphSentence>
+          </Paragraph>
+          <Paragraph Num="3">
+            <ParagraphNum>３</ParagraphNum>
+            <ParagraphSentence>
+              <Sentence Num="1">顧問は、総会その他本会の機関と指揮監督関係を有しない。</Sentence>
+            </ParagraphSentence>
+          </Paragraph>
+          <Paragraph Num="4">
+            <ParagraphNum>４</ParagraphNum>
+            <ParagraphSentence>
+              <Sentence Num="1">顧問は、本会の意思決定に参加せず、総会の議決を拘束しない。</Sentence>
+            </ParagraphSentence>
+          </Paragraph>
+          <Paragraph Num="5">
+            <ParagraphNum>５</ParagraphNum>
+            <ParagraphSentence>
+              <Sentence Num="1">顧問は、執行委員会の推薦及び総会の承認を経て、会長が委嘱する。</Sentence>
+            </ParagraphSentence>
+          </Paragraph>
+        </Article>
+      </Chapter>
+      <Chapter Num="4">
+        <ChapterTitle>第四章　役員</ChapterTitle>
+        <Article Num="30">
+          <ArticleCaption>（役員）</ArticleCaption>
+          <ArticleTitle>第三十条</ArticleTitle>
+          <Paragraph Num="1">
+            <ParagraphNum/>
+            <ParagraphSentence>
+              <Sentence Num="1">執行委員、会計補佐、法務補佐及び監査委員を本会の役員とする。</Sentence>
+            </ParagraphSentence>
+          </Paragraph>
+          <Paragraph Num="2">
+            <ParagraphNum>２</ParagraphNum>
+            <ParagraphSentence>
+              <Sentence Num="1" Function="main">役員は、執行委員会が推薦し、総会により選任される。</Sentence>
+              <Sentence Num="2" Function="proviso">ただし、総会は、執行委員会が推薦した者以外の者を選任することができる。</Sentence>
+            </ParagraphSentence>
+          </Paragraph>
+          <Paragraph Num="3">
+            <ParagraphNum>３</ParagraphNum>
+            <ParagraphSentence>
+              <Sentence Num="1">会長と副会長は、兼任することができない。</Sentence>
+            </ParagraphSentence>
+          </Paragraph>
+          <Paragraph Num="4">
+            <ParagraphNum>４</ParagraphNum>
+            <ParagraphSentence>
+              <Sentence Num="1">会計と会計監査は、兼任することができない。</Sentence>
+            </ParagraphSentence>
+          </Paragraph>
+          <Paragraph Num="5">
+            <ParagraphNum>５</ParagraphNum>
+            <ParagraphSentence>
+              <Sentence Num="1">監査委員は、執行委員、会計補佐又は法務補佐を兼任することができない。</Sentence>
+            </ParagraphSentence>
+          </Paragraph>
+          <Paragraph Num="6">
+            <ParagraphNum>６</ParagraphNum>
+            <ParagraphSentence>
+              <Sentence Num="1">必要に応じ、執行委員として副会長常任代理1名を置くことができる。</Sentence>
+              <Sentence Num="2">副会長常任代理は、副会長の職務を補佐し、副会長が職務を行うことができないときは、その職務を代理する。</Sentence>
+            </ParagraphSentence>
+          </Paragraph>
+          <Paragraph Num="7">
+            <ParagraphNum>７</ParagraphNum>
+            <ParagraphSentence>
+              <Sentence Num="1">副会長常任代理は、会長又は副会長又を兼任することができない。</Sentence>
+            </ParagraphSentence>
+          </Paragraph>
+        </Article>
+        <Article Num="31">
+          <ArticleCaption>（会長）</ArticleCaption>
+          <ArticleTitle>第三十一条</ArticleTitle>
+          <Paragraph Num="1">
+            <ParagraphNum/>
+            <ParagraphSentence>
+              <Sentence Num="1">会長は、本会を代表し、本会の活動を統括する。</Sentence>
+            </ParagraphSentence>
+          </Paragraph>
+          <Paragraph Num="2">
+            <ParagraphNum>２</ParagraphNum>
+            <ParagraphSentence>
+              <Sentence Num="1">会長は、総会及び執行委員会を招集する。</Sentence>
+            </ParagraphSentence>
+          </Paragraph>
+          <Paragraph Num="3">
+            <ParagraphNum>３</ParagraphNum>
+            <ParagraphSentence>
+              <Sentence Num="1">会長は、必要があるときは、他の執行委員の職務を代行することができる。</Sentence>
+            </ParagraphSentence>
+          </Paragraph>
+        </Article>
+        <Article Num="32">
+          <ArticleCaption>（副会長）</ArticleCaption>
+          <ArticleTitle>第三十二条</ArticleTitle>
+          <Paragraph Num="1">
+            <ParagraphNum/>
+            <ParagraphSentence>
+              <Sentence Num="1">副会長は、会長を補佐し、会長に事故があるとき又は会長が職務を行うことができないときは、その職務を代行する。</Sentence>
+            </ParagraphSentence>
+          </Paragraph>
+        </Article>
+        <Article Num="33">
+          <ArticleCaption>（法務）</ArticleCaption>
+          <ArticleTitle>第三十三条</ArticleTitle>
+          <Paragraph Num="1">
+            <ParagraphNum/>
+            <ParagraphSentence>
+              <Sentence Num="1">法務は、本会の法務及びコンプライアンスに関する事項を担当する。</Sentence>
+            </ParagraphSentence>
+          </Paragraph>
+          <Paragraph Num="2">
+            <ParagraphNum>２</ParagraphNum>
+            <ParagraphSentence>
+              <Sentence Num="1">法務は、本会則その他の規程の整備及び解釈に関する助言を行う。</Sentence>
+            </ParagraphSentence>
+          </Paragraph>
+          <Paragraph Num="3">
+            <ParagraphNum>３</ParagraphNum>
+            <ParagraphSentence>
+              <Sentence Num="1">法務補佐1名を法務の下に置く。</Sentence>
+            </ParagraphSentence>
+          </Paragraph>
+          <Paragraph Num="4">
+            <ParagraphNum>４</ParagraphNum>
+            <ParagraphSentence>
+              <Sentence Num="1" Function="main">法務補佐は、法務を補佐する。</Sentence>
+              <Sentence Num="2" Function="proviso">ただし、執行委員会の委員とはならない。</Sentence>
+            </ParagraphSentence>
+          </Paragraph>
+        </Article>
+        <Article Num="34">
+          <ArticleCaption>（会計）</ArticleCaption>
+          <ArticleTitle>第三十四条</ArticleTitle>
+          <Paragraph Num="1">
+            <ParagraphNum/>
+            <ParagraphSentence>
+              <Sentence Num="1">会計は、本会の収支及び財産を管理し、会計に関する記録を作成する。</Sentence>
+            </ParagraphSentence>
+          </Paragraph>
+          <Paragraph Num="2">
+            <ParagraphNum>２</ParagraphNum>
+            <ParagraphSentence>
+              <Sentence Num="1">会計は、予算及び決算を作成し、総会に提出する。</Sentence>
+            </ParagraphSentence>
+          </Paragraph>
+          <Paragraph Num="3">
+            <ParagraphNum>３</ParagraphNum>
+            <ParagraphSentence>
+              <Sentence Num="1">会計は、第四十三条に定める返金を行う場合、その返金総額及び配分方法を執行委員会に提案する。</Sentence>
+            </ParagraphSentence>
+          </Paragraph>
+          <Paragraph Num="4">
+            <ParagraphNum>４</ParagraphNum>
+            <ParagraphSentence>
+              <Sentence Num="1">会計補佐1名を会計の下に置く。</Sentence>
+            </ParagraphSentence>
+          </Paragraph>
+          <Paragraph Num="5">
+            <ParagraphNum>５</ParagraphNum>
+            <ParagraphSentence>
+              <Sentence Num="1" Function="main">会計補佐は、会計を補佐する。</Sentence>
+              <Sentence Num="2" Function="proviso">ただし、執行委員会の委員とはならない。</Sentence>
+            </ParagraphSentence>
+          </Paragraph>
+        </Article>
+        <Article Num="35">
+          <ArticleCaption>（監査委員）</ArticleCaption>
+          <ArticleTitle>第三十五条</ArticleTitle>
+          <Paragraph Num="1">
+            <ParagraphNum/>
+            <ParagraphSentence>
+              <Sentence Num="1">会計監査は、本会の会計に関する監査を行う。</Sentence>
+            </ParagraphSentence>
+          </Paragraph>
+          <Paragraph Num="2">
+            <ParagraphNum>２</ParagraphNum>
+            <ParagraphSentence>
+              <Sentence Num="1">運営監査は、本会の運営に関する監査を行う。</Sentence>
+            </ParagraphSentence>
+          </Paragraph>
+          <Paragraph Num="3">
+            <ParagraphNum>３</ParagraphNum>
+            <ParagraphSentence>
+              <Sentence Num="1">監査委員の職務その他必要な事項については、第二十条の定めるところによる。</Sentence>
+            </ParagraphSentence>
+          </Paragraph>
+        </Article>
+        <Article Num="36">
+          <ArticleCaption>（役員等の任期）</ArticleCaption>
+          <ArticleTitle>第三十六条</ArticleTitle>
+          <Paragraph Num="1">
+            <ParagraphNum/>
+            <ParagraphSentence>
+              <Sentence Num="1">役員の任期は、選任された会計年度の終了時までとする。</Sentence>
+            </ParagraphSentence>
+          </Paragraph>
+          <Paragraph Num="2">
+            <ParagraphNum>２</ParagraphNum>
+            <ParagraphSentence>
+              <Sentence Num="1" Function="main">役員は、再任を妨げない。</Sentence>
+              <Sentence Num="2" Function="proviso">ただし、会長は、再任することができない。</Sentence>
+            </ParagraphSentence>
+          </Paragraph>
+          <Paragraph Num="3">
+            <ParagraphNum>３</ParagraphNum>
+            <ParagraphSentence>
+              <Sentence Num="1" Function="main">役員に欠員が生じた場合は、総会において後任者を選任する。</Sentence>
+              <Sentence Num="2" Function="proviso">ただし、後任者が選任されるまでの間、執行委員会は、必要に応じて当該役員の職務を代行する者を指定することができる。</Sentence>
+            </ParagraphSentence>
+          </Paragraph>
+        </Article>
+        <Article Num="37">
+          <ArticleCaption>（役員の辞任）</ArticleCaption>
+          <ArticleTitle>第三十七条</ArticleTitle>
+          <Paragraph Num="1">
+            <ParagraphNum/>
+            <ParagraphSentence>
+              <Sentence Num="1">役員は、総会に対して辞任を届け出ることができる。</Sentence>
+            </ParagraphSentence>
+          </Paragraph>
+          <Paragraph Num="2">
+            <ParagraphNum>２</ParagraphNum>
+            <ParagraphSentence>
+              <Sentence Num="1">前項の辞任は、総会の承認をもって効力を生ずる。</Sentence>
+            </ParagraphSentence>
+          </Paragraph>
+          <Paragraph Num="3">
+            <ParagraphNum>３</ParagraphNum>
+            <ParagraphSentence>
+              <Sentence Num="1">役員の辞任に伴い本会の運営に重大な支障が生じるおそれがある場合は、総会は、後任者の選任その他必要な措置を講じることができる。</Sentence>
+            </ParagraphSentence>
+          </Paragraph>
+        </Article>
+        <Article Num="38">
+          <ArticleCaption>（役員の解任）</ArticleCaption>
+          <ArticleTitle>第三十八条</ArticleTitle>
+          <Paragraph Num="1">
+            <ParagraphNum/>
+            <ParagraphSentence>
+              <Sentence Num="1">役員が本会の目的又は本会則に反する行為をした場合その他役員として適当でない事由がある場合、総会の決議により解任することができる。</Sentence>
+            </ParagraphSentence>
+          </Paragraph>
+          <Paragraph Num="2">
+            <ParagraphNum>２</ParagraphNum>
+            <ParagraphSentence>
+              <Sentence Num="1">前項の決議を行う場合は、当該役員に弁明の機会を与えなければならない。</Sentence>
+            </ParagraphSentence>
+          </Paragraph>
+        </Article>
+      </Chapter>
+      <Chapter Num="6">
+        <ChapterTitle>第五章　活動</ChapterTitle>
+        <Article Num="39">
+          <ArticleCaption>（成果物）</ArticleCaption>
+          <ArticleTitle>第三十九条</ArticleTitle>
+          <Paragraph Num="1">
+            <ParagraphNum/>
+            <ParagraphSentence>
+              <Sentence Num="1">本会の活動により作成されたソフトウェア、ゲーム、Webサービス、記事、画像、文書その他の成果物については、その作成者、共同開発者その他の権利関係を尊重し、各成果物について別途定める規程又は合意に従って取り扱うものとする。</Sentence>
+            </ParagraphSentence>
+          </Paragraph>
+          <Paragraph Num="2">
+            <ParagraphNum>２</ParagraphNum>
+            <ParagraphSentence>
+              <Sentence Num="1">本会は、会員に無断で当該会員の著作物その他の権利を処分してはならない。</Sentence>
+            </ParagraphSentence>
+          </Paragraph>
+        </Article>
+        <Article Num="40">
+          <ArticleCaption>（公開活動）</ArticleCaption>
+          <ArticleTitle>第四十条</ArticleTitle>
+          <Paragraph Num="1">
+            <ParagraphNum/>
+            <ParagraphSentence>
+              <Sentence Num="1">本会は、技術記事、ソースコード、資料、成果物その他の情報を、Webサイト、ソフトウェアリポジトリ、SNS、印刷物その他の媒体により公開することができる。</Sentence>
+            </ParagraphSentence>
+          </Paragraph>
+          <Paragraph Num="2">
+            <ParagraphNum>２</ParagraphNum>
+            <ParagraphSentence>
+              <Sentence Num="1">公開に当たっては、著作権、個人情報、秘密情報、第三者の権利その他法令上保護される利益を侵害しないよう努めなければならない。</Sentence>
+            </ParagraphSentence>
+          </Paragraph>
+        </Article>
+      </Chapter>
+      <Chapter Num="6">
+        <ChapterTitle>第六章　会計</ChapterTitle>
+        <Article Num="41">
+          <ArticleCaption>（会計年度）</ArticleCaption>
+          <ArticleTitle>第四十一条</ArticleTitle>
+          <Paragraph Num="1">
+            <ParagraphNum/>
+            <ParagraphSentence>
+              <Sentence Num="1">本会の会計年度は、毎年4月1日から翌年3月31日までとする。</Sentence>
+            </ParagraphSentence>
+          </Paragraph>
+        </Article>
+        <Article Num="42">
+          <ArticleCaption>（財源及び会費）</ArticleCaption>
+          <ArticleTitle>第四十二条</ArticleTitle>
+          <Paragraph Num="1">
+            <ParagraphNum/>
+            <ParagraphSentence>
+              <Sentence Num="1">本会の経費は、次に掲げる収入をもって充てる。</Sentence>
+            </ParagraphSentence>
+            <Item Num="1">
+              <ItemTitle>一</ItemTitle>
+              <ItemSentence>
+                <Sentence Num="1">会費</Sentence>
+              </ItemSentence>
+            </Item>
+            <Item Num="2">
+              <ItemTitle>二</ItemTitle>
+              <ItemSentence>
+                <Sentence Num="1">助成金及び補助金</Sentence>
+              </ItemSentence>
+            </Item>
+            <Item Num="3">
+              <ItemTitle>三</ItemTitle>
+              <ItemSentence>
+                <Sentence Num="1">イベントその他の活動による収入</Sentence>
+              </ItemSentence>
+            </Item>
+            <Item Num="4">
+              <ItemTitle>四</ItemTitle>
+              <ItemSentence>
+                <Sentence Num="1">寄附金</Sentence>
+              </ItemSentence>
+            </Item>
+            <Item Num="5">
+              <ItemTitle>五</ItemTitle>
+              <ItemSentence>
+                <Sentence Num="1">その他、本会の活動に伴う収入</Sentence>
+              </ItemSentence>
+            </Item>
+          </Paragraph>
+          <Paragraph Num="2">
+            <ParagraphNum>２</ParagraphNum>
+            <ParagraphSentence>
+              <Sentence Num="1">会員は、総会が定める会費を納入するものとする。</Sentence>
+            </ParagraphSentence>
+          </Paragraph>
+          <Paragraph Num="3">
+            <ParagraphNum>３</ParagraphNum>
+            <ParagraphSentence>
+              <Sentence Num="1">会費の金額、納入方法及び納入時期は、別に定める。</Sentence>
+            </ParagraphSentence>
+          </Paragraph>
+          <Paragraph Num="4">
+            <ParagraphNum>４</ParagraphNum>
+            <ParagraphSentence>
+              <Sentence Num="1">休眠会員の会費は、免除する。</Sentence>
+            </ParagraphSentence>
+          </Paragraph>
+          <Paragraph Num="5">
+            <ParagraphNum>５</ParagraphNum>
+            <ParagraphSentence>
+              <Sentence Num="1">前項の規定にかかわらず、休眠会員本人が会費の納入を希望する場合は、本人の希望に基づき、会費を徴収することができる。</Sentence>
+            </ParagraphSentence>
+          </Paragraph>
+          <Paragraph Num="6">
+            <ParagraphNum>６</ParagraphNum>
+            <ParagraphSentence>
+              <Sentence Num="1">会費を納入した後に休眠会員となった場合であっても、既に納入された会費は、第四十三条に定める返金の場合を除き、原則として返金しない。</Sentence>
+            </ParagraphSentence>
+          </Paragraph>
+          <Paragraph Num="7">
+            <ParagraphNum>７</ParagraphNum>
+            <ParagraphSentence>
+              <Sentence Num="1">制限会員の会費については、制限の内容及び期間その他の事情を考慮し、執行委員会が別に定めることができる。</Sentence>
+            </ParagraphSentence>
+          </Paragraph>
+        </Article>
+        <Article Num="43">
+          <ArticleCaption>（会費の返金）</ArticleCaption>
+          <ArticleTitle>第四十三条</ArticleTitle>
+          <Paragraph Num="1">
+            <ParagraphNum/>
+            <ParagraphSentence>
+              <Sentence Num="1">本会は、次の各号のいずれかに該当するとき、会員に対して会費の全部又は一部を返金することができる。</Sentence>
+            </ParagraphSentence>
+            <Item Num="1">
+              <ItemTitle>一</ItemTitle>
+              <ItemSentence>
+                <Sentence Num="1">会計年度終了時に本会の会計が黒字であり、かつ、翌会計年度も黒字となる見込みがあると会計が判断したとき。</Sentence>
+              </ItemSentence>
+            </Item>
+            <Item Num="2">
+              <ItemTitle>二</ItemTitle>
+              <ItemSentence>
+                <Sentence Num="1">本会を解散するとき。</Sentence>
+              </ItemSentence>
+            </Item>
+          </Paragraph>
+          <Paragraph Num="2">
+            <ParagraphNum>２</ParagraphNum>
+            <ParagraphSentence>
+              <Sentence Num="1" Function="main">前項の返金の対象となる会費は、返金を行う会計年度に納入された会費に限るものとする。</Sentence>
+              <Sentence Num="2" Function="proviso">ただし、第一項第二号の場合は、この限りでない。</Sentence>
+            </ParagraphSentence>
+          </Paragraph>
+          <Paragraph Num="3">
+            <ParagraphNum>３</ParagraphNum>
+            <ParagraphSentence>
+              <Sentence Num="1">返金の総額は、会計がその金額を提案し、執行委員会の決議によって定める。</Sentence>
+            </ParagraphSentence>
+          </Paragraph>
+          <Paragraph Num="4">
+            <ParagraphNum>４</ParagraphNum>
+            <ParagraphSentence>
+              <Sentence Num="1">返金額は、当該年度の会費納入者全員に対し、各会員の当該年度の納入額を上限として、可能な限り均等に配分するものとする。</Sentence>
+            </ParagraphSentence>
+          </Paragraph>
+          <Paragraph Num="5">
+            <ParagraphNum>５</ParagraphNum>
+            <ParagraphSentence>
+              <Sentence Num="1" Function="main">第一項の規定による返金を行う場合の対象者は、各年度における会費納入者とする。</Sentence>
+              <Sentence Num="2" Function="proviso">ただし、会費を納入した後に退会その他の事由により会員資格を失った者については、返金の対象とするか否かを執行委員会が決定する。</Sentence>
+            </ParagraphSentence>
+          </Paragraph>
+        </Article>
+        <Article Num="44">
+          <ArticleCaption>（予算及び決算）</ArticleCaption>
+          <ArticleTitle>第四十四条</ArticleTitle>
+          <Paragraph Num="1">
+            <ParagraphNum/>
+            <ParagraphSentence>
+              <Sentence Num="1">毎会計年度の予算及び決算は、総会の承認を受けなければならない。</Sentence>
+            </ParagraphSentence>
+          </Paragraph>
+          <Paragraph Num="2">
+            <ParagraphNum>２</ParagraphNum>
+            <ParagraphSentence>
+              <Sentence Num="1">当年度の予算及び前年度の決算は、会計が各会計年度最初の通常総会に提出し、承認を受けるものとする。</Sentence>
+            </ParagraphSentence>
+          </Paragraph>
+          <Paragraph Num="3">
+            <ParagraphNum>３</ParagraphNum>
+            <ParagraphSentence>
+              <Sentence Num="1">各会計年度最後の通常総会において、会計は、当年度の暫定決算を報告する。</Sentence>
+            </ParagraphSentence>
+          </Paragraph>
+          <Paragraph Num="4">
+            <ParagraphNum>４</ParagraphNum>
+            <ParagraphSentence>
+              <Sentence Num="1">決算を総会が承認しないときは、総会の決議により、当該年度の役員を除く活動会員から特別会計委員会を組織する。</Sentence>
+            </ParagraphSentence>
+          </Paragraph>
+          <Paragraph Num="5">
+            <ParagraphNum>５</ParagraphNum>
+            <ParagraphSentence>
+              <Sentence Num="1">特別会計委員会は、総会の下に置く。</Sentence>
+              <Sentence Num="2">その組織、権限その他必要な事項は、総会の決議により定める。</Sentence>
+            </ParagraphSentence>
+          </Paragraph>
+          <Paragraph Num="6">
+            <ParagraphNum>６</ParagraphNum>
+            <ParagraphSentence>
+              <Sentence Num="1">予算は、執行委員会が作成し、各会計年度最初の通常総会に提出し、承認を受けるものとする。</Sentence>
+            </ParagraphSentence>
+          </Paragraph>
+          <Paragraph Num="7">
+            <ParagraphNum>７</ParagraphNum>
+            <ParagraphSentence>
+              <Sentence Num="1">予算が承認されないときは、執行委員会は、否決の日から7日以内に修正案を総会に提出し、承認を受けるものとする。</Sentence>
+              <Sentence Num="2">修正案が再度否決された場合は、以後の修正案の提出について本項を準用する。</Sentence>
+            </ParagraphSentence>
+          </Paragraph>
+          <Paragraph Num="8">
+            <ParagraphNum>８</ParagraphNum>
+            <ParagraphSentence>
+              <Sentence Num="1" Function="main">予算は、総会の承認を受けなければ執行することができない。</Sentence>
+              <Sentence Num="2" Function="proviso">ただし、総会の決議により暫定予算を定め、その範囲内で執行することができる。</Sentence>
+            </ParagraphSentence>
+          </Paragraph>
+          <Paragraph Num="9">
+            <ParagraphNum>９</ParagraphNum>
+            <ParagraphSentence>
+              <Sentence Num="1">予算を増額すべき事由が生じたときは、執行委員会は、補正予算を作成し、総会に提出することができる。</Sentence>
+              <Sentence Num="2">補正予算の承認については、通常の予算承認に関する規定を準用する。</Sentence>
+            </ParagraphSentence>
+          </Paragraph>
+          <Paragraph Num="10">
+            <ParagraphNum>１０</ParagraphNum>
+            <ParagraphSentence>
+              <Sentence Num="1">予算を減額すべき事由が生じたときは、会計は、会計監査1名以上の承認を得た上で、裁量により減額することができる。</Sentence>
+            </ParagraphSentence>
+          </Paragraph>
+        </Article>
+        <Article Num="45">
+          <ArticleCaption>（借入）</ArticleCaption>
+          <ArticleTitle>第四十五条</ArticleTitle>
+          <Paragraph Num="1">
+            <ParagraphNum/>
+            <ParagraphSentence>
+              <Sentence Num="1">収入又は運転資金が不足したときは、本会は、役員から金員を借り入れることができる。</Sentence>
+            </ParagraphSentence>
+          </Paragraph>
+          <Paragraph Num="2">
+            <ParagraphNum>２</ParagraphNum>
+            <ParagraphSentence>
+              <Sentence Num="1">役員借入金は、無利息とする。</Sentence>
+            </ParagraphSentence>
+          </Paragraph>
+          <Paragraph Num="3">
+            <ParagraphNum>３</ParagraphNum>
+            <ParagraphSentence>
+              <Sentence Num="1">役員借入金の返済は、当該会計年度中に行うことを基本とする。</Sentence>
+            </ParagraphSentence>
+          </Paragraph>
+          <Paragraph Num="4">
+            <ParagraphNum>４</ParagraphNum>
+            <ParagraphSentence>
+              <Sentence Num="1" Function="main">役員借入金を借り入れる場合、その額は、原則として前条の予算案に記載するものとする。</Sentence>
+              <Sentence Num="2" Function="proviso">ただし、会計監査1名以上の承認を得た上で、会計は、必要な範囲でその額を増額又は減額することができる。</Sentence>
+            </ParagraphSentence>
+          </Paragraph>
+        </Article>
+        <Article Num="46">
+          <ArticleCaption>（支出）</ArticleCaption>
+          <ArticleTitle>第四十六条</ArticleTitle>
+          <Paragraph Num="1">
+            <ParagraphNum/>
+            <ParagraphSentence>
+              <Sentence Num="1">本会の財産は、本会の目的を達成するために必要な活動のために使用するものとする。</Sentence>
+            </ParagraphSentence>
+          </Paragraph>
+          <Paragraph Num="2">
+            <ParagraphNum>２</ParagraphNum>
+            <ParagraphSentence>
+              <Sentence Num="1">会計は、支出に関する記録及び証拠書類を適切に保管しなければならない。</Sentence>
+            </ParagraphSentence>
+          </Paragraph>
+          <Paragraph Num="3">
+            <ParagraphNum>３</ParagraphNum>
+            <ParagraphSentence>
+              <Sentence Num="1">会計は、総会が承認した予算に基づいて支出を執行する。</Sentence>
+            </ParagraphSentence>
+          </Paragraph>
+          <Paragraph Num="4">
+            <ParagraphNum>４</ParagraphNum>
+            <ParagraphSentence>
+              <Sentence Num="1" Function="main">予算は、これを超過して執行してはならない。</Sentence>
+              <Sentence Num="2" Function="proviso">ただし、会計が特に必要であると判断した場合は、会計監査1名以上の承認を得た上で、各科目について、当該科目の予算額の150％又は当該予算額に5,000円を加えた額のいずれか高い額を上限として、かつ、総額について当該予算総額の115％を超えない範囲で超過して執行することができる。</Sentence>
+            </ParagraphSentence>
+          </Paragraph>
+          <Paragraph Num="5">
+            <ParagraphNum>５</ParagraphNum>
+            <ParagraphSentence>
+              <Sentence Num="1">会計に関する規則の詳細については、本会則に反しない範囲で、執行委員会の承認を得て会計が別に定める。</Sentence>
+            </ParagraphSentence>
+          </Paragraph>
+        </Article>
+      </Chapter>
+      <Chapter Num="7">
+        <ChapterTitle>第七章　情報管理及び倫理</ChapterTitle>
+        <Article Num="47">
+          <ArticleCaption>（個人情報等の取扱い）</ArticleCaption>
+          <ArticleTitle>第四十七条</ArticleTitle>
+          <Paragraph Num="1">
+            <ParagraphNum/>
+            <ParagraphSentence>
+              <Sentence Num="1">本会は、会員その他の関係者から取得した個人情報について、関係法令を遵守し、活動上必要な範囲を超えて利用してはならない。</Sentence>
+            </ParagraphSentence>
+          </Paragraph>
+        </Article>
+        <Article Num="48">
+          <ArticleCaption>（秘密保持）</ArticleCaption>
+          <ArticleTitle>第四十八条</ArticleTitle>
+          <Paragraph Num="1">
+            <ParagraphNum/>
+            <ParagraphSentence>
+              <Sentence Num="1">会員は、本会の活動を通じて知り得た第三者の秘密情報について、正当な理由なくこれを外部に漏らしてはならない。</Sentence>
+            </ParagraphSentence>
+          </Paragraph>
+          <Paragraph Num="2">
+            <ParagraphNum>２</ParagraphNum>
+            <ParagraphSentence>
+              <Sentence Num="1">前項の義務は、退会その他の事由により会員資格を失った後も存続する。</Sentence>
+            </ParagraphSentence>
+          </Paragraph>
+          <Paragraph Num="3">
+            <ParagraphNum>３</ParagraphNum>
+            <ParagraphSentence>
+              <Sentence Num="1">法令に基づく義務の履行、本人の同意その他正当な理由により情報を開示する場合は、この限りでない。</Sentence>
+            </ParagraphSentence>
+          </Paragraph>
+        </Article>
+        <Article Num="49">
+          <ArticleCaption>（コンプライアンス）</ArticleCaption>
+          <ArticleTitle>第四十九条</ArticleTitle>
+          <Paragraph Num="1">
+            <ParagraphNum/>
+            <ParagraphSentence>
+              <Sentence Num="1">会員は、法令、本会則、大学その他の関係機関の規則及び本会が定める規程を遵守しなければならない。</Sentence>
+            </ParagraphSentence>
+          </Paragraph>
+        </Article>
+        <Article Num="50">
+          <ArticleCaption>（ハラスメントの調査及び対処）</ArticleCaption>
+          <ArticleTitle>第五十条</ArticleTitle>
+          <Paragraph Num="1">
+            <ParagraphNum/>
+            <ParagraphSentence>
+              <Sentence Num="1">本会の活動に関連してハラスメントを受けた者又はその事実を知った者は、運営監査に対して申立てを行うことができる。</Sentence>
+            </ParagraphSentence>
+          </Paragraph>
+          <Paragraph Num="2">
+            <ParagraphNum>２</ParagraphNum>
+            <ParagraphSentence>
+              <Sentence Num="1" Function="main">申立てを受けた運営監査は、原則として単独で調査を行う。</Sentence>
+              <Sentence Num="2" Function="proviso">ただし、当該運営監査が申立人、被申立人その他の関係者と直接の利害関係を有するときは、調査を行ってはならない。</Sentence>
+            </ParagraphSentence>
+          </Paragraph>
+          <Paragraph Num="3">
+            <ParagraphNum>３</ParagraphNum>
+            <ParagraphSentence>
+              <Sentence Num="1">申立人は、2名の運営監査のいずれかを選択して申立てを行うことができる。</Sentence>
+            </ParagraphSentence>
+          </Paragraph>
+          <Paragraph Num="4">
+            <ParagraphNum>４</ParagraphNum>
+            <ParagraphSentence>
+              <Sentence Num="1">前項の規定にかかわらず、いずれの運営監査にも公正な調査を求めることができない場合、申立人は、会計監査又は執行委員のいずれかに申立てを行うことができる。</Sentence>
+              <Sentence Num="2">この場合において、申立てを受けた者は、当該申立ての処理について運営監査と同等の権限を有するものとする。</Sentence>
+            </ParagraphSentence>
+          </Paragraph>
+          <Paragraph Num="5">
+            <ParagraphNum>５</ParagraphNum>
+            <ParagraphSentence>
+              <Sentence Num="1">前項の場合においても公正な調査を行うことができないときは、申立人は、総会に対して申立てを行うことができる。</Sentence>
+            </ParagraphSentence>
+          </Paragraph>
+          <Paragraph Num="6">
+            <ParagraphNum>６</ParagraphNum>
+            <ParagraphSentence>
+              <Sentence Num="1">総会は、前項による申立てを受けた場合、申立人及び被申立人並びにこれらと直接の利害関係を有する者を除く活動会員に対して、調査を付託することができる。</Sentence>
+            </ParagraphSentence>
+          </Paragraph>
+          <Paragraph Num="7">
+            <ParagraphNum>７</ParagraphNum>
+            <ParagraphSentence>
+              <Sentence Num="1">調査を行う者は、申立人及び被申立人その他の関係者のプライバシー及び秘密を尊重し、必要な範囲を超えて調査内容を開示してはならない。</Sentence>
+            </ParagraphSentence>
+          </Paragraph>
+          <Paragraph Num="8">
+            <ParagraphNum>８</ParagraphNum>
+            <ParagraphSentence>
+              <Sentence Num="1">調査を行う者は、申立人及び被申立人の双方に必要な範囲で弁明又は説明の機会を与えなければならない。</Sentence>
+            </ParagraphSentence>
+          </Paragraph>
+          <Paragraph Num="9">
+            <ParagraphNum>９</ParagraphNum>
+            <ParagraphSentence>
+              <Sentence Num="1">本条による申立て、調査及びその結果に関する記録は、事実確認、再審査、監査その他必要な目的のために必要な期間保存するものとし、保存の必要がなくなったときは、適切な方法により廃棄する。</Sentence>
+            </ParagraphSentence>
+          </Paragraph>
+          <Paragraph Num="10">
+            <ParagraphNum>１０</ParagraphNum>
+            <ParagraphSentence>
+              <Sentence Num="1">本条による申立てを行ったこと又は調査に協力したことを理由として、申立人その他の関係者に不利益な取扱いをしてはならない。</Sentence>
+            </ParagraphSentence>
+          </Paragraph>
+          <Paragraph Num="11">
+            <ParagraphNum>１１</ParagraphNum>
+            <ParagraphSentence>
+              <Sentence Num="1">本条による調査においてハラスメントを認定したときは、調査担当者は、その結果及び必要な措置を総会に報告するものとする。</Sentence>
+            </ParagraphSentence>
+          </Paragraph>
+        </Article>
+      </Chapter>
+      <Chapter Num="8">
+        <ChapterTitle>第八章　紛争解決及び解決</ChapterTitle>
+        <Article Num="51">
+          <ArticleCaption>（協議及び民事調停）</ArticleCaption>
+          <ArticleTitle>第五十一条</ArticleTitle>
+          <Paragraph Num="1">
+            <ParagraphNum/>
+            <ParagraphSentence>
+              <Sentence Num="1">本会と会員その他の関係者との間に、本会の活動、会員資格、財産、成果物その他本会に関する民事上の紛争が生じた場合は、当事者間の協議により解決するよう努めるものとする。</Sentence>
+            </ParagraphSentence>
+          </Paragraph>
+          <Paragraph Num="2">
+            <ParagraphNum>２</ParagraphNum>
+            <ParagraphSentence>
+              <Sentence Num="1" Function="main">前項の協議により解決しない場合は、原則として民事調停による解決を図るものとする。</Sentence>
+              <Sentence Num="2" Function="proviso">ただし、緊急に司法上の救済を求める必要がある場合その他相当の理由がある場合は、この限りでない。</Sentence>
+            </ParagraphSentence>
+          </Paragraph>
+        </Article>
+        <Article Num="52">
+          <ArticleCaption>（専属的合意管轄）</ArticleCaption>
+          <ArticleTitle>第五十二条</ArticleTitle>
+          <Paragraph Num="1">
+            <ParagraphNum/>
+            <ParagraphSentence>
+              <Sentence Num="1">本会と会員その他の関係者との間に生じた紛争について、本条を当事者間の合意による専属的管轄の定めとして適用する場合は、次の各号によるものとする。</Sentence>
+            </ParagraphSentence>
+            <Item Num="1">
+              <ItemTitle>一</ItemTitle>
+              <ItemSentence>
+                <Sentence Num="1">簡易裁判所が第一審の管轄裁判所となる事件については、豊田簡易裁判所を専属的合意管轄裁判所とする。</Sentence>
+              </ItemSentence>
+            </Item>
+            <Item Num="2">
+              <ItemTitle>二</ItemTitle>
+              <ItemSentence>
+                <Sentence Num="1">前号の事件のうち、少額訴訟の対象となる金銭の支払を求める事件については、民事調停が不成立となった場合、原則として豊田簡易裁判所に少額訴訟を提起するものとする。</Sentence>
+              </ItemSentence>
+            </Item>
+            <Item Num="3">
+              <ItemTitle>三</ItemTitle>
+              <ItemSentence>
+                <Sentence Num="1">地方裁判所が第一審の管轄裁判所となる事件については、名古屋地方裁判所岡崎支部を専属的合意管轄裁判所とする。</Sentence>
+              </ItemSentence>
+            </Item>
+          </Paragraph>
+        </Article>
+      </Chapter>
+      <Chapter Num="9">
+        <ChapterTitle>第九章　会則の変更及び解散</ChapterTitle>
+        <Article Num="53">
+          <ArticleCaption>（会則の変更）</ArticleCaption>
+          <ArticleTitle>第五十三条</ArticleTitle>
+          <Paragraph Num="1">
+            <ParagraphNum/>
+            <ParagraphSentence>
+              <Sentence Num="1">本会則は、総会において、議決権を有する出席活動会員の3分の2以上の賛成により変更することができる。</Sentence>
+            </ParagraphSentence>
+          </Paragraph>
+        </Article>
+        <Article Num="54">
+          <ArticleCaption>（解散）</ArticleCaption>
+          <ArticleTitle>第五十四条</ArticleTitle>
+          <Paragraph Num="1">
+            <ParagraphNum/>
+            <ParagraphSentence>
+              <Sentence Num="1">本会は、総会の決議その他法令又は本会則に定める手続により解散する。</Sentence>
+            </ParagraphSentence>
+          </Paragraph>
+          <Paragraph Num="2">
+            <ParagraphNum>２</ParagraphNum>
+            <ParagraphSentence>
+              <Sentence Num="1">解散時に残余財産がある場合は、総会の決議により、本会と同様の目的を有する団体その他適切な団体に帰属させるものとする。</Sentence>
+            </ParagraphSentence>
+          </Paragraph>
+        </Article>
+      </Chapter>
+      <Chapter Num="10">
+        <ChapterTitle>第十章　補則</ChapterTitle>
+        <Article Num="55">
+          <ArticleCaption>（細則）</ArticleCaption>
+          <ArticleTitle>第五十五条</ArticleTitle>
+          <Paragraph Num="1">
+            <ParagraphNum/>
+            <ParagraphSentence>
+              <Sentence Num="1">本会則の施行に必要な事項は、本会則に反しない範囲で、総会又は執行委員会の決議により別に定めることができる。</Sentence>
+            </ParagraphSentence>
+          </Paragraph>
+          <Paragraph Num="2">
+            <ParagraphNum>２</ParagraphNum>
+            <ParagraphSentence>
+              <Sentence Num="1">総会又は執行委員会のいずれかが定めることができる事項について、本会則に別段の定めがない場合は、総会が定めることを妨げない。</Sentence>
+            </ParagraphSentence>
+          </Paragraph>
+        </Article>
+        <Article Num="56">
+          <ArticleCaption>（会則の解釈）</ArticleCaption>
+          <ArticleTitle>第五十六条</ArticleTitle>
+          <Paragraph Num="1">
+            <ParagraphNum/>
+            <ParagraphSentence>
+              <Sentence Num="1">本会則の解釈について疑義が生じた場合は、総会の決議によりこれを決する。</Sentence>
+            </ParagraphSentence>
+          </Paragraph>
+        </Article>
+      </Chapter>
+    </MainProvision>
+    <SupplProvision Type="New">
+      <SupplProvisionLabel>附　則</SupplProvisionLabel>
+      <Paragraph Num="1">
+        <ParagraphNum>１</ParagraphNum>
+        <ParagraphSentence>
+          <Sentence Num="1">本会則は、第1回総会の閉会時から施行する。</Sentence>
+        </ParagraphSentence>
+      </Paragraph>
+      <Paragraph Num="2">
+        <ParagraphNum>２</ParagraphNum>
+        <ParagraphSentence>
+          <Sentence Num="1">本会則の制定時における役員は、第1回総会において決定する。</Sentence>
+        </ParagraphSentence>
+      </Paragraph>
+      <Paragraph Num="3">
+        <ParagraphNum>３</ParagraphNum>
+        <ParagraphSentence>
+          <Sentence Num="1">本会則の施行に必要な細則その他の規程は、執行委員会の決議により定めることができる。</Sentence>
+        </ParagraphSentence>
+      </Paragraph>
+      <Paragraph Num="4">
+        <ParagraphNum>４</ParagraphNum>
+        <ParagraphSentence>
+          <Sentence Num="1">本会則の施行前に行われた人事、予算執行その他の運営上の決定については、本会則又は総会の決議に抵触しない範囲で、有効なものとして取り扱う。</Sentence>
+        </ParagraphSentence>
+      </Paragraph>
+      <Paragraph Num="5">
+        <ParagraphNum>５</ParagraphNum>
+        <ParagraphSentence>
+          <Sentence Num="1">役員は、令和7年度及び令和8年度前期の決算を行い、第1回総会で承認を受ける。</Sentence>
+          <Sentence Num="2">また、令和8年度後期予算案についても同様とする。</Sentence>
+        </ParagraphSentence>
+      </Paragraph>
+      <Paragraph Num="6">
+        <ParagraphNum>６</ParagraphNum>
+        <ParagraphSentence>
+          <Sentence Num="1">令和7年度決算の会計監査は、監査委員会が組織された後に行い、次回の総会で報告する。</Sentence>
+          <Sentence Num="2">また、令和8年度前期決算については、会計監査を省略し、令和8年度の会計年度末に通常の年度決算を行う。</Sentence>
+        </ParagraphSentence>
+      </Paragraph>
+    </SupplProvision>
+  </LawBody>
+</Law>

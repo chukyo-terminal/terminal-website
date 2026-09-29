@@ -1,4 +1,4 @@
-import { Geist, Geist_Mono, IBM_Plex_Sans_JP, Nunito_Sans, Roboto_Slab } from 'next/font/google';
+import { Geist, Geist_Mono, IBM_Plex_Sans_JP, Klee_One, Nunito_Sans, Roboto_Slab } from 'next/font/google';
 
 
 export const GeistSans = Geist({
@@ -34,4 +34,13 @@ export const IBMPlexSansJP = IBM_Plex_Sans_JP({
   subsets: ['latin'],
   display: 'swap',
   weight: ['400', '500'],
+});
+
+
+export const KleeOne = Klee_One({
+  variable: '--font-klee-one',
+  // @ts-expect-error japanese subset
+  subsets: ['latin', 'japanese'],
+  display: 'swap',
+  weight: ['400', '600'],
 });
