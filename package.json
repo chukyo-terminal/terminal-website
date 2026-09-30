@@ -18,7 +18,7 @@
     "@hono/zod-validator": "^0.9.1",
     "@next/third-parties": "^16.3.6",
     "@types/markdown-it": "^14.2.0",
-    "drizzle-orm": "^0.45.2",
+    "drizzle-orm": "^0.45.3",
     "fast-xml-parser": "^5.11.1",
     "framer-motion": "13.4.4",
     "hono": "^4.13.9",
