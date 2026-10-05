@@ -44,7 +44,6 @@ export default async function PostEditPage({ params }: { params: Promise<{ postI
         .where(and(eq(postContentsTable.postId, postContent[0].postId), eq(postContentsTable.identifier, postContent[0].identifier)));
     }
   }
-  // eslint-disable-next-line unicorn/consistent-function-scoping
   async function handlePublish() {
     'use server';
     await db
