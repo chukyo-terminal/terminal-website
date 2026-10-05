@@ -5,6 +5,9 @@ import NewPostForm from './_components/form';
 
 import type { JSX } from 'react';
 
+export const dynamic = 'force-dynamic';
+
+
 export default async function NewPostPage(): Promise<JSX.Element> {
   // eslint-disable-next-line unicorn/consistent-function-scoping
   async function createNewPost(authorId: number, slug: string, title: string): Promise<number> {

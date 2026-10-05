@@ -9,6 +9,8 @@ import { db } from '@/lib/drizzle';
 import type { JSX } from 'react';
 import type { Metadata } from 'next';
 
+export const dynamic = 'force-dynamic';
+
 
 export const metadata: Metadata = {
   title: '投稿一覧 | Terminal',

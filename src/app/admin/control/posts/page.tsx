@@ -6,6 +6,8 @@ import { db } from '@/lib/drizzle';
 
 import type { JSX } from 'react';
 
+export const dynamic = 'force-dynamic';
+
 
 /**
  * 日時をフォーマットする。
