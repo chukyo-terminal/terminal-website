@@ -20,7 +20,7 @@
     "@types/markdown-it": "^14.2.0",
     "drizzle-orm": "^0.45.3",
     "fast-xml-parser": "^5.11.1",
-    "framer-motion": "13.4.4",
+    "framer-motion": "13.5.0",
     "hono": "^4.13.9",
     "http-status-ts": "^2.0.1",
     "lucide-react": "^1.48.0",
