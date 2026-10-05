@@ -91,6 +91,13 @@ export default function Editor({
           await onPublish();
           setIsSaving(false);
           alert('正常に投稿されました。');
+          globalThis.open(`https://twitter.com/intent/tweet?text=${
+            encodeURIComponent(
+              `【記事公開】\n「${title}」\n${description}\nby @chukyo_terminal ※投稿者のユーザー名に置き換えもしくは削除\n${
+                new URL(`/posts/${slug}`, process.env.NEXT_PUBLIC_APP_URL).href // &url=だと余計なスペースが入るため
+              }`,
+            )
+          }`);
         }}
         disabled={isSaving}
         className="bg-blue-500 text-white p-2 rounded"
