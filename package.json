@@ -21,7 +21,7 @@
     "drizzle-orm": "^0.45.3",
     "fast-xml-parser": "^5.11.1",
     "framer-motion": "13.4.4",
-    "hono": "^4.13.9",
+    "hono": "^4.13.12",
     "http-status-ts": "^2.0.1",
     "lucide-react": "^1.48.0",
     "markdown-it": "^15.0.2",
