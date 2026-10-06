@@ -5,22 +5,8 @@
     {
       "idx": 0,
       "version": "7",
-      "when": 1775211970718,
-      "tag": "0000_aromatic_black_bird",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "7",
-      "when": 1776005290935,
-      "tag": "0001_lucky_terror",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "7",
-      "when": 1791251405023,
-      "tag": "0002_awesome_felicia_hardy",
+      "when": 1791256702789,
+      "tag": "0000_gorgeous_storm",
       "breakpoints": true
     }
   ]

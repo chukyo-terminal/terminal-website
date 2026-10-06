@@ -1,5 +1,5 @@
 {
-  "id": "1fbc6cd0-979b-4b16-98bd-7eed0305e7f3",
+  "id": "79f5c6d2-1c34-40f3-bda2-d40845eaf5bc",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -880,7 +880,46 @@
   "sequences": {},
   "roles": {},
   "policies": {},
-  "views": {},
+  "views": {
+    "public.published_posts_view": {
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "integer",
+          "primaryKey": true,
+          "notNull": true,
+          "identity": {
+            "type": "always",
+            "name": "published_posts_view_id_seq",
+            "schema": "public",
+            "increment": "1",
+            "startWith": "1",
+            "minValue": "1",
+            "maxValue": "2147483647",
+            "cache": "1",
+            "cycle": false
+          }
+        },
+        "slug": {
+          "name": "slug",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "published_at": {
+          "name": "published_at",
+          "type": "timestamp (3) with time zone",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "definition": "select distinct on (\"posts\".\"id\") \"posts\".\"id\", \"posts\".\"slug\", \"users\".\"id\" as \"author_id\", \"users\".\"name\" as \"author_name\", \"users\".\"display_name\" as \"author_display_name\", \"post_contents\".\"title\" as \"title\", \"post_contents\".\"description\" as \"description\", \"post_contents\".\"content\" as \"content\", \"tag_agg\", \"original_post_contents\".\"published_at\", \"post_contents\".\"published_at\" as \"updated_at\", \"has_draft\" from \"posts\" inner join \"users\" on \"posts\".\"author_id\" = \"users\".\"id\" inner join \"post_contents\" on \"posts\".\"id\" = \"post_contents\".\"post_id\" left join lateral (select COALESCE(JSONB_AGG(JSONB_BUILD_OBJECT('name', \"tags\".\"name\", 'slug', \"tags\".\"slug\")), '[]'::JSONB) as \"tag_agg\" from \"post_tags\" inner join \"tags\" on \"post_tags\".\"tag_id\" = \"tags\".\"id\" where \"post_tags\".\"post_id\" = \"posts\".\"id\") \"tags\" on TRUE left join lateral (select \"published_at\" from \"post_contents\" where \"post_contents\".\"post_id\" = \"posts\".\"id\" order by \"post_contents\".\"identifier\" asc limit 1) \"original_post_contents\" on TRUE left join lateral (select \"published_at\" is null as \"has_draft\" from \"post_contents\" where \"post_contents\".\"post_id\" = \"posts\".\"id\" order by \"post_contents\".\"identifier\" desc limit 1) \"draft_query\" on TRUE where (\"posts\".\"is_private\" <> true and \"post_contents\".\"is_private\" <> true and \"post_contents\".\"published_at\" is not null) order by \"posts\".\"id\" desc, \"post_contents\".\"identifier\" desc",
+      "name": "published_posts_view",
+      "schema": "public",
+      "isExisting": false,
+      "materialized": false
+    }
+  },
   "_meta": {
     "columns": {},
     "schemas": {},
