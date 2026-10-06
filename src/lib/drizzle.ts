@@ -38,11 +38,8 @@ export const db = drizzle({
 
 
 // 本番環境で、起動時にマイグレーションを実行する
-// eslint-disable-next-line unicorn/prefer-top-level-await
-(async () => {
-  if (process.env.NODE_ENV === 'production' && process.env.NEXT_PHASE !== PHASE_PRODUCTION_BUILD) {
-    console.log('Running database migrations...');
-    await migrate(db, { migrationsFolder: 'drizzle' });
-    console.log('Database migrations completed.');
-  }
-})();
+if (process.env.NODE_ENV === 'production' && process.env.NEXT_PHASE !== PHASE_PRODUCTION_BUILD) {
+  console.log('Running database migrations...');
+  await migrate(db, { migrationsFolder: 'drizzle' });
+  console.log('Database migrations completed.');
+}

@@ -30,6 +30,7 @@ ENV PORT=3000
 COPY --from=builder --chown=nonroot:nonroot /app/.next/standalone ./
 COPY --from=builder --chown=nonroot:nonroot /app/.next/static ./.next/static
 COPY --from=builder --chown=nonroot:nonroot /app/public ./public
+COPY --from=builder --chown=nonroot:nonroot /app/drizzle ./drizzle
 
 USER nonroot
 EXPOSE ${PORT}
