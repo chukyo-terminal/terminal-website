@@ -15,6 +15,13 @@
       "when": 1776005290935,
       "tag": "0001_lucky_terror",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1791251405023,
+      "tag": "0002_awesome_felicia_hardy",
+      "breakpoints": true
     }
   ]
 }
