@@ -16,7 +16,7 @@
   },
   "dependencies": {
     "@hono/zod-validator": "^0.9.1",
-    "@next/third-parties": "^16.3.6",
+    "@next/third-parties": "^16.3.8",
     "@types/markdown-it": "^14.2.0",
     "drizzle-orm": "^0.45.3",
     "fast-xml-parser": "^5.11.1",
