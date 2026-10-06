@@ -1,13 +1,15 @@
 import Link from 'next/link';
 
-import { and, desc, eq, exists, isNotNull, sql } from 'drizzle-orm';
+import { arrayContains, inArray, sql } from 'drizzle-orm';
 import { Code } from 'lucide-react';
 
-import { postContentsTable, postsTable, postTagsTable, tagsTable } from '@/db/schema';
+import { tagsTable, publishedPostsView } from '@/db/schema';
 import { db } from '@/lib/drizzle';
 
 import type { JSX } from 'react';
 import type { Metadata } from 'next';
+
+export const dynamic = 'force-dynamic';
 
 
 export const metadata: Metadata = {
@@ -17,11 +19,19 @@ export const metadata: Metadata = {
 
 
 /**
- * 日付をフォーマットする。
- * @param date - フォーマットする日付。
- * @returns フォーマット済みの日付文字列。null の場合は `-` を返す。
+ * 日時をフォーマットする。
+ * @param date - フォーマットする日時。
+ * @returns フォーマット済みの日時文字列。null の場合は `-` を返す。
  */
-const formatDate = (date: Date | null): string => date ? date.toLocaleDateString('ja-JP') : '-';
+const formatDate = (date: Date | null): string => date ? (
+  new Intl.DateTimeFormat('ja-JP', {
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+  }).format(date)
+) : '-';
 
 
 type SearchParameters = {
@@ -50,73 +60,23 @@ export default async function Posts({
       .filter((value) => value.length > 0),
   )];
 
-  const latestPublishedContentQuery = db
-    .select({
-      identifier: postContentsTable.identifier,
-      title: postContentsTable.title,
-      description: postContentsTable.description,
-      publishedAt: postContentsTable.publishedAt,
-    })
-    .from(postContentsTable)
-    .where(and(
-      eq(postContentsTable.postId, postsTable.id),
-      eq(postContentsTable.isPrivate, false),
-      isNotNull(postContentsTable.publishedAt),
-    ))
-    .orderBy(desc(postContentsTable.identifier))
-    .limit(1)
-    .as('latest_post_contents');
-
-  const originalPostContentQuery = db
-    .select({ publishedAt: postContentsTable.publishedAt })
-    .from(postContentsTable)
-    .where(eq(postContentsTable.postId, postsTable.id))
-    .orderBy(postContentsTable.identifier)
-    .limit(1)
-    .as('original_post_contents');
-
-  const tagJsonAgg = sql<{ name: string; slug: string }[]>`
-    json_agg(json_build_object('name', ${tagsTable.name}, 'slug', ${tagsTable.slug}))
-  `.as('tags');
-  const postTagsQuery = db
-    .select({ tags: tagJsonAgg })
-    .from(postTagsTable)
-    .innerJoin(tagsTable, eq(postTagsTable.tagId, tagsTable.id))
-    .where(eq(postTagsTable.postId, postsTable.id))
-    .as('post_tags');
-
-  const tagExistsConditions = selectedTagSlugs.map((tagSlug) => exists(
-    db
-      .select({ id: postTagsTable.postId })
-      .from(postTagsTable)
-      .innerJoin(tagsTable, eq(postTagsTable.tagId, tagsTable.id))
-      .where(and(
-        eq(postTagsTable.postId, postsTable.id),
-        eq(tagsTable.slug, tagSlug),
-      )),
-  ));
-
-  const whereCondition = and(
-    eq(postsTable.isPrivate, false),
-    isNotNull(latestPublishedContentQuery.identifier),
-    ...tagExistsConditions,
-  );
+  const selectedTags = await db
+    .select({ slug: tagsTable.slug, name: tagsTable.name })
+    .from(tagsTable)
+    .where(inArray(tagsTable.slug, selectedTagSlugs))
+    .then((results) => results.map((result) => ({ slug: result.slug, name: result.name })));
 
   const posts = await db
     .select({
-      id: postsTable.id,
-      slug: postsTable.slug,
-      title: latestPublishedContentQuery.title,
-      description: latestPublishedContentQuery.description,
-      publishedAt: originalPostContentQuery.publishedAt,
-      tags: postTagsQuery.tags,
+      id: publishedPostsView.id,
+      slug: publishedPostsView.slug,
+      title: publishedPostsView.title,
+      description: publishedPostsView.description,
+      publishedAt: publishedPostsView.publishedAt,
+      tags: publishedPostsView.tags,
     })
-    .from(postsTable)
-    .leftJoinLateral(latestPublishedContentQuery, sql`TRUE`)
-    .leftJoinLateral(originalPostContentQuery, sql`TRUE`)
-    .leftJoinLateral(postTagsQuery, sql`TRUE`)
-    .where(whereCondition)
-    .orderBy(desc(originalPostContentQuery.publishedAt), desc(postsTable.id));
+    .from(publishedPostsView)
+    .where(selectedTags.length > 0 ? arrayContains(publishedPostsView.tags, sql`${JSON.stringify(selectedTags.map((tag) => ({ slug: tag.slug })))}::JSONB`) : undefined);
 
   return (
     <div className="space-y-8 z-50 pt-20">
@@ -133,7 +93,7 @@ export default async function Posts({
           タグ
           {' '}
           <span className="text-emerald-300">
-            {selectedTagSlugs.map((tagSlug) => `#${tagSlug}`).join(', ')}
+            {selectedTags.map((tag) => `#${tag.name}`).join(', ')}
           </span>
           {' '}
           のすべてが設定された記事を表示しています。
