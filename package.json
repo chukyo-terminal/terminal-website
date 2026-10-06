@@ -31,7 +31,7 @@
     "pg-error-enum": "^2.0.1",
     "pg-native": "^3.9.0",
     "react": "^19.3.0",
-    "react-dom": "^19.2.8",
+    "react-dom": "^19.3.0",
     "react-modal": "^3.16.3",
     "zod": "^4.6.5"
   },
@@ -44,7 +44,7 @@
     "@types/node": "^24.1.0",
     "@types/pg": "^8.23.1",
     "@types/react": "^19.3.0",
-    "@types/react-dom": "^19.2.5",
+    "@types/react-dom": "^19.3.0",
     "@types/react-modal": "^3.16.3",
     "drizzle-kit": "^0.31.11",
     "eslint": "^9.31.0",
