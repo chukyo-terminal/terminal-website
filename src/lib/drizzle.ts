@@ -1,4 +1,7 @@
+import { PHASE_PRODUCTION_BUILD } from 'next/constants';
+
 import { drizzle } from 'drizzle-orm/node-postgres';
+import { migrate } from 'drizzle-orm/node-postgres/migrator';
 
 import type { AnyColumn, GetColumnData, SQL } from 'drizzle-orm';
 
@@ -20,6 +23,7 @@ export const as = <T extends AnyColumn>(
 };
 
 
+
 export const db = drizzle({
   connection: {
     user: process.env.DATABASE_USER!,
@@ -31,3 +35,14 @@ export const db = drizzle({
   },
   logger: process.env.NODE_ENV !== 'production' ? true : false,
 });
+
+
+// 本番環境で、起動時にマイグレーションを実行する
+// eslint-disable-next-line unicorn/prefer-top-level-await
+(async () => {
+  if (process.env.NODE_ENV === 'production' && process.env.NEXT_PHASE !== PHASE_PRODUCTION_BUILD) {
+    console.log('Running database migrations...');
+    await migrate(db, { migrationsFolder: 'drizzle' });
+    console.log('Database migrations completed.');
+  }
+})();
