@@ -19,7 +19,7 @@
     "@next/third-parties": "^16.3.6",
     "@types/markdown-it": "^14.2.0",
     "drizzle-orm": "^0.45.3",
-    "fast-xml-parser": "^5.11.1",
+    "fast-xml-parser": "^5.11.2",
     "framer-motion": "13.4.4",
     "hono": "^4.13.9",
     "http-status-ts": "^2.0.1",
