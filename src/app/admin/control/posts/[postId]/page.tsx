@@ -3,6 +3,7 @@ import { and, desc, eq } from 'drizzle-orm';
 import Editor from './_components/editor';
 import { db } from '@/lib/drizzle';
 import { postContentsTable, postsTable, usersTable } from '@/db/schema';
+import { getFiscalYear } from '@/utils/date';
 
 import type { JSX } from 'react';
 
@@ -57,7 +58,7 @@ export default async function PostEditPage({ params }: { params: Promise<{ postI
         await tx
           .update(postsTable)
           .set({
-            year: new Date().getUTCFullYear(),
+            year: getFiscalYear(new Date()),
           })
           .where(eq(postsTable.id, postContent[0].postId));
       }
@@ -72,7 +73,7 @@ export default async function PostEditPage({ params }: { params: Promise<{ postI
           description={postContent[0].description}
           authorId={post[0].users.id}
           slug={post[0].posts.slug}
-          year={postContent[0].publishedAt?.getUTCFullYear() ?? new Date().getUTCFullYear()}
+          year={postContent[0].publishedAt ? getFiscalYear(postContent[0].publishedAt) : getFiscalYear(new Date())}
           isPrivate={post[0].posts.isPrivate}
           content={postContent[0].content}
           onSave={handleSave}

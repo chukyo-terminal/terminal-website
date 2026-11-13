@@ -15,6 +15,13 @@
       "when": 1794574784465,
       "tag": "0001_dazzling_morph",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1794576000000,
+      "tag": "0002_convert_post_years_to_fiscal_year",
+      "breakpoints": true
     }
   ]
 }

@@ -7,6 +7,7 @@ import { and, eq, gte, lt } from 'drizzle-orm';
 import { publishedPostsView } from '@/db/schema';
 import { db } from '@/lib/drizzle';
 import { markdownIt } from '@/lib/markdown-it';
+import { getFiscalYearStart } from '@/utils/date';
 import './styles.css';
 
 import type { JSX } from 'react';
@@ -23,8 +24,8 @@ export async function generateMetadata({ params }: { params: Promise<{ year: str
     };
   }
   const yearNumber = Number(year);
-  const startOfYear = new Date(Date.UTC(yearNumber, 0, 1));
-  const startOfNextYear = new Date(Date.UTC(yearNumber + 1, 0, 1));
+  const startOfYear = getFiscalYearStart(yearNumber);
+  const startOfNextYear = getFiscalYearStart(yearNumber + 1);
   const postMeta = await db
     .select({
       title: publishedPostsView.title,
@@ -73,8 +74,8 @@ export default async function Post({ params }: { params: Promise<{ year: string;
   if (!/^\d{4}$/.test(year) || !Number.isInteger(yearNumber)) {
     notFound();
   }
-  const startOfYear = new Date(Date.UTC(yearNumber, 0, 1));
-  const startOfNextYear = new Date(Date.UTC(yearNumber + 1, 0, 1));
+  const startOfYear = getFiscalYearStart(yearNumber);
+  const startOfNextYear = getFiscalYearStart(yearNumber + 1);
   const post = await db
     .select({
       id: publishedPostsView.id,

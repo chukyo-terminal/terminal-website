@@ -5,6 +5,7 @@ import { Code } from 'lucide-react';
 
 import { tagsTable, publishedPostsView } from '@/db/schema';
 import { db } from '@/lib/drizzle';
+import { getFiscalYear } from '@/utils/date';
 
 import type { JSX } from 'react';
 import type { Metadata } from 'next';
@@ -113,7 +114,7 @@ export default async function Posts({
                 className="rounded-lg border border-gray-800 bg-gray-900/40 p-6 space-y-3"
               >
                 <h3 className="text-2xl font-bold text-emerald-300">
-                  <Link href={`/posts/${post.publishedAt!.getUTCFullYear()}/${post.slug}`} className="hover:underline">
+                  <Link href={`/posts/${getFiscalYear(post.publishedAt!)}/${post.slug}`} className="hover:underline">
                     {post.title}
                   </Link>
                 </h3>
