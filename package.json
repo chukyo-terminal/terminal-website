@@ -29,7 +29,7 @@
     "next-auth": "^4.24.15",
     "pg": "^8.23.0",
     "pg-error-enum": "^2.0.1",
-    "pg-native": "^3.9.0",
+    "pg-native": "^3.9.1",
     "react": "^19.3.0",
     "react-dom": "^19.2.8",
     "react-modal": "^3.16.3",
