@@ -19,7 +19,10 @@ export const as = <T extends AnyColumn>(
   column: T,
   alias: string,
 ): SQL.Aliased<GetColumnData<T>> => {
-  return column.getSQL().mapWith(column.mapFromDriverValue).as(alias);
+  // NOTE: `column.mapFromDriverValue` を関数として渡すと `this` がカラムを指さなくなり、
+  //       `PgTimestamp` の `this.withTimezone` が undefined になってタイムゾーンが誤って解釈されるため、
+  //       カラム自体をデコーダーとして渡す。
+  return column.getSQL().mapWith(column).as(alias);
 };
 
 

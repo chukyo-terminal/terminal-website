@@ -64,6 +64,7 @@ const formatDate = (date: Date | null): string => date ? (
     day: '2-digit',
     hour: '2-digit',
     minute: '2-digit',
+    timeZone: 'Asia/Tokyo',
   }).format(date)
 ) : '-';
 
