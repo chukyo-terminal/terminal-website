@@ -1,7 +1,7 @@
 import { and, asc, desc, eq, isNull, isNotNull, sql, ne } from 'drizzle-orm';
 import {
   boolean, char, check, date, foreignKey, integer,
-  pgEnum, pgTable, pgView, primaryKey, text, timestamp, varchar,
+  pgEnum, pgTable, pgView, primaryKey, text, timestamp, unique, varchar,
 } from 'drizzle-orm/pg-core';
 
 import { as } from '@/lib/drizzle';
@@ -101,8 +101,10 @@ export const postsTable = pgTable(
     id: integer().primaryKey().generatedAlwaysAsIdentity(),
     /** 著者 */
     authorId: integer('author_id').notNull().references(() => usersTable.id, { onDelete: 'cascade' }),
+    /** 公開年度 */
+    year: integer(),
     /** スラッグ（数字，小文字の英字，ハイフン，かつ先頭と末尾にハイフンが含まれない） */
-    slug: text().notNull().unique(),
+    slug: text().notNull(),
     /** 非公開フラグ（未公開を意味しない） */
     isPrivate: boolean('is_private').notNull().default(false),
     /** 作成日時 */
@@ -111,6 +113,8 @@ export const postsTable = pgTable(
     updatedAt: timestamp('updated_at', { mode: 'date', precision: 3, withTimezone: true }).notNull().defaultNow().$onUpdateFn(() => new Date()),
   },
   (table) => [
+    unique('posts_year_slug_unique').on(table.year, table.slug),
+    check('valid_year', sql`${table.year} IS NULL OR ${table.year} >= 2025`),
     check('valid_slug', sql`${table.slug} ~ '^[a-z0-9]+(-[a-z0-9]+)*$'`),
   ],
 );

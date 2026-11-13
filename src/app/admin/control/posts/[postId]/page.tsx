@@ -46,12 +46,22 @@ export default async function PostEditPage({ params }: { params: Promise<{ postI
   }
   async function handlePublish() {
     'use server';
-    await db
-      .update(postContentsTable)
-      .set({
-        publishedAt: new Date(),
-      })
-      .where(and(eq(postContentsTable.postId, postContent[0].postId), eq(postContentsTable.identifier, postContent[0].identifier)));
+    await db.transaction(async (tx) => {
+      await tx
+        .update(postContentsTable)
+        .set({
+          publishedAt: new Date(),
+        })
+        .where(and(eq(postContentsTable.postId, postContent[0].postId), eq(postContentsTable.identifier, postContent[0].identifier)));
+      if (postContent[0].publishedAt === null) {
+        await tx
+          .update(postsTable)
+          .set({
+            year: new Date().getUTCFullYear(),
+          })
+          .where(eq(postsTable.id, postContent[0].postId));
+      }
+    });
   }
   return (
     <div className="mx-auto px-4 py-12">
@@ -62,6 +72,7 @@ export default async function PostEditPage({ params }: { params: Promise<{ postI
           description={postContent[0].description}
           authorId={post[0].users.id}
           slug={post[0].posts.slug}
+          year={postContent[0].publishedAt?.getUTCFullYear() ?? new Date().getUTCFullYear()}
           isPrivate={post[0].posts.isPrivate}
           content={postContent[0].content}
           onSave={handleSave}

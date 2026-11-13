@@ -2,7 +2,7 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
 
-import { eq } from 'drizzle-orm';
+import { and, eq, gte, lt } from 'drizzle-orm';
 
 import { publishedPostsView } from '@/db/schema';
 import { db } from '@/lib/drizzle';
@@ -15,15 +15,27 @@ import type { JSX } from 'react';
 const siteTitle = 'Terminal | 中京大学プログラミングサークル';
 
 
-export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
-  const { slug } = await params;
+export async function generateMetadata({ params }: { params: Promise<{ year: string; slug: string }> }): Promise<Metadata> {
+  const { year, slug } = await params;
+  if (!/^\d{4}$/.test(year)) {
+    return {
+      title: `投稿 | ${siteTitle}`,
+    };
+  }
+  const yearNumber = Number(year);
+  const startOfYear = new Date(Date.UTC(yearNumber, 0, 1));
+  const startOfNextYear = new Date(Date.UTC(yearNumber + 1, 0, 1));
   const postMeta = await db
     .select({
       title: publishedPostsView.title,
       description: publishedPostsView.description,
     })
     .from(publishedPostsView)
-    .where(eq(publishedPostsView.slug, slug))
+    .where(and(
+      eq(publishedPostsView.slug, slug),
+      gte(publishedPostsView.publishedAt, startOfYear),
+      lt(publishedPostsView.publishedAt, startOfNextYear),
+    ))
     .then((result) => result.at(0)); // XXX: `result[0]` とすると型が `T | undefined` にならないため、`result.at(0)` としている
 
   if (!postMeta) {
@@ -55,8 +67,14 @@ const formatDate = (date: Date | null): string => date ? (
 ) : '-';
 
 
-export default async function Post({ params }: { params: Promise<{ slug: string }> }): Promise<JSX.Element> {
-  const { slug } = await params;
+export default async function Post({ params }: { params: Promise<{ year: string; slug: string }> }): Promise<JSX.Element> {
+  const { year, slug } = await params;
+  const yearNumber = Number(year);
+  if (!/^\d{4}$/.test(year) || !Number.isInteger(yearNumber)) {
+    notFound();
+  }
+  const startOfYear = new Date(Date.UTC(yearNumber, 0, 1));
+  const startOfNextYear = new Date(Date.UTC(yearNumber + 1, 0, 1));
   const post = await db
     .select({
       id: publishedPostsView.id,
@@ -75,7 +93,11 @@ export default async function Post({ params }: { params: Promise<{ slug: string 
       hasDraft: publishedPostsView.hasDraft,
     })
     .from(publishedPostsView)
-    .where(eq(publishedPostsView.slug, slug))
+    .where(and(
+      eq(publishedPostsView.slug, slug),
+      gte(publishedPostsView.publishedAt, startOfYear),
+      lt(publishedPostsView.publishedAt, startOfNextYear),
+    ))
     .then((result) => result.at(0)); // XXX: `result[0]` とすると型が `T | undefined` にならないため、`result.at(0)` としている
   if (!post) {
     notFound();

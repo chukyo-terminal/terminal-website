@@ -9,6 +9,7 @@ export default function Editor({
   description,
   authorId,
   slug,
+  year,
   isPrivate,
   content,
   onSave,
@@ -18,6 +19,7 @@ export default function Editor({
   description: string | null;
   authorId: number;
   slug: string;
+  year: number;
   isPrivate: boolean;
   content: string;
   onSave: (data: { title: string; description: string | null; authorId: number; slug: string; isPrivate: boolean; content: string }) => Promise<void>;
@@ -94,7 +96,7 @@ export default function Editor({
           globalThis.open(`https://twitter.com/intent/tweet?text=${
             encodeURIComponent(
               `【記事公開】\n「${title}」\n${description}\nby @chukyo_terminal ※投稿者のユーザー名に置き換えもしくは削除\n${
-                new URL(`/posts/${slug}`, process.env.NEXT_PUBLIC_APP_URL).href // &url=だと余計なスペースが入るため
+                new URL(`/posts/${year}/${slug}`, process.env.NEXT_PUBLIC_APP_URL).href // &url=だと余計なスペースが入るため
               }`,
             )
           }`);

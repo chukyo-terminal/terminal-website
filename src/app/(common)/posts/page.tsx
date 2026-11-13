@@ -113,7 +113,7 @@ export default async function Posts({
                 className="rounded-lg border border-gray-800 bg-gray-900/40 p-6 space-y-3"
               >
                 <h3 className="text-2xl font-bold text-emerald-300">
-                  <Link href={`/posts/${post.slug}`} className="hover:underline">
+                  <Link href={`/posts/${post.publishedAt!.getUTCFullYear()}/${post.slug}`} className="hover:underline">
                     {post.title}
                   </Link>
                 </h3>
