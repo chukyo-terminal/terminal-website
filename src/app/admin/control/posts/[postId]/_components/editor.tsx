@@ -16,8 +16,10 @@ import MarkdownEditor from './markdown-editor';
 import MarkdownPreview from './markdown-preview';
 import MarkdownToolbar from './markdown-toolbar';
 import ShortcutHelpModal from './shortcut-help-modal';
+import TagInput from './tag-input';
 import {
-  PostFormSchema, PostFormValuesSchema, RECOMMENDED_DESCRIPTION_LENGTH, isSamePostFormValues, normalizeDescription,
+  MAX_TAGS_PER_POST, PostFormSchema, PostFormValuesSchema, RECOMMENDED_DESCRIPTION_LENGTH, isSamePostFormValues,
+  normalizeDescription,
 } from '../_lib/post-form';
 import { getEditorScrollPosition } from '../_lib/scroll-sync';
 import { SHORTCUT_KEYS, formatShortcut, useIsApplePlatform } from '../_lib/shortcuts';
@@ -28,7 +30,7 @@ import type { CursorInfo } from './markdown-editor';
 import type { MarkdownPreviewHandle } from './markdown-preview';
 import type { ViewMode } from './markdown-toolbar';
 import type { MarkdownCommand } from '../_lib/markdown-commands';
-import type { PostFormValues, PostStatus, PublishResult, SaveResult } from '../_lib/post-form';
+import type { PostFormValues, PostStatus, PublishResult, SaveResult, TagOption } from '../_lib/post-form';
 
 
 /**
@@ -247,6 +249,8 @@ type EditorProperties = {
   firstPublishedAt: Date | null;
   /** 最後に保存された日時 */
   lastSavedAt: Date;
+  /** 既存のタグ（タグの入力候補） */
+  availableTags: TagOption[];
   onSave: (values: PostFormValues) => Promise<SaveResult>;
   onPublish: () => Promise<PublishResult>;
 };
@@ -267,6 +271,7 @@ export default function Editor({
   expectedYear,
   firstPublishedAt,
   lastSavedAt,
+  availableTags,
   onSave,
   onPublish,
 }: EditorProperties): JSX.Element {
@@ -324,6 +329,7 @@ export default function Editor({
 
   const descriptionLength = values.description?.length ?? 0;
   const isDescriptionTooLong = descriptionLength > RECOMMENDED_DESCRIPTION_LENGTH;
+  const isTagLimitReached = values.tags.length >= MAX_TAGS_PER_POST;
 
   /**
    * フォームの値を更新する。
@@ -683,6 +689,28 @@ export default function Editor({
               className={`${INPUT_CLASS_NAME} resize-y border-gray-600`}
             />
           </Field>
+          <Field
+            label="タグ"
+            htmlFor="post-tags"
+            error={fieldErrors.tags}
+            aside={(
+              <span className={`text-xs ${isTagLimitReached ? 'text-amber-300' : 'text-gray-500'}`}>
+                {values.tags.length} / {MAX_TAGS_PER_POST}
+              </span>
+            )}
+          >
+            <TagInput
+              id="post-tags"
+              value={values.tags}
+              options={availableTags}
+              onChange={(tags) => updateField('tags', tags)}
+              describedBy={fieldErrors.tags ? 'post-tags-error' : 'post-tags-hint'}
+              isInvalid={!!fieldErrors.tags}
+            />
+            <p id="post-tags-hint" className="text-xs text-gray-500">
+              既存のタグから選ぶか、新しいタグを作成できます。タグの変更は、保存するとすぐに公開ページに反映されます。
+            </p>
+          </Field>
         </div>
         <div className="flex flex-col gap-4">
           <Field label="スラッグ" htmlFor="post-slug" error={fieldErrors.slug}>
@@ -761,6 +789,7 @@ export default function Editor({
             title={values.title}
             author={author}
             publishedAt={firstPublishedAt}
+            tags={values.tags}
             content={values.content}
             isActive={effectiveViewMode !== 'edit'}
             onRender={syncPreviewScroll}

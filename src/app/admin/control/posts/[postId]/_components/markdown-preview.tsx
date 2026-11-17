@@ -10,6 +10,7 @@ import '@/styles/markdown.css';
 import { interpolateScrollTop } from '../_lib/scroll-sync';
 
 import type { JSX, MouseEvent, Ref } from 'react';
+import type { PostTag } from '../_lib/post-form';
 import type { EditorScrollPosition, SourceLineAnchor } from '../_lib/scroll-sync';
 
 
@@ -147,6 +148,7 @@ type MarkdownPreviewProperties = {
   title: string;
   author: string;
   publishedAt: Date | null;
+  tags: readonly PostTag[];
   content: string;
   /** 表示中かどうか（非表示の間はプレビューを更新しない） */
   isActive: boolean;
@@ -169,6 +171,7 @@ export default function MarkdownPreview({
   title,
   author,
   publishedAt,
+  tags,
   content,
   isActive,
   onRender,
@@ -297,6 +300,13 @@ export default function MarkdownPreview({
             </p>
           </div>
         </header>
+        {tags.length > 0 && (
+          <div className="flex flex-wrap gap-x-3 gap-y-1">
+            {tags.map((tag) => (
+              <span key={tag.slug} className="text-emerald-300">#{tag.name}</span>
+            ))}
+          </div>
+        )}
         <div className="h-1 w-20 rounded bg-emerald-400" />
         {body}
       </article>

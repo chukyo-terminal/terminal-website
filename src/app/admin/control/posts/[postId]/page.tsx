@@ -1,23 +1,17 @@
-import { DrizzleQueryError, and, asc, desc, eq, isNotNull } from 'drizzle-orm';
-import { DatabaseError } from 'pg';
-import { PostgresError } from 'pg-error-enum';
+import { and, asc, count, desc, eq, isNotNull } from 'drizzle-orm';
 
 import Editor from './_components/editor';
+import { PostActionError, syncPostTags, toErrorMessage } from './_lib/post-actions';
 import { PostFormSchema, normalizeDescription } from './_lib/post-form';
 import { db } from '@/lib/drizzle';
-import { postContentsTable, postsTable, usersTable } from '@/db/schema';
+import { postContentsTable, postTagsTable, postsTable, tagsTable, usersTable } from '@/db/schema';
 import { getFiscalYear } from '@/utils/date';
 
 import type { JSX } from 'react';
+import type { Transaction } from './_lib/post-actions';
 import type { PostFormValues, PostStatus, PublishResult, SaveResult } from './_lib/post-form';
 
 export const dynamic = 'force-dynamic';
-
-
-/**
- * トランザクション内でクエリを実行するオブジェクト。
- */
-type Transaction = Parameters<Parameters<typeof db.transaction>[0]>[0];
 
 
 /**
@@ -57,19 +51,6 @@ async function getFirstPublishedAt(executor: Pick<Transaction, 'select'>, postId
 }
 
 
-/**
- * 一意性制約違反のエラーかどうかを判定する。
- *
- * @param e - エラー
- * @returns 一意性制約違反の場合は `true`
- */
-function isUniqueViolation(e: unknown): boolean {
-  return e instanceof DrizzleQueryError
-    && e.cause instanceof DatabaseError
-    && e.cause.code === PostgresError.UNIQUE_VIOLATION;
-}
-
-
 export default async function PostEditPage({ params }: { params: Promise<{ postId: string }> }): Promise<JSX.Element> {
   const { postId: postIdParameter } = await params;
   const postId = Number(postIdParameter);
@@ -100,7 +81,21 @@ export default async function PostEditPage({ params }: { params: Promise<{ postI
     );
   }
 
-  const firstPublishedAt = await getFirstPublishedAt(db, postId);
+  const [firstPublishedAt, postTags, availableTags] = await Promise.all([
+    getFirstPublishedAt(db, postId),
+    db
+      .select({ name: tagsTable.name, slug: tagsTable.slug })
+      .from(postTagsTable)
+      .innerJoin(tagsTable, eq(postTagsTable.tagId, tagsTable.id))
+      .where(eq(postTagsTable.postId, postId))
+      .orderBy(asc(tagsTable.name)),
+    db
+      .select({ name: tagsTable.name, slug: tagsTable.slug, postCount: count(postTagsTable.postId) })
+      .from(tagsTable)
+      .leftJoin(postTagsTable, eq(tagsTable.id, postTagsTable.tagId))
+      .groupBy(tagsTable.id)
+      .orderBy(asc(tagsTable.name)),
+  ]);
   let status: PostStatus = 'draft';
   if (latestContent.publishedAt) {
     status = 'published';
@@ -164,14 +159,16 @@ export default async function PostEditPage({ params }: { params: Promise<{ postI
             .where(eq(postsTable.id, postId));
         }
 
+        // タグは版ごとではなく記事ごとに管理しているため、保存時点で公開ページにも反映される
+        await syncPostTags(tx, postId, data.tags);
+
         return { ok: true, savedAt: new Date() };
       });
     } catch (e) {
-      if (isUniqueViolation(e)) {
-        return { ok: false, error: '同じ年度に同じスラッグの記事が既に存在します。別のスラッグを指定してください。' };
+      if (!(e instanceof PostActionError)) {
+        console.error('Failed to save post:', e);
       }
-      console.error('Failed to save post:', e);
-      return { ok: false, error: '保存に失敗しました。' };
+      return { ok: false, error: toErrorMessage(e, '保存に失敗しました。') };
     }
   }
 
@@ -219,11 +216,10 @@ export default async function PostEditPage({ params }: { params: Promise<{ postI
         };
       });
     } catch (e) {
-      if (isUniqueViolation(e)) {
-        return { ok: false, error: '同じ年度に同じスラッグの記事が既に存在します。スラッグを変更してから公開してください。' };
+      if (!(e instanceof PostActionError)) {
+        console.error('Failed to publish post:', e);
       }
-      console.error('Failed to publish post:', e);
-      return { ok: false, error: '公開に失敗しました。' };
+      return { ok: false, error: toErrorMessage(e, '公開に失敗しました。') };
     }
   }
 
@@ -236,6 +232,7 @@ export default async function PostEditPage({ params }: { params: Promise<{ postI
           description: latestContent.description,
           slug: post.slug,
           isPrivate: post.isPrivate,
+          tags: postTags,
           content: latestContent.content,
         }}
         author={post.authorDisplayName || post.authorName}
@@ -244,6 +241,7 @@ export default async function PostEditPage({ params }: { params: Promise<{ postI
         expectedYear={getFiscalYear(new Date())}
         firstPublishedAt={firstPublishedAt}
         lastSavedAt={latestContent.updatedAt}
+        availableTags={availableTags}
         onSave={handleSave}
         onPublish={handlePublish}
       />
