@@ -1,76 +1,87 @@
-import Link from 'next/link';
-import { desc, eq } from 'drizzle-orm';
+import { asc, desc, eq, isNotNull, min } from 'drizzle-orm';
 
-import { postContentsTable, postsTable, usersTable } from '@/db/schema';
+import PostList from './_components/post-list';
+import { parsePostListFilters } from './_lib/post-list';
+import { getPostStatus } from './_lib/post-status';
+import { postContentsTable, postTagsTable, postsTable, tagsTable, usersTable } from '@/db/schema';
 import { db } from '@/lib/drizzle';
+import { getFiscalYear } from '@/utils/date';
 
 import type { JSX } from 'react';
+import type { PostListItem } from './_lib/post-list';
 
 export const dynamic = 'force-dynamic';
 
 
-/**
- * 日時をフォーマットする。
- * @param date - フォーマットする日時。
- * @returns フォーマット済みの日時文字列。null の場合は `-` を返す。
- */
-const formatDate = (date: Date | null): string => date ? (
-  new Intl.DateTimeFormat('ja-JP', {
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit',
-    hour: '2-digit',
-    minute: '2-digit',
-  }).format(date)
-) : '-';
+export default async function PostManagementPage({
+  searchParams,
+}: {
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+}): Promise<JSX.Element> {
+  const [latestContents, firstPublications, postTags] = await Promise.all([
+    // 各投稿の最新の版
+    db
+      .selectDistinctOn([postsTable.id], {
+        id: postsTable.id,
+        slug: postsTable.slug,
+        isPrivate: postsTable.isPrivate,
+        createdAt: postsTable.createdAt,
+        authorId: usersTable.id,
+        authorName: usersTable.name,
+        authorDisplayName: usersTable.displayName,
+        title: postContentsTable.title,
+        description: postContentsTable.description,
+        updatedAt: postContentsTable.updatedAt,
+        publishedAt: postContentsTable.publishedAt,
+      })
+      .from(postsTable)
+      .innerJoin(usersTable, eq(postsTable.authorId, usersTable.id))
+      .innerJoin(postContentsTable, eq(postsTable.id, postContentsTable.postId))
+      .orderBy(desc(postsTable.id), desc(postContentsTable.identifier)),
+    // 各投稿が初めて公開された日時
+    db
+      .select({ postId: postContentsTable.postId, publishedAt: min(postContentsTable.publishedAt) })
+      .from(postContentsTable)
+      .where(isNotNull(postContentsTable.publishedAt))
+      .groupBy(postContentsTable.postId),
+    // 各投稿のタグ
+    db
+      .select({ postId: postTagsTable.postId, name: tagsTable.name, slug: tagsTable.slug })
+      .from(postTagsTable)
+      .innerJoin(tagsTable, eq(postTagsTable.tagId, tagsTable.id))
+      .orderBy(asc(tagsTable.name)),
+  ]);
 
+  const firstPublishedAtByPost = new Map(firstPublications.map((row) => [row.postId, row.publishedAt]));
+  const tagsByPost = new Map<number, { name: string; slug: string }[]>();
+  for (const { postId, name, slug } of postTags) {
+    tagsByPost.set(postId, [...(tagsByPost.get(postId) ?? []), { name, slug }]);
+  }
 
-export default async function PostManagementPage(): Promise<JSX.Element> {
-  const posts = await db
-    .selectDistinctOn([postsTable.id], {
-      id: postsTable.id,
-      author: {
-        id: usersTable.id,
-        name: usersTable.name,
-        displayName: usersTable.displayName,
-      },
-      title: postContentsTable.title,
-      description: postContentsTable.description,
-      slug: postsTable.slug,
-      isPrivate: postsTable.isPrivate,
-      createdAt: postsTable.createdAt,
-      updatedAt: postContentsTable.updatedAt,
-      publishedAt: postContentsTable.publishedAt,
-    })
-    .from(postsTable)
-    .innerJoin(usersTable, eq(postsTable.authorId, usersTable.id))
-    .innerJoin(postContentsTable, eq(postsTable.id, postContentsTable.postId))
-    .orderBy(desc(postsTable.id), desc(postContentsTable.updatedAt));
+  const posts: PostListItem[] = latestContents.map((content) => {
+    const firstPublishedAt = firstPublishedAtByPost.get(content.id) ?? null;
+    return {
+      id: content.id,
+      title: content.title,
+      description: content.description,
+      slug: content.slug,
+      isPrivate: content.isPrivate,
+      status: getPostStatus(content.publishedAt, firstPublishedAt),
+      author: { id: content.authorId, name: content.authorDisplayName || content.authorName },
+      tags: tagsByPost.get(content.id) ?? [],
+      createdAt: content.createdAt,
+      updatedAt: content.updatedAt,
+      firstPublishedAt,
+      // 記事の URL の年度は、初めて公開された日時で決まる
+      publicPath: firstPublishedAt && !content.isPrivate
+        ? `/posts/${getFiscalYear(firstPublishedAt)}/${content.slug}`
+        : null,
+    };
+  });
+
   return (
     <div className="mx-auto px-4 py-12">
-      <h1 className="text-2xl">投稿管理</h1>
-      <div className="flex flex-col">
-        {posts.map((post, index) => (
-          <Link key={index} href={`./posts/${post.id}`}>
-            <article className="my-4 rounded-lg border p-4">
-              <h2>{post.title}</h2>
-              {post.isPrivate && (
-                <p className="text-sm text-red-500">非公開</p>
-              )}
-              <p className="text-sm text-muted-foreground text-right">
-                著者: {post.author.displayName ?? post.author.name}
-              </p>
-              <p className="text-sm text-muted-foreground text-right">
-                公開日: <time>{formatDate(post.publishedAt)}</time>
-              </p>
-              <p className="text-sm text-muted-foreground text-right">
-                最終更新: <time>{formatDate(post.updatedAt)}</time>
-              </p>
-              <p>{post.description}</p>
-            </article>
-          </Link>
-        ))}
-      </div>
+      <PostList posts={posts} initialFilters={parsePostListFilters(await searchParams)} now={new Date()} />
     </div>
   );
 }

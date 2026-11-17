@@ -12,6 +12,8 @@ import { z } from 'zod';
 
 import Modal from '@/components/elements/modal';
 
+import { PostStatusBadge, PrivateBadge } from '../../_components/post-status-badge';
+
 import MarkdownEditor from './markdown-editor';
 import MarkdownPreview from './markdown-preview';
 import MarkdownToolbar from './markdown-toolbar';
@@ -85,16 +87,6 @@ type StoredDraft = z.infer<typeof StoredDraftSchema>;
 type Toast = {
   type: 'success' | 'error';
   message: string;
-};
-
-
-/**
- * 公開状態の表示。
- */
-const STATUS_BADGES: Readonly<Record<PostStatus, { label: string; className: string }>> = {
-  'draft': { label: '未公開', className: 'border-gray-500 text-gray-300' },
-  'published': { label: '公開中', className: 'border-emerald-500/60 text-emerald-300' },
-  'published-with-draft': { label: '公開中・未公開の変更あり', className: 'border-amber-500/60 text-amber-300' },
 };
 
 
@@ -304,7 +296,6 @@ export default function Editor({
   const publicUrl = status !== 'draft' && publishedYear !== null && !savedValues.isPrivate
     ? `/posts/${publishedYear}/${savedValues.slug}`
     : null;
-  const badge = STATUS_BADGES[status];
 
   const fieldErrors = useMemo(() => {
     const result = PostFormSchema.safeParse(values);
@@ -607,10 +598,8 @@ export default function Editor({
           投稿一覧
         </Link>
         <h1 className="text-2xl">投稿編集</h1>
-        <span className={`rounded-full border px-2.5 py-0.5 text-xs ${badge.className}`}>{badge.label}</span>
-        {savedValues.isPrivate && (
-          <span className="rounded-full border border-red-500/60 px-2.5 py-0.5 text-xs text-red-300">非公開設定</span>
-        )}
+        <PostStatusBadge status={status} />
+        {savedValues.isPrivate && <PrivateBadge />}
         {publicUrl && (
           <a
             href={publicUrl}

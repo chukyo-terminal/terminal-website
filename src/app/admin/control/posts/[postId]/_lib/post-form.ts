@@ -91,14 +91,7 @@ export type TagOption = PostTag & {
 };
 
 
-/**
- * 記事の公開状態。
- *
- * - `draft`: 一度も公開されていない
- * - `published`: 最新の内容が公開されている
- * - `published-with-draft`: 公開済みだが、公開されていない変更（下書き）がある
- */
-export type PostStatus = 'draft' | 'published' | 'published-with-draft';
+export type { PostStatus } from '../../_lib/post-status';
 
 
 /**

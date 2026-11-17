@@ -7,9 +7,11 @@ import { db } from '@/lib/drizzle';
 import { postContentsTable, postTagsTable, postsTable, tagsTable, usersTable } from '@/db/schema';
 import { getFiscalYear } from '@/utils/date';
 
+import { getPostStatus } from '../_lib/post-status';
+
 import type { JSX } from 'react';
 import type { Transaction } from './_lib/post-actions';
-import type { PostFormValues, PostStatus, PublishResult, SaveResult } from './_lib/post-form';
+import type { PostFormValues, PublishResult, SaveResult } from './_lib/post-form';
 
 export const dynamic = 'force-dynamic';
 
@@ -96,12 +98,7 @@ export default async function PostEditPage({ params }: { params: Promise<{ postI
       .groupBy(tagsTable.id)
       .orderBy(asc(tagsTable.name)),
   ]);
-  let status: PostStatus = 'draft';
-  if (latestContent.publishedAt) {
-    status = 'published';
-  } else if (firstPublishedAt) {
-    status = 'published-with-draft';
-  }
+  const status = getPostStatus(latestContent.publishedAt, firstPublishedAt);
 
   async function handleSave(values: PostFormValues): Promise<SaveResult> {
     'use server';
