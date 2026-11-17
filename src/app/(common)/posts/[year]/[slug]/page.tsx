@@ -8,6 +8,7 @@ import { publishedPostsView } from '@/db/schema';
 import { db } from '@/lib/drizzle';
 import { markdownIt } from '@/lib/markdown-it';
 import { getFiscalYearStart } from '@/utils/date';
+import '@/styles/markdown.css';
 import './styles.css';
 
 import type { JSX } from 'react';
@@ -134,7 +135,7 @@ export default async function Post({ params }: { params: Promise<{ year: string;
       </div>
       <div className="h-1 w-20 bg-emerald-400 rounded"></div>
       <div className="space-y-16 text-gray-200">
-        <div dangerouslySetInnerHTML={{ __html: markdownIt.render(post.content) }} />
+        <div className="markdown-body" dangerouslySetInnerHTML={{ __html: markdownIt.render(post.content) }} />
       </div>
     </div>
   );
