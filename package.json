@@ -62,7 +62,7 @@
     "eslint-plugin-unused-imports": "^4.1.4",
     "globals": "^17.14.0",
     "jiti": "^2.7.0",
-    "postcss": "^8.5.28",
+    "postcss": "^8.5.33",
     "postcss-load-config": "^6.0.1",
     "tailwindcss": "^4.3.4",
     "tsx": "^4.23.15",
