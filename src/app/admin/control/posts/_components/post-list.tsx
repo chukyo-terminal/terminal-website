@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { useEffect, useEffectEvent, useMemo, useRef, useState } from 'react';
 
-import { CalendarDays, ExternalLink, FilePlus2, Plus, Search, SearchX, UserRound, X } from 'lucide-react';
+import { CalendarDays, ExternalLink, FilePlus2, Plus, Search, SearchX, Tags, UserRound, X } from 'lucide-react';
 
 import { PostStatusBadge, PrivateBadge } from './post-status-badge';
 import { formatDate, formatDateTime, formatRelativeTime } from '../_lib/date-format';
@@ -20,6 +20,12 @@ import type { PostListFilters, PostListItem, SortOrder } from '../_lib/post-list
  * 新規投稿ページのパス。
  */
 const NEW_POST_PATH = '/admin/control/posts/new';
+
+
+/**
+ * タグ管理ページのパス。
+ */
+const TAG_MANAGEMENT_PATH = '/admin/control/posts/tags';
 
 
 /**
@@ -217,13 +223,25 @@ export default function PostList({ posts, initialFilters, now }: PostListPropert
             全{posts.length}件の投稿
           </p>
         </div>
-        <Link
-          href={NEW_POST_PATH}
-          className={PRIMARY_BUTTON_CLASS_NAME}
-        >
-          <Plus className="h-4 w-4" aria-hidden />
-          新規投稿
-        </Link>
+        <div className="flex flex-wrap items-center gap-2">
+          <Link
+            href={TAG_MANAGEMENT_PATH}
+            className={
+              'inline-flex items-center gap-2 rounded border border-gray-600 px-4 py-2 font-medium text-gray-200 '
+              + 'hover:border-gray-500 hover:bg-gray-800'
+            }
+          >
+            <Tags className="h-4 w-4" aria-hidden />
+            タグ管理
+          </Link>
+          <Link
+            href={NEW_POST_PATH}
+            className={PRIMARY_BUTTON_CLASS_NAME}
+          >
+            <Plus className="h-4 w-4" aria-hidden />
+            新規投稿
+          </Link>
+        </div>
       </div>
 
       {posts.length === 0 ? (
