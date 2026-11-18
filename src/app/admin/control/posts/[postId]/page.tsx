@@ -5,6 +5,8 @@ import { PostActionError, syncPostTags, toErrorMessage } from './_lib/post-actio
 import { PostFormSchema, normalizeDescription } from './_lib/post-form';
 import { db } from '@/lib/drizzle';
 import { postContentsTable, postTagsTable, postsTable, tagsTable, usersTable } from '@/db/schema';
+import { checkPermission } from '@/lib/auth';
+import { selectPostVersions } from '@/lib/post-version-queries';
 import { getFiscalYear } from '@/utils/date';
 
 import { getPostStatus } from '../_lib/post-status';
@@ -12,6 +14,8 @@ import { getPostStatus } from '../_lib/post-status';
 import type { JSX } from 'react';
 import type { Transaction } from './_lib/post-actions';
 import type { PostFormValues, PublishResult, SaveResult } from './_lib/post-form';
+import type { PostVersion } from '@/lib/post-versions';
+import type { ActionResult } from '@/types';
 
 export const dynamic = 'force-dynamic';
 
@@ -220,6 +224,75 @@ export default async function PostEditPage({ params }: { params: Promise<{ postI
     }
   }
 
+  async function handleLoadHistory(): Promise<ActionResult<PostVersion[]>> {
+    'use server';
+    const permissionError = await checkPermission('user');
+    if (permissionError) {
+      return { ok: false, error: permissionError };
+    }
+    try {
+      return { ok: true, data: await selectPostVersions(postId) };
+    } catch (e) {
+      console.error('Failed to load post history:', e);
+      return { ok: false, error: '編集履歴を読み込めませんでした。' };
+    }
+  }
+
+  async function handleSetVersionPrivate(identifier: number, isPrivate: boolean): Promise<ActionResult<PostVersion[]>> {
+    'use server';
+    const permissionError = await checkPermission('user');
+    if (permissionError) {
+      return { ok: false, error: permissionError };
+    }
+    if (!Number.isSafeInteger(identifier) || identifier <= 0 || typeof isPrivate !== 'boolean') {
+      return { ok: false, error: '指定された版が正しくありません。' };
+    }
+    try {
+      await db.transaction(async (tx) => {
+        // 同時に操作されても公開中の版がなくならないよう、記事のすべての版をロックしてから確認する
+        const versions = await tx
+          .select({
+            identifier: postContentsTable.identifier,
+            isPrivate: postContentsTable.isPrivate,
+            publishedAt: postContentsTable.publishedAt,
+            updatedAt: postContentsTable.updatedAt,
+          })
+          .from(postContentsTable)
+          .where(eq(postContentsTable.postId, postId))
+          .for('update');
+        const target = versions.find((version) => version.identifier === identifier);
+        if (!target) {
+          throw new PostActionError('指定された版が見つかりませんでした。');
+        }
+        if (!target.publishedAt) {
+          throw new PostActionError('公開されていない版（下書き）の公開設定は変更できません。');
+        }
+        if (target.isPrivate === isPrivate) {
+          return;
+        }
+        const hasOtherPublicVersion = versions.some((version) => (
+          version.identifier !== identifier && version.publishedAt !== null && !version.isPrivate
+        ));
+        if (isPrivate && !hasOtherPublicVersion) {
+          throw new PostActionError(
+            '公開中の版がなくなるため、この版は非公開にできません。記事全体を非公開にする場合は、「非公開にする」を設定して保存してください。',
+          );
+        }
+        await tx
+          .update(postContentsTable)
+          // 内容の編集ではないため、更新日時（最終保存日時として表示される）は変更しない
+          .set({ isPrivate, updatedAt: target.updatedAt })
+          .where(and(eq(postContentsTable.postId, postId), eq(postContentsTable.identifier, identifier)));
+      });
+      return { ok: true, data: await selectPostVersions(postId) };
+    } catch (e) {
+      if (!(e instanceof PostActionError)) {
+        console.error('Failed to change version visibility:', e);
+      }
+      return { ok: false, error: toErrorMessage(e, '版の公開設定を変更できませんでした。') };
+    }
+  }
+
   return (
     <div className="mx-auto px-4 py-12">
       <Editor
@@ -241,6 +314,8 @@ export default async function PostEditPage({ params }: { params: Promise<{ postI
         availableTags={availableTags}
         onSave={handleSave}
         onPublish={handlePublish}
+        onLoadHistory={handleLoadHistory}
+        onSetVersionPrivate={handleSetVersionPrivate}
       />
     </div>
   );

@@ -2,9 +2,10 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
 
-import { and, eq, gte, lt } from 'drizzle-orm';
+import { and, count, eq, gte, isNotNull, lt } from 'drizzle-orm';
+import { History } from 'lucide-react';
 
-import { publishedPostsView } from '@/db/schema';
+import { postContentsTable, publishedPostsView } from '@/db/schema';
 import { db } from '@/lib/drizzle';
 import { markdownIt } from '@/lib/markdown-it';
 import { getFiscalYearStart } from '@/utils/date';
@@ -105,6 +106,16 @@ export default async function Post({ params }: { params: Promise<{ year: string;
   if (!post) {
     notFound();
   }
+  // 公開ページに表示できる版（公開済みで、非公開にしていない版）の数
+  const publicVersionCount = await db
+    .select({ count: count() })
+    .from(postContentsTable)
+    .where(and(
+      eq(postContentsTable.postId, post.id),
+      isNotNull(postContentsTable.publishedAt),
+      eq(postContentsTable.isPrivate, false),
+    ))
+    .then((result) => result.at(0)?.count ?? 0);
 
   return (
     <div className="space-y-8 z-50 pt-20">
@@ -124,6 +135,15 @@ export default async function Post({ params }: { params: Promise<{ year: string;
               </p>
             )}
           </div>
+          {publicVersionCount > 1 && (
+            <Link
+              href={`/posts/${year}/${slug}/history`}
+              className="mt-1 inline-flex items-center gap-1 text-emerald-400 hover:text-emerald-300 hover:underline"
+            >
+              <History className="h-4 w-4" aria-hidden />
+              編集履歴（{publicVersionCount}版）
+            </Link>
+          )}
         </div>
       </div>
       <div className="flex flex-wrap gap-x-3 gap-y-1">

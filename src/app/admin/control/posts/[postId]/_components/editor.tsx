@@ -6,7 +6,7 @@ import { useEffect, useEffectEvent, useMemo, useRef, useState } from 'react';
 
 import { EditorView } from '@codemirror/view';
 import {
-  ArrowLeft, CircleAlert, CircleCheck, ExternalLink, LoaderCircle, Save, Send, TriangleAlert, X,
+  ArrowLeft, CircleAlert, CircleCheck, ExternalLink, History, LoaderCircle, Save, Send, TriangleAlert, X,
 } from 'lucide-react';
 import { z } from 'zod';
 
@@ -14,6 +14,7 @@ import Modal from '@/components/elements/modal';
 
 import { PostStatusBadge, PrivateBadge } from '../../_components/post-status-badge';
 
+import HistoryDialog from './history-dialog';
 import MarkdownEditor from './markdown-editor';
 import MarkdownPreview from './markdown-preview';
 import MarkdownToolbar from './markdown-toolbar';
@@ -33,6 +34,8 @@ import type { MarkdownPreviewHandle } from './markdown-preview';
 import type { ViewMode } from './markdown-toolbar';
 import type { MarkdownCommand } from '../_lib/markdown-commands';
 import type { PostFormValues, PostStatus, PublishResult, SaveResult, TagOption } from '../_lib/post-form';
+import type { PostVersion } from '@/lib/post-versions';
+import type { ActionResult } from '@/types';
 
 
 /**
@@ -245,6 +248,10 @@ type EditorProperties = {
   availableTags: TagOption[];
   onSave: (values: PostFormValues) => Promise<SaveResult>;
   onPublish: () => Promise<PublishResult>;
+  /** 編集履歴（すべての版）を読み込む */
+  onLoadHistory: () => Promise<ActionResult<PostVersion[]>>;
+  /** 版の非公開設定を変更し、変更後のすべての版を返す */
+  onSetVersionPrivate: (identifier: number, isPrivate: boolean) => Promise<ActionResult<PostVersion[]>>;
 };
 
 
@@ -266,6 +273,8 @@ export default function Editor({
   availableTags,
   onSave,
   onPublish,
+  onLoadHistory,
+  onSetVersionPrivate,
 }: EditorProperties): JSX.Element {
   const router = useRouter();
   const isApple = useIsApplePlatform();
@@ -281,7 +290,7 @@ export default function Editor({
   const [viewMode, setViewMode] = useState<ViewMode>('split');
   const [isScrollSyncEnabled, setIsScrollSyncEnabled] = useState(true);
   const [isFullscreen, setIsFullscreen] = useState(false);
-  const [openedModal, setOpenedModal] = useState<'publish' | 'help' | null>(null);
+  const [openedModal, setOpenedModal] = useState<'publish' | 'help' | 'history' | null>(null);
   const [shouldShare, setShouldShare] = useState(false);
   const [toast, setToast] = useState<Toast | null>(null);
   const [storedDraft, setStoredDraft] = useState<StoredDraft | null>(null);
@@ -600,17 +609,30 @@ export default function Editor({
         <h1 className="text-2xl">投稿編集</h1>
         <PostStatusBadge status={status} />
         {savedValues.isPrivate && <PrivateBadge />}
-        {publicUrl && (
-          <a
-            href={publicUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center gap-1 text-sm text-emerald-400 hover:underline sm:ml-auto"
+        <div className="flex flex-wrap items-center gap-x-4 gap-y-2 sm:ml-auto">
+          <button
+            type="button"
+            onClick={() => setOpenedModal('history')}
+            className={
+              'inline-flex items-center gap-1.5 rounded border border-gray-600 px-2.5 py-1 text-sm text-gray-300 '
+              + 'hover:border-gray-500 hover:bg-gray-800 hover:text-white'
+            }
           >
-            公開ページを表示
-            <ExternalLink className="h-4 w-4" aria-hidden />
-          </a>
-        )}
+            <History className="h-4 w-4" aria-hidden />
+            編集履歴
+          </button>
+          {publicUrl && (
+            <a
+              href={publicUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1 text-sm text-emerald-400 hover:underline"
+            >
+              公開ページを表示
+              <ExternalLink className="h-4 w-4" aria-hidden />
+            </a>
+          )}
+        </div>
       </div>
 
       {/* 一時保存した編集内容の復元 */}
@@ -916,6 +938,17 @@ export default function Editor({
       </Modal>
 
       <ShortcutHelpModal isOpen={openedModal === 'help'} onRequestClose={() => setOpenedModal(null)} />
+
+      {openedModal === 'history' && (
+        <HistoryDialog
+          onRequestClose={() => setOpenedModal(null)}
+          author={author}
+          isPostPrivate={savedValues.isPrivate}
+          hasUnsavedChanges={isDirty}
+          onLoad={onLoadHistory}
+          onSetPrivate={onSetVersionPrivate}
+        />
+      )}
     </div>
   );
 }
