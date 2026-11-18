@@ -5,17 +5,40 @@ import type { Metadata } from 'next';
 import { and, count, eq, gte, isNotNull, lt } from 'drizzle-orm';
 import { History } from 'lucide-react';
 
-import { postContentsTable, publishedPostsView } from '@/db/schema';
+import PostFeedback from './_components/post-feedback';
+import { postCommentsTable, postContentsTable, postRatingsTable, publishedPostsView } from '@/db/schema';
 import { db } from '@/lib/drizzle';
 import { markdownIt } from '@/lib/markdown-it';
+import {
+  CommentFormSchema, POST_FEEDBACK_TURNSTILE_ACTION, toPostFeedbackTurnstileCData, toPublicComments,
+} from '@/lib/post-feedback';
+import {
+  countRecentVisitorComments, findReplyTarget, isPublicPost, selectComments, selectRatingSummary, selectVisitorRating,
+} from '@/lib/post-feedback-queries';
+import { verifyNonInteractiveTurnstileToken } from '@/lib/turnstile';
+import { getOrCreateVisitorId, getVisitorId } from '@/lib/visitor';
 import { getFiscalYearStart } from '@/utils/date';
 import '@/styles/markdown.css';
 import './styles.css';
 
 import type { JSX } from 'react';
+import type { CommentFormValues, CommentPostResult, RatingState, RatingValue } from '@/lib/post-feedback';
+import type { ActionResult } from '@/types';
 
 
 const siteTitle = 'Terminal | 中京大学プログラミングサークル';
+
+
+/**
+ * 連続投稿を制限する期間（ms）。
+ */
+const COMMENT_RATE_LIMIT_WINDOW = 10 * 60 * 1000;
+
+
+/**
+ * 連続投稿を制限する期間内に、1人の訪問者が投稿できるコメントの数。
+ */
+const COMMENT_RATE_LIMIT_COUNT = 5;
 
 
 export async function generateMetadata({ params }: { params: Promise<{ year: string; slug: string }> }): Promise<Metadata> {
@@ -117,6 +140,108 @@ export default async function Post({ params }: { params: Promise<{ year: string;
     ))
     .then((result) => result.at(0)?.count ?? 0);
 
+  const postId = post.id;
+  const visitorId = await getVisitorId();
+  const [ratingSummary, myRating, comments] = await Promise.all([
+    selectRatingSummary(postId),
+    visitorId ? selectVisitorRating(postId, visitorId) : null,
+    selectComments(postId),
+  ]);
+  const turnstileExpectation = {
+    action: POST_FEEDBACK_TURNSTILE_ACTION,
+    cdata: toPostFeedbackTurnstileCData(postId),
+  };
+
+  async function handleRate(value: RatingValue | null, turnstileToken: string): Promise<ActionResult<RatingState>> {
+    'use server';
+    if (value !== null && value !== 'positive' && value !== 'negative') {
+      return { ok: false, error: '評価が正しくありません。' };
+    }
+    if (!await verifyNonInteractiveTurnstileToken(turnstileToken, turnstileExpectation)) {
+      return { ok: false, error: 'ボット対策の確認に失敗しました。時間をおいて再度お試しください。' };
+    }
+    try {
+      if (!await isPublicPost(postId)) {
+        return { ok: false, error: 'この記事は現在公開されていません。' };
+      }
+      const currentVisitorId = await getOrCreateVisitorId();
+      await (value === null
+        ? db
+          .delete(postRatingsTable)
+          .where(and(eq(postRatingsTable.postId, postId), eq(postRatingsTable.visitorId, currentVisitorId)))
+        : db
+          .insert(postRatingsTable)
+          .values({ postId, visitorId: currentVisitorId, isPositive: value === 'positive' })
+          .onConflictDoUpdate({
+            target: [postRatingsTable.postId, postRatingsTable.visitorId],
+            set: { isPositive: value === 'positive', updatedAt: new Date() },
+          }));
+      return {
+        ok: true,
+        data: { summary: await selectRatingSummary(postId), myRating: value },
+      };
+    } catch (e) {
+      console.error('Failed to rate post:', e);
+      return { ok: false, error: '評価を送信できませんでした。' };
+    }
+  }
+
+  async function handleComment(
+    values: CommentFormValues,
+    parentId: number | null,
+    turnstileToken: string,
+  ): Promise<ActionResult<CommentPostResult>> {
+    'use server';
+    if (parentId !== null && !(Number.isSafeInteger(parentId) && parentId > 0)) {
+      return { ok: false, error: '返信先のコメントが正しくありません。' };
+    }
+    const parsed = CommentFormSchema.safeParse(values);
+    if (!parsed.success) {
+      return { ok: false, error: parsed.error.issues[0]?.message ?? '入力内容が正しくありません。' };
+    }
+    if (!await verifyNonInteractiveTurnstileToken(turnstileToken, turnstileExpectation)) {
+      return { ok: false, error: 'BOT対策の確認に失敗しました。時間をおいて再度お試しください。' };
+    }
+    try {
+      if (!await isPublicPost(postId)) {
+        return { ok: false, error: 'この記事は現在公開されていません。' };
+      }
+      // 返信の場合は、公開ページに表示されているコメントにのみ返信できる
+      let threadId: number | null = null;
+      if (parentId !== null) {
+        const target = await findReplyTarget(postId, parentId);
+        if (!target?.isVisible) {
+          return { ok: false, error: '返信先のコメントが見つかりませんでした。削除された可能性があります。' };
+        }
+        threadId = target.threadId;
+      }
+      const currentVisitorId = await getOrCreateVisitorId();
+      const recentCount = await countRecentVisitorComments(currentVisitorId, COMMENT_RATE_LIMIT_WINDOW);
+      if (recentCount >= COMMENT_RATE_LIMIT_COUNT) {
+        return { ok: false, error: '短時間に多くのコメントが投稿されました。しばらくしてから再度お試しください。' };
+      }
+      const [created] = await db
+        .insert(postCommentsTable)
+        .values({
+          postId,
+          threadId,
+          parentId,
+          visitorId: currentVisitorId,
+          authorName: parsed.data.authorName,
+          authorEmail: parsed.data.authorEmail,
+          content: parsed.data.content,
+        })
+        .returning({ id: postCommentsTable.id });
+      return {
+        ok: true,
+        data: { comments: toPublicComments(await selectComments(postId)), postedId: created.id },
+      };
+    } catch (e) {
+      console.error('Failed to post comment:', e);
+      return { ok: false, error: 'コメントを投稿できませんでした。' };
+    }
+  }
+
   return (
     <div className="space-y-8 z-50 pt-20">
       <div className="flex justify-between items-start">
@@ -157,6 +282,14 @@ export default async function Post({ params }: { params: Promise<{ year: string;
       <div className="space-y-16 text-gray-200">
         <div className="markdown-body" dangerouslySetInnerHTML={{ __html: markdownIt.render(post.content) }} />
       </div>
+      <PostFeedback
+        postId={postId}
+        turnstileSiteKey={process.env.CLOUDFLARE_TURNSTILE_NON_INTERACTIVE_SITE_KEY || null}
+        initialRating={{ summary: ratingSummary, myRating }}
+        initialComments={toPublicComments(comments)}
+        onRate={handleRate}
+        onComment={handleComment}
+      />
     </div>
   );
 }

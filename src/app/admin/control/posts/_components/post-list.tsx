@@ -3,7 +3,9 @@
 import Link from 'next/link';
 import { useEffect, useEffectEvent, useMemo, useRef, useState } from 'react';
 
-import { CalendarDays, ExternalLink, FilePlus2, Plus, Search, SearchX, Tags, UserRound, X } from 'lucide-react';
+import {
+  CalendarDays, ExternalLink, FilePlus2, MessageSquare, Plus, Search, SearchX, Tags, UserRound, X,
+} from 'lucide-react';
 
 import { PostStatusBadge, PrivateBadge } from './post-status-badge';
 import { formatDate, formatDateTime, formatRelativeTime } from '../_lib/date-format';
@@ -137,6 +139,26 @@ function PostCard({
           </time>
         </span>
         <span className="font-mono break-all text-gray-600">{post.slug}</span>
+        <Link
+          href={`${editPath}/comments`}
+          title="コメント管理を開く"
+          aria-label={
+            `「${post.title}」のコメント管理を開く（${post.commentCount}件`
+            + (post.unrepliedCommentCount > 0 ? `、未返信${post.unrepliedCommentCount}件）` : '）')
+          }
+          className={
+            'relative z-10 ml-auto inline-flex items-center gap-1 rounded px-1.5 py-0.5 text-gray-400 '
+            + 'hover:bg-gray-700/60 hover:text-emerald-300'
+          }
+        >
+          <MessageSquare className="h-3.5 w-3.5" aria-hidden />
+          <span className="tabular-nums">{post.commentCount}</span>
+          {post.unrepliedCommentCount > 0 && (
+            <span className="rounded-full bg-sky-500/20 px-1.5 text-sky-300 tabular-nums">
+              未返信 {post.unrepliedCommentCount}
+            </span>
+          )}
+        </Link>
       </div>
     </li>
   );

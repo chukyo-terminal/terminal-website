@@ -6,7 +6,8 @@ import { useEffect, useEffectEvent, useMemo, useRef, useState } from 'react';
 
 import { EditorView } from '@codemirror/view';
 import {
-  ArrowLeft, CircleAlert, CircleCheck, ExternalLink, History, LoaderCircle, Save, Send, TriangleAlert, X,
+  ArrowLeft, CircleAlert, CircleCheck, ExternalLink, History, LoaderCircle, MessageSquare, Save, Send, TriangleAlert,
+  X,
 } from 'lucide-react';
 import { z } from 'zod';
 
@@ -246,6 +247,10 @@ type EditorProperties = {
   lastSavedAt: Date;
   /** 既存のタグ（タグの入力候補） */
   availableTags: TagOption[];
+  /** 訪問者のコメント数 */
+  commentCount: number;
+  /** 返信していない（非表示にしていない）コメント数 */
+  unrepliedCommentCount: number;
   onSave: (values: PostFormValues) => Promise<SaveResult>;
   onPublish: () => Promise<PublishResult>;
   /** 編集履歴（すべての版）を読み込む */
@@ -271,6 +276,8 @@ export default function Editor({
   firstPublishedAt,
   lastSavedAt,
   availableTags,
+  commentCount,
+  unrepliedCommentCount,
   onSave,
   onPublish,
   onLoadHistory,
@@ -621,6 +628,27 @@ export default function Editor({
             <History className="h-4 w-4" aria-hidden />
             編集履歴
           </button>
+          <Link
+            href={`/admin/control/posts/${postId}/comments`}
+            onClick={(event) => {
+              if (isDirty && !globalThis.confirm('保存されていない変更があります。このページを離れますか？')) {
+                event.preventDefault();
+              }
+            }}
+            className={
+              'inline-flex items-center gap-1.5 rounded border border-gray-600 px-2.5 py-1 text-sm text-gray-300 '
+              + 'hover:border-gray-500 hover:bg-gray-800 hover:text-white'
+            }
+          >
+            <MessageSquare className="h-4 w-4" aria-hidden />
+            コメント
+            <span className="tabular-nums text-gray-400">{commentCount}</span>
+            {unrepliedCommentCount > 0 && (
+              <span className="rounded-full bg-sky-500/20 px-1.5 text-xs text-sky-300 tabular-nums">
+                未返信 {unrepliedCommentCount}
+              </span>
+            )}
+          </Link>
           {publicUrl && (
             <a
               href={publicUrl}

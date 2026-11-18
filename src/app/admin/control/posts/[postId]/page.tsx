@@ -6,6 +6,7 @@ import { PostFormSchema, normalizeDescription } from './_lib/post-form';
 import { db } from '@/lib/drizzle';
 import { postContentsTable, postTagsTable, postsTable, tagsTable, usersTable } from '@/db/schema';
 import { checkPermission } from '@/lib/auth';
+import { selectCommentCounts } from '@/lib/post-feedback-queries';
 import { selectPostVersions } from '@/lib/post-version-queries';
 import { getFiscalYear } from '@/utils/date';
 
@@ -87,7 +88,7 @@ export default async function PostEditPage({ params }: { params: Promise<{ postI
     );
   }
 
-  const [firstPublishedAt, postTags, availableTags] = await Promise.all([
+  const [firstPublishedAt, postTags, availableTags, commentCounts] = await Promise.all([
     getFirstPublishedAt(db, postId),
     db
       .select({ name: tagsTable.name, slug: tagsTable.slug })
@@ -101,6 +102,7 @@ export default async function PostEditPage({ params }: { params: Promise<{ postI
       .leftJoin(postTagsTable, eq(tagsTable.id, postTagsTable.tagId))
       .groupBy(tagsTable.id)
       .orderBy(asc(tagsTable.name)),
+    selectCommentCounts(postId).then((result) => result.at(0)),
   ]);
   const status = getPostStatus(latestContent.publishedAt, firstPublishedAt);
 
@@ -312,6 +314,8 @@ export default async function PostEditPage({ params }: { params: Promise<{ postI
         firstPublishedAt={firstPublishedAt}
         lastSavedAt={latestContent.updatedAt}
         availableTags={availableTags}
+        commentCount={commentCounts?.commentCount ?? 0}
+        unrepliedCommentCount={commentCounts?.unrepliedCount ?? 0}
         onSave={handleSave}
         onPublish={handlePublish}
         onLoadHistory={handleLoadHistory}

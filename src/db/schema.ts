@@ -1,7 +1,7 @@
 import { and, asc, desc, eq, isNull, isNotNull, sql, ne } from 'drizzle-orm';
 import {
-  boolean, char, check, date, foreignKey, integer,
-  pgEnum, pgTable, pgView, primaryKey, text, timestamp, unique, varchar,
+  boolean, char, check, date, foreignKey, index, integer,
+  pgEnum, pgTable, pgView, primaryKey, text, timestamp, unique, uuid, varchar,
 } from 'drizzle-orm/pg-core';
 
 import { as } from '@/lib/drizzle';
@@ -200,6 +200,99 @@ export const postReviewsTable = pgTable(
     }).onDelete('cascade'),
     primaryKey({ columns: [table.postId, table.postIdentifier, table.reviewerId] }),
     check('valid_review', sql`NOT (${table.isApproved} = false AND ${table.comment} IS NULL)`), // 承認されていない場合、コメントは必須
+  ],
+);
+
+
+/**
+ * 投稿評価テーブル
+ *
+ * 訪問者ごとに、記事を「良い」「良くない」の二段階で評価する。訪問者はCookieに保存した訪問者IDで識別する。
+ */
+export const postRatingsTable = pgTable(
+  'post_ratings',
+  {
+    /** 投稿ID */
+    postId: integer('post_id').notNull().references(() => postsTable.id, { onDelete: 'cascade' }),
+    /** 訪問者ID */
+    visitorId: uuid('visitor_id').notNull(),
+    /** 評価（`true` は良い、`false` は良くない） */
+    isPositive: boolean('is_positive').notNull(),
+    /** 作成日時 */
+    createdAt: timestamp('created_at', { mode: 'date', precision: 3, withTimezone: true }).notNull().defaultNow(),
+    /** 更新日時 */
+    updatedAt: timestamp('updated_at', { mode: 'date', precision: 3, withTimezone: true }).notNull().defaultNow().$onUpdateFn(() => new Date()),
+  },
+  (table) => [
+    primaryKey({ columns: [table.postId, table.visitorId] }),
+  ],
+);
+
+
+/**
+ * 投稿コメントテーブル
+ *
+ * 訪問者のコメントと、それに対する返信（訪問者・管理者）を保存する。
+ * 記事に直接投稿されたコメントを起点とするスレッドで管理し、返信はスレッド内のどのコメントに対しても行える。
+ *
+ * - スレッドの起点のコメント: `threadId` と `parentId` が `null`（訪問者のみ投稿できる）
+ * - 返信: `threadId` に起点のコメント、`parentId` に返信先のコメントを設定する（返信先が削除された場合は `parentId` が `null` になる）
+ * - 訪問者のコメント: `visitorId` と `authorEmail` を設定し、`authorId` は `null`
+ * - 管理者の返信: `authorId` を設定し、`visitorId`・`authorEmail`・`authorName` は `null`
+ */
+export const postCommentsTable = pgTable(
+  'post_comments',
+  {
+    /** コメントID（自動生成連番） */
+    id: integer().primaryKey().generatedAlwaysAsIdentity(),
+    /** 投稿ID */
+    postId: integer('post_id').notNull().references(() => postsTable.id, { onDelete: 'cascade' }),
+    /** スレッドの起点のコメントID（起点のコメント自身は `null`） */
+    threadId: integer('thread_id'),
+    /** 返信先のコメントID（起点のコメントや、返信先が削除された返信は `null`） */
+    parentId: integer('parent_id'),
+    /** 管理者の返信の返信者（訪問者のコメントは `null`） */
+    authorId: integer('author_id').references(() => usersTable.id, { onDelete: 'cascade' }),
+    /** 訪問者の名前（未入力の場合や管理者の返信は `null`） */
+    authorName: text('author_name'),
+    /** 訪問者のメールアドレス（公開しない。管理者の返信は `null`） */
+    authorEmail: varchar('author_email', { length: 254 }),
+    /** 訪問者ID（管理者の返信は `null`） */
+    visitorId: uuid('visitor_id'),
+    /** 内容（プレーンテキスト） */
+    content: text().notNull(),
+    /** 非表示フラグ */
+    isHidden: boolean('is_hidden').notNull().default(false),
+    /** 作成日時 */
+    createdAt: timestamp('created_at', { mode: 'date', precision: 3, withTimezone: true }).notNull().defaultNow(),
+    /** 更新日時 */
+    updatedAt: timestamp('updated_at', { mode: 'date', precision: 3, withTimezone: true }).notNull().defaultNow().$onUpdateFn(() => new Date()),
+  },
+  (table) => [
+    // 起点のコメントを削除すると、スレッド全体を削除する
+    foreignKey({
+      name: 'post_comments_thread_id_fk',
+      columns: [table.threadId],
+      foreignColumns: [table.id],
+    }).onDelete('cascade'),
+    // 返信先を削除しても、その返信は残す
+    foreignKey({
+      name: 'post_comments_parent_id_fk',
+      columns: [table.parentId],
+      foreignColumns: [table.id],
+    }).onDelete('set null'),
+    index('post_comments_post_id_index').on(table.postId),
+    index('post_comments_thread_id_index').on(table.threadId),
+    index('post_comments_parent_id_index').on(table.parentId),
+    index('post_comments_visitor_id_index').on(table.visitorId, table.createdAt),
+    // 返信先を持つのは返信のみ
+    check('valid_comment_thread', sql`${table.threadId} IS NOT NULL OR ${table.parentId} IS NULL`),
+    // 管理者はスレッドを作成できない（返信のみ）
+    check('valid_comment_staff', sql`${table.authorId} IS NULL OR ${table.threadId} IS NOT NULL`),
+    check('valid_comment_visitor', sql`(${table.authorId} IS NULL) = (${table.visitorId} IS NOT NULL)`),
+    check('valid_comment_author_email', sql`(${table.authorId} IS NULL) = (${table.authorEmail} IS NOT NULL)`),
+    check('valid_comment_author_name', sql`${table.authorId} IS NULL OR ${table.authorName} IS NULL`),
+    check('valid_comment_email', sql`${table.authorEmail} IS NULL OR ${table.authorEmail} ~* '^[^@[:space:]]+@[^@[:space:]]+\\.[^@[:space:]]+$'`),
   ],
 );
 

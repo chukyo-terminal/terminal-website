@@ -5,6 +5,7 @@ import { parsePostListFilters } from './_lib/post-list';
 import { getPostStatus } from './_lib/post-status';
 import { postContentsTable, postTagsTable, postsTable, tagsTable, usersTable } from '@/db/schema';
 import { db } from '@/lib/drizzle';
+import { selectCommentCounts } from '@/lib/post-feedback-queries';
 import { getFiscalYear } from '@/utils/date';
 
 import type { JSX } from 'react';
@@ -18,7 +19,7 @@ export default async function PostManagementPage({
 }: {
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 }): Promise<JSX.Element> {
-  const [latestContents, firstPublications, postTags] = await Promise.all([
+  const [latestContents, firstPublications, postTags, commentCounts] = await Promise.all([
     // 各投稿の最新の版
     db
       .selectDistinctOn([postsTable.id], {
@@ -50,9 +51,12 @@ export default async function PostManagementPage({
       .from(postTagsTable)
       .innerJoin(tagsTable, eq(postTagsTable.tagId, tagsTable.id))
       .orderBy(asc(tagsTable.name)),
+    // 各投稿のコメント数
+    selectCommentCounts(),
   ]);
 
   const firstPublishedAtByPost = new Map(firstPublications.map((row) => [row.postId, row.publishedAt]));
+  const commentCountsByPost = new Map(commentCounts.map((row) => [row.postId, row]));
   const tagsByPost = new Map<number, { name: string; slug: string }[]>();
   for (const { postId, name, slug } of postTags) {
     tagsByPost.set(postId, [...(tagsByPost.get(postId) ?? []), { name, slug }]);
@@ -72,6 +76,8 @@ export default async function PostManagementPage({
       createdAt: content.createdAt,
       updatedAt: content.updatedAt,
       firstPublishedAt,
+      commentCount: commentCountsByPost.get(content.id)?.commentCount ?? 0,
+      unrepliedCommentCount: commentCountsByPost.get(content.id)?.unrepliedCount ?? 0,
       // 記事の URL の年度は、初めて公開された日時で決まる
       publicPath: firstPublishedAt && !content.isPrivate
         ? `/posts/${getFiscalYear(firstPublishedAt)}/${content.slug}`
