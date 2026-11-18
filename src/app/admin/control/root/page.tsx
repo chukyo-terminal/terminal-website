@@ -1,665 +1,223 @@
-'use client';
+import { DrizzleQueryError, asc, eq } from 'drizzle-orm';
+import { DatabaseError } from 'pg';
+import { PostgresError } from 'pg-error-enum';
 
-import { useEffect, useRef, useState } from 'react';
-
-import { Plus, Trash2, Pen } from 'lucide-react';
-import { z } from 'zod';
-
-import Modal from '@/components/elements/modal';
-import { SudoersApiGetResponseSchema, SudoersApiPostResponseSchema } from '@/api-schemas/sudoers';
-import { UsersApiGetResponseSchema, UsersApiPatchResponseSchema, UsersApiPostResponseSchema } from '@/api-schemas/users';
-import { api } from '@/lib/hono';
+import UserManager from './_components/user-manager';
+import { UserCreateFormSchema, UserUpdateFormSchema } from './_lib/user';
+import { sudoersTable, usersTable } from '@/db/schema';
+import { checkPermission } from '@/lib/auth';
+import { db } from '@/lib/drizzle';
 
 import type { JSX } from 'react';
+import type { SQL } from 'drizzle-orm';
+import type { Sudoer, User, UserCreateFormValues, UserUpdateFormValues } from './_lib/user';
+import type { ActionResult } from '@/types';
+
+export const dynamic = 'force-dynamic';
 
 
 /**
- * 管理者ページのモーダルタイプを定義する。
+ * ユーザーを取得する。
+ *
+ * @param where - 絞り込み条件
+ * @returns ID順に並べたユーザー
  */
-enum ModalType {
-  ADD_SUDOER,
-  REMOVE_SUDOER,
-  ADD_USER,
-  EDIT_USER,
-  REMOVE_USER,
+async function selectUsers(where?: SQL): Promise<User[]> {
+  return await db
+    .select({
+      id: usersTable.id,
+      cuId: usersTable.cuId,
+      name: usersTable.name,
+      displayName: usersTable.displayName,
+      email: usersTable.email,
+      roles: usersTable.roles,
+      isActive: usersTable.isActive,
+      createdAt: usersTable.createdAt,
+      updatedAt: usersTable.updatedAt,
+    })
+    .from(usersTable)
+    .where(where)
+    .orderBy(asc(usersTable.id));
 }
 
-const USER_ROLES = ['ADMIN', 'REVIEWER', 'CONTRIBUTOR'] as const;
 
-type UserRole = (typeof USER_ROLES)[number];
+/**
+ * データベースの制約違反のエラーの場合に、エラーコードと違反した制約の名前を返す。
+ *
+ * @param e - エラー
+ * @returns エラーコードと制約の名前（データベースのエラーでない場合は `null`）
+ */
+function getDatabaseError(e: unknown): { code: string | undefined; constraint: string | undefined } | null {
+  if (e instanceof DrizzleQueryError && e.cause instanceof DatabaseError) {
+    return { code: e.cause.code, constraint: e.cause.constraint };
+  }
+  return null;
+}
 
 
 /**
- * 上級管理者ページを生成する。
+ * IDが正しい形式であるかを検証する。
  *
- * @returns 生成したページ
+ * @param id - 検証する値
+ * @returns 正の整数であれば `true`
  */
-export default function RootControlPage(): JSX.Element {
-  const [isReload, setReload] = useState(true);
-  const [modalType, setModalType] = useState<ModalType | null>(null);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const targetId = useRef(0);
-  const [sudoers, setSudoers] = useState<z.infer<typeof SudoersApiGetResponseSchema>['data']['sudoers']>([]);
-  const [users, setUsers] = useState<z.infer<typeof UsersApiGetResponseSchema>['data']['users']>([]);
-  // 編集モーダル用
-  const [editRoles, setEditRoles] = useState<UserRole[]>([]);
+function isValidId(id: unknown): id is number {
+  return Number.isSafeInteger(id) && (id as number) > 0;
+}
 
-  // 編集対象ユーザー変更時にロール初期化
-  useEffect(() => {
-    if (modalType === ModalType.EDIT_USER) {
-      const user = users.find(u => u.id === targetId.current);
-      if (user) setEditRoles(user.roles);
+
+export default async function RootControlPage(): Promise<JSX.Element> {
+  const [users, sudoers] = await Promise.all([
+    selectUsers(),
+    db
+      .select({ id: sudoersTable.id, createdAt: sudoersTable.createdAt })
+      .from(sudoersTable)
+      .orderBy(asc(sudoersTable.id)),
+  ]);
+
+  async function createSudoer(userId: number): Promise<ActionResult<Sudoer>> {
+    'use server';
+    const permissionError = await checkPermission('root');
+    if (permissionError) {
+      return { ok: false, error: permissionError };
     }
-  }, [modalType, users]);
-
-  useEffect(() => {
-    (async () => {
-      if (!isReload) return;
-      try {
-        const usersResponse = await api.users.$get();
-        const sudoersResponse = await api.sudoers.$get();
-        if (!sudoersResponse.ok || !usersResponse.ok) {
-          throw new Error('Failed to fetch data');
+    if (!isValidId(userId)) {
+      return { ok: false, error: 'ユーザーIDが正しくありません。' };
+    }
+    try {
+      const [sudoer] = await db
+        .insert(sudoersTable)
+        .values({ id: userId })
+        .returning({ id: sudoersTable.id, createdAt: sudoersTable.createdAt });
+      return { ok: true, data: sudoer };
+    } catch (e) {
+      switch (getDatabaseError(e)?.code) {
+        case PostgresError.UNIQUE_VIOLATION: {
+          return { ok: false, error: '既に上級管理者に登録されています。' };
         }
-        // eslint-disable-next-line unicorn/no-await-expression-member
-        const usersData = (await UsersApiGetResponseSchema.parseAsync(await usersResponse.json())).data.users;
-        // eslint-disable-next-line unicorn/no-await-expression-member
-        const sudoersData = (await SudoersApiGetResponseSchema.parseAsync(await sudoersResponse.json())).data.sudoers;
-        setSudoers(sudoersData);
-        setUsers(usersData);
-      } catch (e) {
-        console.error('Error fetching data:', e);
-      } finally {
-        setReload(false);
+        case PostgresError.FOREIGN_KEY_VIOLATION: {
+          return { ok: false, error: 'ユーザーが見つかりませんでした。' };
+        }
+        default: {
+          console.error('Failed to create sudoer:', e);
+          return { ok: false, error: '上級管理者の追加に失敗しました。' };
+        }
       }
-    })();
-  }, [isReload]);
+    }
+  }
 
-  const sudoerCandidateUsers = users.filter((user) => !sudoers.some((sudoer) => sudoer.id === user.id));
+  async function deleteSudoer(userId: number): Promise<ActionResult> {
+    'use server';
+    const permissionError = await checkPermission('root');
+    if (permissionError) {
+      return { ok: false, error: permissionError };
+    }
+    if (!isValidId(userId)) {
+      return { ok: false, error: 'ユーザーIDが正しくありません。' };
+    }
+    try {
+      await db.delete(sudoersTable).where(eq(sudoersTable.id, userId));
+      return { ok: true };
+    } catch (e) {
+      console.error('Failed to delete sudoer:', e);
+      return { ok: false, error: '上級管理者の削除に失敗しました。' };
+    }
+  }
+
+  async function createUser(values: UserCreateFormValues): Promise<ActionResult<User>> {
+    'use server';
+    const permissionError = await checkPermission('root');
+    if (permissionError) {
+      return { ok: false, error: permissionError };
+    }
+    const parsed = UserCreateFormSchema.safeParse(values);
+    if (!parsed.success) {
+      return { ok: false, error: parsed.error.issues[0]?.message ?? '入力内容が正しくありません。' };
+    }
+    try {
+      const [{ id }] = await db
+        .insert(usersTable)
+        .values(parsed.data)
+        .returning({ id: usersTable.id });
+      const [user] = await selectUsers(eq(usersTable.id, id));
+      return { ok: true, data: user };
+    } catch (e) {
+      const error = getDatabaseError(e);
+      if (error?.code === PostgresError.UNIQUE_VIOLATION && error.constraint === 'users_cu_id_unique') {
+        return { ok: false, error: `CU_ID「${parsed.data.cuId}」のユーザーは既に存在します。` };
+      }
+      if (error?.code === PostgresError.CHECK_VIOLATION && error.constraint === 'valid_cu_id') {
+        return { ok: false, error: 'CU_IDの形式が正しくありません。' };
+      }
+      console.error('Failed to create user:', e);
+      return { ok: false, error: '一般管理者の追加に失敗しました。' };
+    }
+  }
+
+  async function updateUser(userId: number, values: UserUpdateFormValues): Promise<ActionResult<User>> {
+    'use server';
+    const permissionError = await checkPermission('root');
+    if (permissionError) {
+      return { ok: false, error: permissionError };
+    }
+    if (!isValidId(userId)) {
+      return { ok: false, error: 'ユーザーIDが正しくありません。' };
+    }
+    const parsed = UserUpdateFormSchema.safeParse(values);
+    if (!parsed.success) {
+      return { ok: false, error: parsed.error.issues[0]?.message ?? '入力内容が正しくありません。' };
+    }
+    try {
+      const updated = await db
+        .update(usersTable)
+        .set(parsed.data)
+        .where(eq(usersTable.id, userId))
+        .returning({ id: usersTable.id });
+      if (updated.length === 0) {
+        return { ok: false, error: 'ユーザーが見つかりませんでした。' };
+      }
+      const [user] = await selectUsers(eq(usersTable.id, userId));
+      return { ok: true, data: user };
+    } catch (e) {
+      const error = getDatabaseError(e);
+      if (error?.code === PostgresError.UNIQUE_VIOLATION && error.constraint === 'users_email_unique') {
+        return { ok: false, error: 'このメールアドレスは別のユーザーが使用しています。' };
+      }
+      if (error?.code === PostgresError.CHECK_VIOLATION && error.constraint === 'valid_email') {
+        return { ok: false, error: 'メールアドレスが正しくありません（m.chukyo-u.ac.jp のアドレスは登録できません）。' };
+      }
+      console.error('Failed to update user:', e);
+      return { ok: false, error: '一般管理者の編集に失敗しました。' };
+    }
+  }
+
+  async function deleteUser(userId: number): Promise<ActionResult> {
+    'use server';
+    const permissionError = await checkPermission('root');
+    if (permissionError) {
+      return { ok: false, error: permissionError };
+    }
+    if (!isValidId(userId)) {
+      return { ok: false, error: 'ユーザーIDが正しくありません。' };
+    }
+    try {
+      await db.delete(usersTable).where(eq(usersTable.id, userId));
+      return { ok: true };
+    } catch (e) {
+      console.error('Failed to delete user:', e);
+      return { ok: false, error: '一般管理者の削除に失敗しました。' };
+    }
+  }
 
   return (
-    <div className="mx-auto px-4 py-8">
-      {modalType === ModalType.ADD_SUDOER &&
-        <Modal isOpen={true} onRequestClose={() => setModalType(null)} contentLabel="上級管理者追加">
-          <form
-            onSubmit={async (event) => {
-              event.preventDefault();
-              if (isSubmitting) return;
-              const formData = new FormData(event.target as HTMLFormElement);
-              const selectedUserId = Number(formData.get('userId'));
-              if (Number.isNaN(selectedUserId)) {
-                alert('ユーザーを選択してください。');
-                return;
-              }
-              setIsSubmitting(true);
-              try {
-                const response = await api.sudoers.$post({
-                  json: {
-                    user: {
-                      id: selectedUserId,
-                    },
-                  },
-                });
-                if (response.ok) {
-                  // eslint-disable-next-line unicorn/no-await-expression-member
-                  const createdAt = (await SudoersApiPostResponseSchema.parseAsync(await response.json())).data.createdAt;
-                  console.info('Successfully added sudoer');
-                  setSudoers((previous) => [...previous, { id: selectedUserId, createdAt }].toSorted((a, b) => a.id - b.id));
-                  setModalType(null);
-                } else {
-                  console.error('Failed to add sudoer:', response.status, response.statusText);
-                  const responseText = await response.text();
-                  try {
-                    console.log(JSON.parse(responseText));
-                  } catch {
-                    console.log(responseText);
-                  }
-                  alert('上級管理者の追加に失敗しました。');
-                }
-              } finally {
-                setIsSubmitting(false);
-              }
-            }}
-            className="flex flex-col gap-4"
-          >
-            <label className="block">
-              <span className="text-sm font-medium">ユーザー</span>
-              <select
-                name="userId"
-                className="mt-1 block w-full rounded border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-emerald-500"
-                defaultValue=""
-                required
-              >
-                <option value="" disabled>ユーザーを選択</option>
-                {sudoerCandidateUsers.map((user) => (
-                  <option key={user.id} value={user.id}>{`${user.cuId} (${user.name})`}</option>
-                ))}
-              </select>
-            </label>
-            {sudoerCandidateUsers.length === 0 &&
-              <p className="text-sm text-red-700">追加可能な一般管理者がいません。</p>
-            }
-            <div className="flex justify-end gap-2 mt-4">
-              <button
-                type="button"
-                className="px-4 py-2 rounded bg-gray-400 hover:bg-gray-500"
-                disabled={isSubmitting}
-                onClick={() => setModalType(null)}
-              >キャンセル</button>
-              <button
-                type="submit"
-                className="px-4 py-2 rounded bg-emerald-600 text-white hover:bg-emerald-700"
-                disabled={isSubmitting || sudoerCandidateUsers.length === 0}
-              >追加</button>
-            </div>
-          </form>
-        </Modal>
-      }
-      {modalType === ModalType.REMOVE_SUDOER &&
-        <Modal isOpen={true} onRequestClose={() => setModalType(null)} contentLabel="上級管理者削除">
-          <form
-            onSubmit={async (event) => {
-              event.preventDefault();
-              if (isSubmitting) return;
-              setIsSubmitting(true);
-              try {
-                const response = await api.sudoers[':id'].$delete({
-                  param: { id: String(targetId.current) },
-                });
-                if (response.ok) {
-                  console.info('Successfully removed sudoer');
-                  console.log(await response.json());
-                  setSudoers((previous) => previous.filter((sudoer) => sudoer.id !== targetId.current));
-                  setModalType(null);
-                } else {
-                  console.error('Failed to remove sudoer:', response.status, response.statusText);
-                  const responseText = await response.text();
-                  try {
-                    console.log(JSON.parse(responseText));
-                  } catch {
-                    console.log(responseText);
-                  }
-                  alert('上級管理者の削除に失敗しました。');
-                }
-              } finally {
-                setIsSubmitting(false);
-              }
-            }}
-            className="flex flex-col gap-2"
-          >
-            <div className="mt-2 flex justify-center">
-              <span className="relative inline-flex items-baseline">
-                <span className="absolute right-full mr-2 text-md whitespace-nowrap top-1/2 -translate-y-1/2">削除対象: </span>
-                {/* eslint-disable-next-line react-hooks/refs*/}
-                <span className="font-mono text-2xl text-red-700">{users.find(u => u.id === targetId.current)?.cuId ?? ''}</span>
-              </span>
-            </div>
-            <div className="flex justify-end gap-2 mt-4">
-              <button
-                type="button"
-                className="px-4 py-2 rounded bg-gray-400 hover:bg-gray-500"
-                disabled={isSubmitting}
-                onClick={() => setModalType(null)}
-              >キャンセル</button>
-              <button
-                type="submit"
-                // eslint-disable-next-line react-hooks/refs
-                value={targetId.current}
-                className="px-4 py-2 rounded bg-red-600 text-white hover:bg-red-700"
-                disabled={isSubmitting}
-              >削除</button>
-            </div>
-          </form>
-        </Modal>
-      }
-      {modalType === ModalType.ADD_USER &&
-        <Modal isOpen={true} onRequestClose={() => setModalType(null)} contentLabel="一般管理者追加">
-          <form
-            onSubmit={async (event) => {
-              event.preventDefault();
-              if (isSubmitting) return;
-              const formData = new FormData(event.target as HTMLFormElement);
-              const cuId = formData.get('cuId') as string;
-              const name = formData.get('name') as string;
-              const roles = [...formData.getAll('role')]
-                .filter((role): role is UserRole => USER_ROLES.includes(role as UserRole));
-              setIsSubmitting(true);
-              try {
-                const createResponse = await api.users.$post({
-                  json: { cuId, name, roles },
-                });
-                if (createResponse.ok) {
-                  // eslint-disable-next-line unicorn/no-await-expression-member
-                  const userData = (await UsersApiPostResponseSchema.parseAsync(await createResponse.json())).data.user;
-                  console.info('Successfully added user');
-                  setUsers((previous) => [
-                    ...previous,
-                    {
-                      id: userData.id,
-                      cuId,
-                      name,
-                      displayName: null,
-                      email: null,
-                      roles,
-                      // POST時はログイン可否を設定しないため、DBデフォルト値を採用する。
-                      isActive: true,
-                      createdAt: userData.createdAt,
-                      updatedAt: userData.updatedAt,
-                    },
-                  ].toSorted((a, b) => a.id - b.id));
-                  setModalType(null);
-                } else {
-                  console.error('Failed to add user:', createResponse.status, createResponse.statusText);
-                  const responseText = await createResponse.text();
-                  try {
-                    console.log(JSON.parse(responseText));
-                  } catch {
-                    console.log(responseText);
-                  }
-                  alert('一般管理者の追加に失敗しました。');
-                }
-              } finally {
-                setIsSubmitting(false);
-              }
-            }}
-            className="flex flex-col gap-4"
-          >
-            <label className="block">
-              <span className="text-sm font-medium">ID</span>
-              <input
-                type="text"
-                name="cuId"
-                className="mt-1 block w-full rounded border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-emerald-500"
-                placeholder="CU_IDを入力"
-                autoFocus
-                required
-              />
-            </label>
-            <label className="block">
-              <span className="text-sm font-medium">名前</span>
-              <input
-                type="text"
-                name="name"
-                className="mt-1 block w-full rounded border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-emerald-500"
-                placeholder="名前を入力"
-                required
-              />
-            </label>
-            <label className="block">
-              <span className="text-sm font-medium">ロール</span>
-              <div className="mt-2 flex flex-col gap-2">
-                {USER_ROLES.map(role => (
-                  <label key={role} className="flex items-center gap-2">
-                    <input
-                      type="checkbox"
-                      name="role"
-                      value={role}
-                    />
-                    <span className="text-sm">{role}</span>
-                  </label>
-                ))}
-              </div>
-            </label>
-            <div className="flex justify-end gap-2 mt-4">
-              <button
-                type="button"
-                className="px-4 py-2 rounded bg-gray-400 hover:bg-gray-500"
-                disabled={isSubmitting}
-                onClick={() => setModalType(null)}
-              >キャンセル</button>
-              <button
-                type="submit"
-                className="px-4 py-2 rounded bg-emerald-600 text-white hover:bg-emerald-700"
-                disabled={isSubmitting}
-              >追加</button>
-            </div>
-          </form>
-        </Modal>
-      }
-      {modalType === ModalType.EDIT_USER &&
-        // eslint-disable-next-line react-hooks/refs
-        (() => {
-          const user = users.find(u => u.id === targetId.current);
-          if (!user) return null;
-          return (
-            <Modal isOpen={true} onRequestClose={() => setModalType(null)} contentLabel="一般管理者編集">
-              <form
-                onSubmit={async (event) => {
-                  event.preventDefault();
-                  if (isSubmitting) return;
-                  const formData = new FormData(event.target as HTMLFormElement);
-                  const name = formData.get('name') as string;
-                  const displayName = formData.get('displayName') as string | null;
-                  const email = formData.get('email') as string | null;
-                  const isActive = formData.get('isActive') !== null;
-                  const roles = editRoles;
-                  const normalizedDisplayName = displayName && displayName.trim() !== '' ? displayName : null;
-                  const normalizedEmail = email && email.trim() !== '' ? email : null;
-                  setIsSubmitting(true);
-                  try {
-                    const response = await api.users[':userId'].$patch({
-                      param: { userId: String(user.id) },
-                      json: {
-                        name,
-                        displayName: normalizedDisplayName,
-                        email: normalizedEmail,
-                        roles,
-                        isActive,
-                      },
-                    });
-                    if (response.ok) {
-                      // eslint-disable-next-line unicorn/no-await-expression-member
-                      const updatedAt = (await UsersApiPatchResponseSchema.parseAsync(await response.json())).data.updatedAt;
-                      console.info('Successfully edited user');
-                      setUsers((previous) => previous.map((current) => {
-                        if (current.id !== user.id) {
-                          return current;
-                        }
-                        return {
-                          ...current,
-                          name,
-                          displayName: normalizedDisplayName,
-                          email: normalizedEmail,
-                          roles,
-                          isActive,
-                          updatedAt,
-                        };
-                      }));
-                      setModalType(null);
-                    } else {
-                      console.error('Failed to edit user:', response.status, response.statusText);
-                      const responseText = await response.text();
-                      try {
-                        console.log(JSON.parse(responseText));
-                      } catch {
-                        console.log(responseText);
-                      }
-                      alert('一般管理者の編集に失敗しました。');
-                    }
-                  } finally {
-                    setIsSubmitting(false);
-                  }
-                }}
-                className="flex flex-col gap-4"
-              >
-                <label className="block">
-                  <span className="text-sm font-medium">CU_ID</span>
-                  <input
-                    type="text"
-                    name="cuId"
-                    className="mt-1 block w-full rounded border border-gray-500 px-3 py-2 text-gray-500 cursor-not-allowed"
-                    value={user.cuId}
-                    readOnly
-                    disabled
-                  />
-                </label>
-                <label className="block">
-                  <span className="text-sm font-medium">名前</span>
-                  <input
-                    type="text"
-                    name="name"
-                    className="mt-1 block w-full rounded border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-emerald-500"
-                    placeholder="名前を入力"
-                    defaultValue={user.name ?? ''}
-                  />
-                </label>
-                <label className="block">
-                  <span className="text-sm font-medium">表示名</span>
-                  <input
-                    type="text"
-                    name="displayName"
-                    className="mt-1 block w-full rounded border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-emerald-500"
-                    placeholder="表示名を入力"
-                    defaultValue={user.displayName ?? ''}
-                  />
-                </label>
-                <label className="block">
-                  <span className="text-sm font-medium">メールアドレス</span>
-                  <input
-                    type="email"
-                    name="email"
-                    className="mt-1 block w-full rounded border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-emerald-500"
-                    placeholder="メールアドレスを入力"
-                    defaultValue={user.email ?? ''}
-                  />
-                </label>
-                <label className="block">
-                  <span className="text-sm font-medium">ロール</span>
-                  <div className="mt-2 flex flex-col gap-2">
-                    {USER_ROLES.map(role => (
-                      <label key={role} className="flex items-center gap-2">
-                        <input
-                          type="checkbox"
-                          name="role"
-                          value={role}
-                          checked={editRoles.includes(role)}
-                          onChange={e => {
-                            if (e.target.checked) {
-                              setEditRoles([...editRoles, role]);
-                            } else {
-                              setEditRoles(editRoles.filter(r => r !== role));
-                            }
-                          }}
-                        />
-                        <span className="text-sm">{role}</span>
-                      </label>
-                    ))}
-                  </div>
-                </label>
-                <label className="flex items-center gap-2">
-                  <input
-                    type="checkbox"
-                    name="isActive"
-                    defaultChecked={user.isActive}
-                  />
-                  <span className="text-sm font-medium">ログイン許可</span>
-                </label>
-                <div className="flex justify-end gap-2 mt-4">
-                  <button
-                    type="button"
-                    className="px-4 py-2 rounded bg-red-600 text-white hover:bg-red-700 mr-auto"
-                    disabled={isSubmitting}
-                    onClick={() => {
-                      setModalType(ModalType.REMOVE_USER);
-                    }}
-                  >削除</button>
-                  <button
-                    type="button"
-                    className="px-4 py-2 rounded bg-gray-400 hover:bg-gray-500"
-                    disabled={isSubmitting}
-                    onClick={() => setModalType(null)}
-                  >キャンセル</button>
-                  <button
-                    type="submit"
-                    className="px-4 py-2 rounded bg-blue-600 text-white hover:bg-blue-700"
-                    disabled={isSubmitting}
-                  >編集</button>
-                </div>
-              </form>
-            </Modal>
-          );
-        })()
-      }
-      {modalType === ModalType.REMOVE_USER &&
-        <Modal isOpen={true} onRequestClose={() => setModalType(null)} contentLabel="一般管理者削除">
-          <form
-            onSubmit={async (event) => {
-              event.preventDefault();
-              if (isSubmitting) return;
-              setIsSubmitting(true);
-              try {
-                const response = await api.users[':userId'].$delete({
-                  param: { userId: String(targetId.current) },
-                });
-                if (response.ok) {
-                  console.info('Successfully removed user');
-                  console.log(await response.json());
-                  setUsers((previous) => previous.filter((current) => current.id !== targetId.current));
-                  // users削除時はDB側でsudoersもcascade deleteされるため、UI側も同期する。
-                  setSudoers((previous) => previous.filter((sudoer) => sudoer.id !== targetId.current));
-                  setModalType(null);
-                } else {
-                  console.error('Failed to remove user:', response.status, response.statusText);
-                  const responseText = await response.text();
-                  try {
-                    console.log(JSON.parse(responseText));
-                  } catch {
-                    console.log(responseText);
-                  }
-                  alert('一般管理者の削除に失敗しました。');
-                }
-              } finally {
-                setIsSubmitting(false);
-              }
-            }}
-            className="flex flex-col gap-2"
-          >
-            <div className="mt-2 flex justify-center">
-              <span className="relative inline-flex items-baseline">
-                <span className="absolute right-full mr-2 text-md whitespace-nowrap top-1/2 -translate-y-1/2">削除対象: </span>
-                {/* eslint-disable-next-line react-hooks/refs */}
-                <span className="font-mono text-2xl text-red-700">{users.find(u => u.id === targetId.current)?.cuId ?? ''}</span>
-              </span>
-            </div>
-            <div className="flex justify-end gap-2 mt-4">
-              <button
-                type="button"
-                className="px-4 py-2 rounded bg-gray-400 hover:bg-gray-500"
-                disabled={isSubmitting}
-                onClick={() => setModalType(null)}
-              >キャンセル</button>
-              <button
-                type="submit"
-                // eslint-disable-next-line react-hooks/refs
-                value={targetId.current}
-                className="px-4 py-2 rounded bg-red-600 text-white hover:bg-red-700"
-                disabled={isSubmitting}
-              >削除</button>
-            </div>
-          </form>
-        </Modal>
-      }
-      <h1 className="md:mt-8 text-2xl font-bold mb-4">ユーザー管理</h1>
-      <div className="mb-4">
-        <h2 className="text-xl mb-2">上級管理者</h2>
-        <div className="overflow-x-auto w-full">
-          <table className="ml-4 table-auto border-collapse border border-gray-600 min-w-max">
-            <thead>
-              <tr>
-                <th className="border-t border-b-4 border-l border-gray-600 border-r px-6 py-2 text-center border-solid">CU_ID</th>
-                <th className="border-t border-b-4 border-r border-gray-600 px-6 py-2 text-center border-solid">名前</th>
-                <th className="border-t border-b-4 border-r border-gray-600 px-6 py-2 text-center border-solid">登録日時</th>
-                <th className="border-t border-b-4 border-r border-gray-600 px-0 py-0 text-center border-solid w-12 h-12 min-w-12 min-h-12">
-                  <div className="flex justify-center items-center w-12 h-12 min-w-12 min-h-12">
-                    <button
-                      type="button"
-                      disabled={isSubmitting}
-                      onClick={(event) => {
-                        event.stopPropagation();
-                        setModalType(ModalType.ADD_SUDOER);
-                      }}
-                      className="bg-emerald-600 hover:bg-emerald-700 text-white font-medium rounded w-8 h-8 flex items-center justify-center transition-colors duration-200"
-                    >
-                      <Plus className="w-4 h-4" />
-                    </button>
-                  </div>
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              {sudoers.map((sudoer) => (
-                <tr key={sudoer.id}>
-                  <td className="border-l border-b border-t border-r border-gray-600 px-6 py-2 text-center">{users.find(u => u.id === sudoer.id)?.cuId ?? ''}</td>
-                  <td className="border-l border-b border-t border-r border-gray-600 px-6 py-2 text-center">{users.find(u => u.id === sudoer.id)?.name ?? ''}</td>
-                  <td className="border-b border-t border-r border-gray-600 px-6 py-2 text-center">{sudoer.createdAt.toLocaleString()}</td>
-                  <td className="border-b border-t border-r border-gray-600 px-0 py-0 text-center w-12 h-12 min-w-12 min-h-12">
-                    <div className="flex justify-center items-center w-12 h-12 min-w-12 min-h-12">
-                      <button
-                        type="button"
-                        disabled={isSubmitting}
-                        value={sudoer.id}
-                        onClick={(event) => {
-                          event.stopPropagation();
-                          targetId.current = sudoer.id;
-                          setModalType(ModalType.REMOVE_SUDOER);
-                        }}
-                        className="bg-red-600 hover:bg-red-700 text-white font-medium rounded w-8 h-8 flex items-center justify-center transition-colors duration-200"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </div>
-      <div>
-        <h2 className="text-xl mb-2">一般管理者</h2>
-        <div className="overflow-x-auto w-full">
-          <table className="ml-4 table-auto border-collapse border border-gray-600 min-w-max">
-            <thead>
-              <tr>
-                <th className="border-t border-b-4 border-l border-gray-600 border-r px-6 py-2 text-center border-solid">CU_ID</th>
-                <th className="border-t border-b-4 border-r border-gray-600 px-6 py-2 text-center border-solid">名前</th>
-                <th className="border-t border-b-4 border-r border-gray-600 px-6 py-2 text-center border-solid">表示名</th>
-                <th className="border-t border-b-4 border-r border-gray-600 px-6 py-2 text-center border-solid">メールアドレス</th>
-                <th className="border-t border-b-4 border-r border-gray-600 px-6 py-2 text-center border-solid">ロール</th>
-                <th className="border-t border-b-4 border-r border-gray-600 px-6 py-2 text-center border-solid">ログイン許可</th>
-                <th className="border-t border-b-4 border-r border-gray-600 px-6 py-2 text-center border-solid">登録日時</th>
-                <th className="border-t border-b-4 border-r border-gray-600 px-6 py-2 text-center border-solid">最終更新日時</th>
-                <th className="border-t border-b-4 border-r border-gray-600 px-0 py-0 text-center border-solid w-12 h-12 min-w-12 min-h-12">
-                  <div className="flex justify-center items-center w-12 h-12 min-w-12 min-h-12">
-                    <button
-                      type="button"
-                      disabled={isSubmitting}
-                      onClick={(event) => {
-                        event.stopPropagation();
-                        setModalType(ModalType.ADD_USER);
-                      }}
-                      className="bg-emerald-600 hover:bg-emerald-700 text-white font-medium rounded w-8 h-8 flex items-center justify-center transition-colors duration-200"
-                    >
-                      <Plus className="w-4 h-4" />
-                    </button>
-                  </div>
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              {users.map((user) => (
-                <tr key={user.id}>
-                  <td className="border-l border-b border-t border-r border-gray-600 px-6 py-2 text-center">{user.cuId}</td>
-                  <td className="border-b border-t border-r border-gray-600 px-6 py-2 text-center">{user.name}</td>
-                  <td className="border-b border-t border-r border-gray-600 px-6 py-2 text-center">{user.displayName || ''}</td>
-                  <td className="border-b border-t border-r border-gray-600 px-6 py-2 text-center">{user.email || ''}</td>
-                  <td className="border-b border-t border-r border-gray-600 px-6 py-2 text-center">{user.roles.join(', ')}</td>
-                  <td className="border-b border-t border-r border-gray-600 px-6 py-2 text-center">{user.isActive ? '許可' : '拒否'}</td>
-                  <td className="border-b border-t border-r border-gray-600 px-6 py-2 text-center">{user.createdAt.toLocaleString()}</td>
-                  <td className="border-b border-t border-r border-gray-600 px-6 py-2 text-center">{user.updatedAt.toLocaleString()}</td>
-                  <td className="border-b border-t border-r border-gray-600 px-0 py-0 text-center w-12 h-12 min-w-12 min-h-12">
-                    <div className="flex justify-center items-center w-12 h-12 min-w-12 min-h-12">
-                      <button
-                        type="button"
-                        disabled={isSubmitting}
-                        value={user.id}
-                        onClick={(event) => {
-                          event.stopPropagation();
-                          targetId.current = user.id;
-                          setModalType(ModalType.EDIT_USER);
-                        }}
-                        className="bg-blue-600 hover:bg-blue-700 text-white font-medium rounded w-8 h-8 flex items-center justify-center transition-colors duration-200"
-                      >
-                        <Pen className="w-4 h-4" />
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </div>
+    <UserManager
+      initialUsers={users}
+      initialSudoers={sudoers}
+      onCreateSudoer={createSudoer}
+      onDeleteSudoer={deleteSudoer}
+      onCreateUser={createUser}
+      onUpdateUser={updateUser}
+      onDeleteUser={deleteUser}
+    />
   );
 }

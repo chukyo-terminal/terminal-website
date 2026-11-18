@@ -79,36 +79,6 @@ export async function proxy(request: NextRequest) {
             }
           }
         }
-        case 'api': {
-          switch (pathSegments.next()) {
-            case 'auth': {
-              // 認証関連のAPIは認証不要
-              return NextResponse.next();
-            }
-            case 'sudoers':
-            case 'users': {
-              if (!token) {
-                // ログインしていない場合は認証エラー
-                return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-              } else if (token.mode !== 'root') {
-                // 一般管理者はこれらのAPIにアクセスできない
-                return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
-              } else {
-                // 上級管理者はアクセスを許可
-                return NextResponse.next();
-              }
-            }
-            default: {
-              if (!token) { // eslint-disable-line unicorn/prefer-ternary
-                // ログインしていない場合は認証エラー
-                return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-              } else {
-                // その他のAPIはログインしていればアクセスを許可
-                return NextResponse.next();
-              }
-            }
-          }
-        }
       }
     }
   }
@@ -118,5 +88,5 @@ export async function proxy(request: NextRequest) {
 
 
 export const config = {
-  matcher: ['/admin/:path*', '/api/:path*'],
+  matcher: ['/admin/:path*'],
 };

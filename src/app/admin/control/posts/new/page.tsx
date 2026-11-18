@@ -9,7 +9,7 @@ export const dynamic = 'force-dynamic';
 
 
 export default async function NewPostPage(): Promise<JSX.Element> {
-  // eslint-disable-next-line unicorn/consistent-function-scoping
+
   async function createNewPost(authorId: number, slug: string, title: string): Promise<number> {
     'use server';
     let postId: number = 0;

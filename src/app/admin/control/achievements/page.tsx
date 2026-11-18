@@ -1,595 +1,148 @@
-'use client';
+import { desc, eq } from 'drizzle-orm';
 
-import { useEffect, useRef, useState } from 'react';
-
-import { Pen, Plus } from 'lucide-react';
-import { z } from 'zod';
-
-import {
-  AchievementsApiGetResponseSchema,
-  AchievementsApiPatchResponseSchema,
-  AchievementsApiPostResponseSchema,
-} from '@/api-schemas/achievements';
-import Modal from '@/components/elements/modal';
-import { api } from '@/lib/hono';
+import AchievementManager from './_components/achievement-manager';
+import { AchievementFormSchema } from './_lib/achievement';
+import { achievementsTable, postsTable } from '@/db/schema';
+import { checkPermission } from '@/lib/auth';
+import { db } from '@/lib/drizzle';
 
 import type { JSX } from 'react';
+import type { ActionResult } from '@/types';
+import type { SQL } from 'drizzle-orm';
+import type { Achievement, AchievementFormValues } from './_lib/achievement';
+
+export const dynamic = 'force-dynamic';
+
 
 /**
- * 実績管理ページのモーダルタイプを定義する。
- */
-enum ModalType {
-  ADD_ACHIEVEMENT,
-  EDIT_ACHIEVEMENT,
-  REMOVE_ACHIEVEMENT,
-}
-
-type Achievement = z.infer<typeof AchievementsApiGetResponseSchema>['data']['achievements'][number];
-
-/**
- * 日付をinput[type="date"]向けの文字列に整形する。
- */
-function formatDateForInput(date: Date): string {
-  const year = date.getUTCFullYear();
-  const month = String(date.getUTCMonth() + 1).padStart(2, '0');
-  const day = String(date.getUTCDate()).padStart(2, '0');
-  return `${year}-${month}-${day}`;
-}
-
-/**
- * YYYY-MM-DDをAPIに渡すISO文字列へ変換する。
- */
-function toIsoDateTime(value: string): string {
-  return `${value}T12:00:00.000Z`;
-}
-
-/**
- * 日付降順で実績を並べる。
- */
-function sortAchievementsByDateDesc(achievements: Achievement[]): Achievement[] {
-  return [...achievements].toSorted((a, b) => {
-    const dateDiff = b.date.getTime() - a.date.getTime();
-    return dateDiff !== 0 ? dateDiff : b.id - a.id;
-  });
-}
-
-/**
- * 実績管理ページを生成する。
+ * 実績を取得する。
  *
- * @returns 生成したページ
+ * @param where - 絞り込み条件
+ * @returns 日付の降順に並べた実績
  */
-export default function AchievementsControlPage(): JSX.Element {
-  const [isReload, setReload] = useState(true);
-  const [modalType, setModalType] = useState<ModalType | null>(null);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const targetId = useRef(0);
-  const [achievements, setAchievements] = useState<Achievement[]>([]);
+async function selectAchievements(where?: SQL): Promise<Achievement[]> {
+  const rows = await db
+    .select({
+      id: achievementsTable.id,
+      title: achievementsTable.title,
+      description: achievementsTable.description,
+      postId: postsTable.id,
+      postSlug: postsTable.slug,
+      date: achievementsTable.date,
+      createdAt: achievementsTable.createdAt,
+      updatedAt: achievementsTable.updatedAt,
+    })
+    .from(achievementsTable)
+    .leftJoin(postsTable, eq(achievementsTable.postId, postsTable.id))
+    .where(where)
+    .orderBy(desc(achievementsTable.date), desc(achievementsTable.id));
 
-  useEffect(() => {
-    (async () => {
-      if (!isReload) return;
-      try {
-        const response = await api.achievements.$get();
-        if (!response.ok) {
-          throw new Error('Failed to fetch achievements');
-        }
-        const parsedResponse =
-          await AchievementsApiGetResponseSchema.parseAsync(await response.json());
-        const achievementData = parsedResponse.data.achievements;
-        setAchievements(sortAchievementsByDateDesc(achievementData));
-      } catch (e) {
-        console.error('Error fetching achievements:', e);
-      } finally {
-        setReload(false);
+  return rows.map((row) => ({
+    id: row.id,
+    title: row.title,
+    description: row.description,
+    post: row.postId !== null && row.postSlug !== null ? { id: row.postId, slug: row.postSlug } : null,
+    date: new Date(`${row.date}T00:00:00.000Z`),
+    createdAt: row.createdAt,
+    updatedAt: row.updatedAt,
+  }));
+}
+
+
+/**
+ * IDが正しい形式であるかを検証する。
+ *
+ * @param id - 検証する値
+ * @returns 正の整数であれば `true`
+ */
+function isValidId(id: unknown): id is number {
+  return Number.isSafeInteger(id) && (id as number) > 0;
+}
+
+
+export default async function AchievementsControlPage(): Promise<JSX.Element> {
+  const achievements = await selectAchievements();
+
+  async function createAchievement(values: AchievementFormValues): Promise<ActionResult<Achievement>> {
+    'use server';
+    const permissionError = await checkPermission('user');
+    if (permissionError) {
+      return { ok: false, error: permissionError };
+    }
+    const parsed = AchievementFormSchema.safeParse(values);
+    if (!parsed.success) {
+      return { ok: false, error: parsed.error.issues[0]?.message ?? '入力内容が正しくありません。' };
+    }
+    try {
+      const [{ id }] = await db
+        .insert(achievementsTable)
+        .values({ ...parsed.data, postId: null })
+        .returning({ id: achievementsTable.id });
+      const [created] = await selectAchievements(eq(achievementsTable.id, id));
+      return { ok: true, data: created };
+    } catch (e) {
+      console.error('Failed to create achievement:', e);
+      return { ok: false, error: '実績の追加に失敗しました。' };
+    }
+  }
+
+  async function updateAchievement(
+    id: number,
+    values: AchievementFormValues,
+  ): Promise<ActionResult<Achievement>> {
+    'use server';
+    const permissionError = await checkPermission('user');
+    if (permissionError) {
+      return { ok: false, error: permissionError };
+    }
+    if (!isValidId(id)) {
+      return { ok: false, error: '実績IDが正しくありません。' };
+    }
+    const parsed = AchievementFormSchema.safeParse(values);
+    if (!parsed.success) {
+      return { ok: false, error: parsed.error.issues[0]?.message ?? '入力内容が正しくありません。' };
+    }
+    try {
+      const updated = await db
+        .update(achievementsTable)
+        .set(parsed.data)
+        .where(eq(achievementsTable.id, id))
+        .returning({ id: achievementsTable.id });
+      if (updated.length === 0) {
+        return { ok: false, error: '実績が見つかりませんでした。' };
       }
-    })();
-  }, [isReload]);
+      const [achievement] = await selectAchievements(eq(achievementsTable.id, id));
+      return { ok: true, data: achievement };
+    } catch (e) {
+      console.error('Failed to update achievement:', e);
+      return { ok: false, error: '実績の編集に失敗しました。' };
+    }
+  }
+
+  async function deleteAchievement(id: number): Promise<ActionResult> {
+    'use server';
+    const permissionError = await checkPermission('user');
+    if (permissionError) {
+      return { ok: false, error: permissionError };
+    }
+    if (!isValidId(id)) {
+      return { ok: false, error: '実績IDが正しくありません。' };
+    }
+    try {
+      await db.delete(achievementsTable).where(eq(achievementsTable.id, id));
+      return { ok: true };
+    } catch (e) {
+      console.error('Failed to delete achievement:', e);
+      return { ok: false, error: '実績の削除に失敗しました。' };
+    }
+  }
 
   return (
-    <div className="mx-auto px-4 py-8">
-      {modalType === ModalType.ADD_ACHIEVEMENT &&
-        <Modal
-          isOpen={true}
-          onRequestClose={() => setModalType(null)}
-          contentLabel="実績追加"
-        >
-          <form
-            onSubmit={async (event) => {
-              event.preventDefault();
-              if (isSubmitting) return;
-
-              const formData = new FormData(event.target as HTMLFormElement);
-              const title = (formData.get('title') as string).trim();
-              const description = (formData.get('description') as string).trim();
-              const date = formData.get('date') as string;
-
-              if (description === '') {
-                alert('説明を入力してください。');
-                return;
-              }
-
-              setIsSubmitting(true);
-              try {
-                const response = await api.achievements.$post({
-                  json: {
-                    title,
-                    description,
-                    postId: null,
-                    date: toIsoDateTime(date),
-                  },
-                });
-
-                if (response.ok) {
-                  const parsedResponse =
-                    await AchievementsApiPostResponseSchema.parseAsync(await response.json());
-                  const data = parsedResponse.data;
-                  console.info('Successfully added achievement');
-                  setAchievements((previous) => sortAchievementsByDateDesc([
-                    ...previous,
-                    {
-                      id: data.id,
-                      title,
-                      description,
-                      post: null,
-                      date: new Date(toIsoDateTime(date)),
-                      createdAt: data.createdAt,
-                      updatedAt: data.createdAt,
-                    },
-                  ]));
-                  setModalType(null);
-                } else {
-                  console.error(
-                    'Failed to add achievement:',
-                    response.status,
-                    response.statusText,
-                  );
-                  const responseText = await response.text();
-                  try {
-                    console.log(JSON.parse(responseText));
-                  } catch {
-                    console.log(responseText);
-                  }
-                  alert('実績の追加に失敗しました。');
-                }
-              } finally {
-                setIsSubmitting(false);
-              }
-            }}
-            className="flex flex-col gap-4"
-          >
-            <label className="block">
-              <span className="text-sm font-medium">タイトル</span>
-              <input
-                type="text"
-                name="title"
-                className={
-                  'mt-1 block w-full rounded border border-gray-300 px-3 py-2 ' +
-                  'focus:outline-none focus:ring-2 focus:ring-emerald-500'
-                }
-                placeholder="実績タイトルを入力"
-                autoFocus
-                required
-              />
-            </label>
-            <label className="block">
-              <span className="text-sm font-medium">説明</span>
-              <textarea
-                name="description"
-                className={
-                  'mt-1 block w-full rounded border border-gray-300 px-3 py-2 ' +
-                  'focus:outline-none focus:ring-2 focus:ring-emerald-500'
-                }
-                placeholder="実績の説明を入力"
-                rows={4}
-                required
-              />
-            </label>
-            <label className="block">
-              <span className="text-sm font-medium">日付</span>
-              <input
-                type="date"
-                name="date"
-                className={
-                  'mt-1 block w-full rounded border border-gray-300 px-3 py-2 ' +
-                  'focus:outline-none focus:ring-2 focus:ring-emerald-500'
-                }
-                required
-              />
-            </label>
-            <div className="flex justify-end gap-2 mt-4">
-              <button
-                type="button"
-                className="px-4 py-2 rounded bg-gray-400 hover:bg-gray-500"
-                disabled={isSubmitting}
-                onClick={() => setModalType(null)}
-              >
-                キャンセル
-              </button>
-              <button
-                type="submit"
-                className="px-4 py-2 rounded bg-emerald-600 text-white hover:bg-emerald-700"
-                disabled={isSubmitting}
-              >
-                追加
-              </button>
-            </div>
-          </form>
-        </Modal>
-      }
-
-      {modalType === ModalType.EDIT_ACHIEVEMENT &&
-        // eslint-disable-next-line react-hooks/refs
-        (() => {
-          const achievement = achievements.find((current) => current.id === targetId.current);
-          if (!achievement) return null;
-
-          return (
-            <Modal
-              isOpen={true}
-              onRequestClose={() => setModalType(null)}
-              contentLabel="実績編集"
-            >
-              <form
-                onSubmit={async (event) => {
-                  event.preventDefault();
-                  if (isSubmitting) return;
-
-                  const formData = new FormData(event.target as HTMLFormElement);
-                  const title = (formData.get('title') as string).trim();
-                  const description = (formData.get('description') as string).trim();
-                  const date = formData.get('date') as string;
-
-                  if (description === '') {
-                    alert('説明を入力してください。');
-                    return;
-                  }
-
-                  setIsSubmitting(true);
-                  try {
-                    const response = await api.achievements[':id'].$patch({
-                      param: { id: String(achievement.id) },
-                      json: {
-                        title,
-                        description,
-                        postId: achievement.post?.id ?? null,
-                        date: toIsoDateTime(date),
-                      },
-                    });
-
-                    if (response.ok) {
-                      const parsedResponse =
-                        await AchievementsApiPatchResponseSchema.parseAsync(await response.json());
-                      const updatedAt = parsedResponse.data.updatedAt;
-                      console.info('Successfully edited achievement');
-                      setAchievements((previous) => sortAchievementsByDateDesc(previous.map((current) => {
-                        if (current.id !== achievement.id) {
-                          return current;
-                        }
-                        return {
-                          ...current,
-                          title,
-                          description,
-                          date: new Date(toIsoDateTime(date)),
-                          updatedAt,
-                        };
-                      })));
-                      setModalType(null);
-                    } else {
-                      console.error(
-                        'Failed to edit achievement:',
-                        response.status,
-                        response.statusText,
-                      );
-                      const responseText = await response.text();
-                      try {
-                        console.log(JSON.parse(responseText));
-                      } catch {
-                        console.log(responseText);
-                      }
-                      alert('実績の編集に失敗しました。');
-                    }
-                  } finally {
-                    setIsSubmitting(false);
-                  }
-                }}
-                className="flex flex-col gap-4"
-              >
-                <label className="block">
-                  <span className="text-sm font-medium">タイトル</span>
-                  <input
-                    type="text"
-                    name="title"
-                    className={
-                      'mt-1 block w-full rounded border border-gray-300 px-3 py-2 ' +
-                      'focus:outline-none focus:ring-2 focus:ring-emerald-500'
-                    }
-                    defaultValue={achievement.title}
-                    required
-                  />
-                </label>
-                <label className="block">
-                  <span className="text-sm font-medium">説明</span>
-                  <textarea
-                    name="description"
-                    className={
-                      'mt-1 block w-full rounded border border-gray-300 px-3 py-2 ' +
-                      'focus:outline-none focus:ring-2 focus:ring-emerald-500'
-                    }
-                    defaultValue={achievement.description ?? ''}
-                    rows={4}
-                    required
-                  />
-                </label>
-                <label className="block">
-                  <span className="text-sm font-medium">関連投稿</span>
-                  <input
-                    type="text"
-                    name="postSlug"
-                    className={
-                      'mt-1 block w-full rounded border border-gray-500 px-3 py-2 ' +
-                      'text-gray-500 cursor-not-allowed'
-                    }
-                    value={achievement.post?.slug ?? ''}
-                    readOnly
-                    disabled
-                  />
-                </label>
-                <label className="block">
-                  <span className="text-sm font-medium">日付</span>
-                  <input
-                    type="date"
-                    name="date"
-                    className={
-                      'mt-1 block w-full rounded border border-gray-300 px-3 py-2 ' +
-                      'focus:outline-none focus:ring-2 focus:ring-emerald-500'
-                    }
-                    defaultValue={formatDateForInput(achievement.date)}
-                    required
-                  />
-                </label>
-                <div className="flex justify-end gap-2 mt-4">
-                  <button
-                    type="button"
-                    className="px-4 py-2 rounded bg-red-600 text-white hover:bg-red-700 mr-auto"
-                    disabled={isSubmitting}
-                    onClick={() => setModalType(ModalType.REMOVE_ACHIEVEMENT)}
-                  >
-                    削除
-                  </button>
-                  <button
-                    type="button"
-                    className="px-4 py-2 rounded bg-gray-400 hover:bg-gray-500"
-                    disabled={isSubmitting}
-                    onClick={() => setModalType(null)}
-                  >
-                    キャンセル
-                  </button>
-                  <button
-                    type="submit"
-                    className="px-4 py-2 rounded bg-blue-600 text-white hover:bg-blue-700"
-                    disabled={isSubmitting}
-                  >
-                    編集
-                  </button>
-                </div>
-              </form>
-            </Modal>
-          );
-        })()
-      }
-
-      {modalType === ModalType.REMOVE_ACHIEVEMENT &&
-        <Modal
-          isOpen={true}
-          onRequestClose={() => setModalType(null)}
-          contentLabel="実績削除"
-        >
-          <form
-            onSubmit={async (event) => {
-              event.preventDefault();
-              if (isSubmitting) return;
-
-              setIsSubmitting(true);
-              try {
-                const response = await api.achievements[':id'].$delete({
-                  param: { id: String(targetId.current) },
-                });
-
-                if (response.ok) {
-                  console.info('Successfully removed achievement');
-                  setAchievements((previous) =>
-                    previous.filter((achievement) => achievement.id !== targetId.current),
-                  );
-                  setModalType(null);
-                } else {
-                  console.error(
-                    'Failed to remove achievement:',
-                    response.status,
-                    response.statusText,
-                  );
-                  const responseText = await response.text();
-                  try {
-                    console.log(JSON.parse(responseText));
-                  } catch {
-                    console.log(responseText);
-                  }
-                  alert('実績の削除に失敗しました。');
-                }
-              } finally {
-                setIsSubmitting(false);
-              }
-            }}
-            className="flex flex-col gap-2"
-          >
-            <div className="mt-2 flex justify-center">
-              <span className="relative inline-flex items-baseline">
-                <span
-                  className={
-                    'absolute right-full mr-2 text-md whitespace-nowrap top-1/2 -translate-y-1/2'
-                  }
-                >
-                  削除対象:
-                </span>
-                <span className="font-mono text-2xl text-red-700">
-                  {/* eslint-disable-next-line react-hooks/refs */}
-                  {achievements.find((achievement) => achievement.id === targetId.current)?.title ?? ''}
-                </span>
-              </span>
-            </div>
-            <div className="flex justify-end gap-2 mt-4">
-              <button
-                type="button"
-                className="px-4 py-2 rounded bg-gray-400 hover:bg-gray-500"
-                disabled={isSubmitting}
-                onClick={() => setModalType(null)}
-              >
-                キャンセル
-              </button>
-              <button
-                type="submit"
-                className="px-4 py-2 rounded bg-red-600 text-white hover:bg-red-700"
-                disabled={isSubmitting}
-              >
-                削除
-              </button>
-            </div>
-          </form>
-        </Modal>
-      }
-
-      <h1 className="md:mt-8 text-2xl font-bold mb-4">活動実績管理</h1>
-      <div className="overflow-x-auto w-full">
-        <table className="ml-4 table-auto border-collapse border border-gray-600 min-w-max">
-          <thead>
-            <tr>
-              <th
-                className={
-                  'border-t border-b-4 border-l border-r border-gray-600 ' +
-                  'px-6 py-2 text-center border-solid'
-                }
-              >
-                タイトル
-              </th>
-              <th
-                className={
-                  'border-t border-b-4 border-r border-gray-600 ' +
-                  'px-6 py-2 text-center border-solid'
-                }
-              >
-                説明
-              </th>
-              <th
-                className={
-                  'border-t border-b-4 border-r border-gray-600 ' +
-                  'px-6 py-2 text-center border-solid'
-                }
-              >
-                関連投稿
-              </th>
-              <th
-                className={
-                  'border-t border-b-4 border-r border-gray-600 ' +
-                  'px-6 py-2 text-center border-solid'
-                }
-              >
-                日付
-              </th>
-              <th
-                className={
-                  'border-t border-b-4 border-r border-gray-600 ' +
-                  'px-6 py-2 text-center border-solid'
-                }
-              >
-                登録日時
-              </th>
-              <th
-                className={
-                  'border-t border-b-4 border-r border-gray-600 ' +
-                  'px-6 py-2 text-center border-solid'
-                }
-              >
-                最終更新日時
-              </th>
-              <th
-                className={
-                  'border-t border-b-4 border-r border-gray-600 px-0 py-0 text-center ' +
-                  'border-solid w-12 h-12 min-w-12 min-h-12'
-                }
-              >
-                <div className="flex justify-center items-center w-12 h-12 min-w-12 min-h-12">
-                  <button
-                    type="button"
-                    disabled={isSubmitting}
-                    onClick={(event) => {
-                      event.stopPropagation();
-                      setModalType(ModalType.ADD_ACHIEVEMENT);
-                    }}
-                    className={
-                      'bg-emerald-600 hover:bg-emerald-700 text-white font-medium rounded w-8 h-8 ' +
-                      'flex items-center justify-center transition-colors duration-200'
-                    }
-                  >
-                    <Plus className="w-4 h-4" />
-                  </button>
-                </div>
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            {achievements.map((achievement) => (
-              <tr key={achievement.id}>
-                <td className="border-l border-b border-t border-r border-gray-600 px-6 py-2 text-center">
-                  {achievement.title}
-                </td>
-                <td
-                  className={
-                    'border-b border-t border-r border-gray-600 px-6 py-2 text-center ' +
-                    'max-w-sm whitespace-pre-wrap'
-                  }
-                >
-                  {achievement.description ?? ''}
-                </td>
-                <td className="border-b border-t border-r border-gray-600 px-6 py-2 text-center">
-                  {achievement.post?.slug ?? ''}
-                </td>
-                <td className="border-b border-t border-r border-gray-600 px-6 py-2 text-center">
-                  {formatDateForInput(achievement.date)}
-                </td>
-                <td className="border-b border-t border-r border-gray-600 px-6 py-2 text-center">
-                  {achievement.createdAt.toLocaleString()}
-                </td>
-                <td className="border-b border-t border-r border-gray-600 px-6 py-2 text-center">
-                  {achievement.updatedAt.toLocaleString()}
-                </td>
-                <td
-                  className={
-                    'border-b border-t border-r border-gray-600 px-0 py-0 text-center ' +
-                    'w-12 h-12 min-w-12 min-h-12'
-                  }
-                >
-                  <div className="flex justify-center items-center w-12 h-12 min-w-12 min-h-12">
-                    <button
-                      type="button"
-                      disabled={isSubmitting}
-                      onClick={(event) => {
-                        event.stopPropagation();
-                        targetId.current = achievement.id;
-                        setModalType(ModalType.EDIT_ACHIEVEMENT);
-                      }}
-                      className={
-                        'bg-blue-600 hover:bg-blue-700 text-white font-medium rounded w-8 h-8 ' +
-                        'flex items-center justify-center transition-colors duration-200'
-                      }
-                    >
-                      <Pen className="w-4 h-4" />
-                    </button>
-                  </div>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-    </div>
+    <AchievementManager
+      initialAchievements={achievements}
+      onCreate={createAchievement}
+      onUpdate={updateAchievement}
+      onDelete={deleteAchievement}
+    />
   );
 }
