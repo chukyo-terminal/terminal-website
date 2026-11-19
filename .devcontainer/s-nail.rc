@@ -1,0 +1,25 @@
+# Terminal Website の Dev Container 用の s-nail の設定 (devcontainer.json の containerEnv で MAILRC に指定して読み込む)。
+#
+# 送信は Mailpit の SMTP (mail:1025)、受信は Mailpit の POP3 (mail:1110。ユーザー dev / パスワード dev) で行う。
+# Mailpit は届いたメールをすべて受け止めて外部には配送しないので、宛先はどのアドレスでもよい (実在のアドレスにも届かない)。
+#
+#   送信: echo '本文' | s-nail -s '件名' someone@terminal-website.test
+#   受信: s-nail            (Mailpit に届いたメールの一覧を開く。q で終了)
+#   一覧: s-nail -H         (一覧を表示して終了)
+
+# v15 の動作 (URL とパスワードの扱いなど) を使う
+set v15-compat
+
+# 端末と送信の文字コード (日本語の件名・本文を UTF-8 で扱う)
+set ttycharset=utf-8 sendcharsets=utf-8
+
+# 送信: s-nail の SMTP クライアントで Mailpit に送る (認証・TLS なし)
+set mta=smtp://mail:1025 smtp-auth=none
+set from="Terminal Website Dev <dev@terminal-website.test>" hostname=terminal-website.test
+
+# 受信: Mailpit の POP3 を受信箱にする (URL にポートがあるので、パスワードの変数名の HOST は mail:1110。開発用の固定のパスワード)
+set inbox=pop3://dev@mail:1110 password-dev@mail:1110=dev
+# Mailpit の POP3 は APOP に対応していない
+set pop3-no-apop
+# 読んだメールを ~/mbox に移さず Mailpit に残す (消すときは d で削除してから q で終了)
+set hold

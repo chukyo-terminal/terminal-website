@@ -45,6 +45,20 @@ services:
     # Add "forwardPorts": ["5432"] to **devcontainer.json** to forward PostgreSQL locally.
     # (Adding the "ports" property to this file will not forward from a Codespace.)
 
+  # メールの開発用の SMTP サーバー (Mailpit)。届いたメールはすべて受け止めて外部には配送しない (コンテナを作り直すと消える)。
+  # SMTP は mail:1025 (TLS なし)、POP3 は mail:1110、Web UI は mail:8025 (devcontainer.json で転送)
+  mail:
+    image: axllent/mailpit:latest
+    restart: unless-stopped
+    networks:
+      - app-network
+    environment:
+      # POP3 で受信箱を読めるようにする (s-nail 用。ユーザー dev / パスワード dev)
+      MP_POP3_AUTH: "dev:dev"
+      # アプリを SMTP 認証ありの設定にしても送れるよう、どのユーザー名・パスワードも (認証なしも) 受け付ける
+      MP_SMTP_AUTH_ACCEPT_ANY: "true"
+      MP_SMTP_AUTH_ALLOW_INSECURE: "true"
+
 networks:
   app-network:
     driver: bridge
