@@ -6,6 +6,12 @@
 #   送信: echo '本文' | s-nail -s '件名' someone@terminal-website.test
 #   受信: s-nail            (Mailpit に届いたメールの一覧を開く。q で終了)
 #   一覧: s-nail -H         (一覧を表示して終了)
+#
+# 問い合わせ者として、お問い合わせ管理から送信した返信メールに返信する (問い合わせ者からの返信の自動記録を試す):
+#   s-nail -r taro.yamada@example.com   (問い合わせ者のアドレスを送信元にして一覧を開く)
+#   r 番号                               (返信メールに返信する。本文を入力し、Ctrl+D または「~.」だけの行で送信する)
+# サイトのアドレス (contact@terminal-website.test) 宛てのメールは、Mailpit から IMAP サーバー (imap サービス) にも配送され、
+# アプリが IMAP で受信して記録する。
 
 # v15 の動作 (URL とパスワードの扱いなど) を使う
 set v15-compat

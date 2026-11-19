@@ -7,6 +7,10 @@ import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { Code } from 'lucide-react';
 
+import {
+  CONTACT_CONTENT_MAX_LENGTH, CONTACT_EMAIL_MAX_LENGTH, CONTACT_NAME_MAX_LENGTH, CONTACT_SUBJECT_MAX_LENGTH,
+} from '@/lib/contact';
+
 import type { JSX } from 'react';
 
 type Properties = {
@@ -111,6 +115,7 @@ export default function ContactForm({ submitForm }: Properties): JSX.Element {
                 onChange={(event) => setName(event.target.value)}
                 disabled={isSubmitting}
                 required
+                maxLength={CONTACT_NAME_MAX_LENGTH}
                 className="w-full px-3 md:px-4 py-2 bg-gray-700 border border-gray-600 rounded-md text-gray-100 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent text-sm md:text-base"
                 placeholder="中京 太郎"
               />
@@ -127,6 +132,7 @@ export default function ContactForm({ submitForm }: Properties): JSX.Element {
                 onChange={(event) => setEmail(event.target.value)}
                 disabled={isSubmitting}
                 required
+                maxLength={CONTACT_EMAIL_MAX_LENGTH}
                 className="w-full px-3 md:px-4 py-2 bg-gray-700 border border-gray-600 rounded-md text-gray-100 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent text-sm md:text-base"
                 placeholder="example@example.com"
               />
@@ -143,6 +149,7 @@ export default function ContactForm({ submitForm }: Properties): JSX.Element {
                 onChange={(event) => setSubject(event.target.value)}
                 disabled={isSubmitting}
                 required
+                maxLength={CONTACT_SUBJECT_MAX_LENGTH}
                 className="w-full px-3 md:px-4 py-2 bg-gray-700 border border-gray-600 rounded-md text-gray-100 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent text-sm md:text-base"
                 placeholder="件名をご記入ください"
               />
@@ -159,6 +166,7 @@ export default function ContactForm({ submitForm }: Properties): JSX.Element {
                 onChange={(event) => setContent(event.target.value)}
                 disabled={isSubmitting}
                 required
+                maxLength={CONTACT_CONTENT_MAX_LENGTH}
                 className="w-full px-3 md:px-4 py-2 bg-gray-700 border border-gray-600 rounded-md text-gray-100 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent text-sm md:text-base"
                 placeholder="お問い合わせ内容をご記入ください"
               ></textarea>

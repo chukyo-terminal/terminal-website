@@ -1,6 +1,6 @@
 import { and, asc, desc, eq, isNull, isNotNull, sql, ne } from 'drizzle-orm';
 import {
-  boolean, char, check, date, foreignKey, index, integer,
+  bigint, boolean, char, check, date, foreignKey, index, integer,
   pgEnum, pgTable, pgView, primaryKey, text, timestamp, unique, uuid, varchar,
 } from 'drizzle-orm/pg-core';
 
@@ -327,6 +327,8 @@ export const achievementsTable = pgTable(
 
 /**
  * 問い合わせテーブル
+ *
+ * 対応状況は、完了日時と返信の有無から判定する（完了日時がある場合は完了、管理者の返信がある場合は対応中、それ以外は未対応）。
  */
 export const contactsTable = pgTable(
   'contacts',
@@ -343,7 +345,7 @@ export const contactsTable = pgTable(
     content: text().notNull(),
     /** 担当者 */
     assignedTo: integer('assigned_to').references(() => usersTable.id, { onDelete: 'set null' }),
-    /** 完了日時 */
+    /** 完了日時（未完了の場合は `null`） */
     completedAt: timestamp('completed_at', { mode: 'date', precision: 3, withTimezone: true }),
     /** 作成日時 */
     createdAt: timestamp('created_at', { mode: 'date', precision: 3, withTimezone: true }).notNull().defaultNow(),
@@ -355,6 +357,12 @@ export const contactsTable = pgTable(
 
 /**
  * 問い合わせ返信テーブル
+ *
+ * 問い合わせに対するやり取りを保存する。
+ *
+ * - 管理者の返信: `isFromInquirer` が `false`。保存時に問い合わせ者へメールで送信する（送信できなかった場合は保存しない）
+ * - 問い合わせ者からの返信: `isFromInquirer` が `true`。問い合わせ者から届いたメールを、IMAP で受信して自動で記録する。
+ *   自動で記録されなかったメールは、管理者が手動で記録する（`messageId` と `fromAddress` は `null`）
  */
 export const contactRepliesTable = pgTable(
   'contact_replies',
@@ -363,12 +371,56 @@ export const contactRepliesTable = pgTable(
     id: integer().primaryKey().generatedAlwaysAsIdentity(),
     /** 問い合わせID */
     contactId: integer('contact_id').notNull().references(() => contactsTable.id, { onDelete: 'cascade' }),
-    /** 返信者（null の場合は問い合わせを行ったユーザーであることを示す） */
+    /** 返信者、または問い合わせ者からの返信を手動で記録した管理者（自動で記録した場合や、ユーザーが削除された場合は `null`） */
     authorId: integer('author_id').references(() => usersTable.id, { onDelete: 'set null' }),
+    /** 問い合わせ者からの返信であるかどうか */
+    isFromInquirer: boolean('is_from_inquirer').notNull().default(false),
+    /** 受信したメールの Message-ID（自動で記録した問い合わせ者からの返信のみ。同じメールを重複して記録しないために使用する） */
+    messageId: text('message_id').unique(),
+    /** 受信したメールの送信元のメールアドレス（自動で記録した問い合わせ者からの返信のみ） */
+    fromAddress: text('from_address'),
+    /** 受信したメールの添付ファイルの名前（添付ファイル自体は保存しない） */
+    attachmentNames: text('attachment_names').array().notNull().default([]),
     /** 件名 */
     subject: text().notNull(),
-    /** 内容 */
+    /** 内容（受信したメールは、プレーンテキストの本文） */
     content: text().notNull(),
+    /** 作成日時（管理者の返信は送信日時、問い合わせ者からの返信は受信日時、手動で記録した場合は記録日時） */
+    createdAt: timestamp('created_at', { mode: 'date', precision: 3, withTimezone: true }).notNull().defaultNow(),
+    /** 更新日時 */
+    updatedAt: timestamp('updated_at', { mode: 'date', precision: 3, withTimezone: true }).notNull().defaultNow().$onUpdateFn(() => new Date()),
+  },
+  (table) => [
+    index('contact_replies_contact_id_index').on(table.contactId),
+    // 受信したメールの情報を持つのは、問い合わせ者からの返信のみ
+    check(
+      'valid_contact_reply_received_mail',
+      sql`${table.isFromInquirer} OR (${table.messageId} IS NULL AND ${table.fromAddress} IS NULL)`,
+    ),
+  ],
+);
+
+
+/**
+ * 受信メールの確認状況テーブル
+ *
+ * IMAP のメールボックスごとに、確認済みの最後のメールの UID を保存する（メールボックスのメールには既読などの変更を加えない）。
+ */
+export const mailboxSyncStatesTable = pgTable(
+  'mailbox_sync_states',
+  {
+    /** メールボックスを識別するキー（ユーザー名・サーバー・メールボックス名から生成する） */
+    mailboxKey: text('mailbox_key').primaryKey(),
+    /** UIDVALIDITY（変わった場合は UID が振り直されたため、確認し直す。まだ確認していない場合は `null`） */
+    uidValidity: bigint('uid_validity', { mode: 'number' }),
+    /** 確認済みの最後のメールの UID */
+    lastUid: bigint('last_uid', { mode: 'number' }).notNull().default(0),
+    /** 最後に確認に成功した日時 */
+    lastSucceededAt: timestamp('last_succeeded_at', { mode: 'date', precision: 3, withTimezone: true }),
+    /** 最後に確認に失敗した日時 */
+    lastFailedAt: timestamp('last_failed_at', { mode: 'date', precision: 3, withTimezone: true }),
+    /** 確認に失敗した理由（確認に成功すると `null` に戻す） */
+    lastError: text('last_error'),
     /** 作成日時 */
     createdAt: timestamp('created_at', { mode: 'date', precision: 3, withTimezone: true }).notNull().defaultNow(),
     /** 更新日時 */

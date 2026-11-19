@@ -1,0 +1,2 @@
+ALTER TABLE "contact_replies" ADD COLUMN "is_from_inquirer" boolean DEFAULT false NOT NULL;--> statement-breakpoint
+CREATE INDEX "contact_replies_contact_id_index" ON "contact_replies" USING btree ("contact_id");

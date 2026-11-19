@@ -46,18 +46,32 @@ services:
     # (Adding the "ports" property to this file will not forward from a Codespace.)
 
   # メールの開発用の SMTP サーバー (Mailpit)。届いたメールはすべて受け止めて外部には配送しない (コンテナを作り直すと消える)。
+  # ただし、サイトのアドレス (contact@terminal-website.test) 宛てのメールは、受信用の IMAP サーバー (imap サービス) にも配送する。
   # SMTP は mail:1025 (TLS なし)、POP3 は mail:1110、Web UI は mail:8025 (devcontainer.json で転送)
   mail:
     image: axllent/mailpit:latest
     restart: unless-stopped
     networks:
       - app-network
+    volumes:
+      - ./mailpit-relay.yaml:/etc/mailpit/relay.yaml:ro
     environment:
       # POP3 で受信箱を読めるようにする (s-nail 用。ユーザー dev / パスワード dev)
       MP_POP3_AUTH: "dev:dev"
       # アプリを SMTP 認証ありの設定にしても送れるよう、どのユーザー名・パスワードも (認証なしも) 受け付ける
       MP_SMTP_AUTH_ACCEPT_ANY: "true"
       MP_SMTP_AUTH_ALLOW_INSECURE: "true"
+      # サイトのアドレス宛てのメール (問い合わせ者からの返信) を IMAP サーバーにも配送する (配送先は mailpit-relay.yaml)
+      MP_SMTP_RELAY_CONFIG: /etc/mailpit/relay.yaml
+      MP_SMTP_RELAY_MATCHING: '^contact@terminal-website\.test$'
+
+  # 問い合わせ者からの返信を受信するための、開発用の IMAP サーバー (GreenMail)。Mailpit から配送されたメールを受け取る (コンテナを作り直すと消える)。
+  # IMAP は imap:3143 (TLS なし)。ユーザー名はメールアドレス (contact@terminal-website.test) で、どのパスワードでもログインできる
+  imap:
+    image: greenmail/standalone:latest
+    restart: unless-stopped
+    networks:
+      - app-network
 
 networks:
   app-network:

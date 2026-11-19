@@ -1,0 +1,8 @@
+# Mailpit の SMTP リレーの設定 (compose.yaml の mail サービスで読み込む)。
+# MP_SMTP_RELAY_MATCHING に一致する宛先のメールを、開発用の IMAP サーバー (imap サービス) の SMTP に配送する。
+host: imap
+port: 3025
+starttls: false
+auth: none
+# 元の Message-ID のまま配送する (問い合わせ者からの返信を重複して記録しないために使用する)
+preserve-message-ids: true

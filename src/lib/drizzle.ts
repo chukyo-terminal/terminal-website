@@ -40,9 +40,30 @@ export const db = drizzle({
 });
 
 
-// 本番環境で、起動時にマイグレーションを実行する
-if (process.env.NODE_ENV === 'production' && process.env.NEXT_PHASE !== PHASE_PRODUCTION_BUILD) {
+/**
+ * `globalThis` に実行中のマイグレーションを保存するキー。
+ */
+const MIGRATION_KEY = Symbol.for('terminal-website.database-migration');
+
+
+/**
+ * マイグレーションを開始する。
+ *
+ * @returns マイグレーションの完了を待つ Promise
+ */
+function startMigrations(): Promise<void> {
   console.log('Running database migrations...');
-  await migrate(db, { migrationsFolder: 'drizzle' });
-  console.log('Database migrations completed.');
+  return migrate(db, { migrationsFolder: 'drizzle' }).then(() => console.log('Database migrations completed.'));
 }
+
+
+// 本番環境で、起動時にマイグレーションを実行する。
+// サーバーの起動時の処理（instrumentation）とページは別々にバンドルされ、このモジュールが複数回読み込まれるため、
+// 同時に実行して競合しないよう、`globalThis` で共有して1回だけ実行する
+/*
+if (process.env.NODE_ENV === 'production' && process.env.NEXT_PHASE !== PHASE_PRODUCTION_BUILD) {
+  const store = globalThis as unknown as Record<symbol, Promise<void> | undefined>;
+  store[MIGRATION_KEY] ??= startMigrations();
+  await store[MIGRATION_KEY];
+}
+*/

@@ -2,14 +2,16 @@ import { db } from '@/lib/drizzle';
 
 import ContactForm from './_components/form';
 import { contactsTable } from '@/db/schema';
-import { postDiscordWebhook } from '@/utils/discord';
+import { ContactFormSchema } from '@/lib/contact';
+import { notifyNewContact } from '@/lib/contact-notification';
 
 
 export default function FormPage() {
   // eslint-disable-next-line unicorn/consistent-function-scoping
   async function submitForm(name: string, email: string, subject: string, content: string, turnstileToken: string): Promise<void> {
     'use server';
-    if (!name || !email || !subject || !content || !turnstileToken) {
+    const parsed = ContactFormSchema.safeParse({ name, email, subject, content });
+    if (!parsed.success || !turnstileToken) {
       throw new Error('Invalid parameters');
     }
     const turnstileResponse = await fetch('https://challenges.cloudflare.com/turnstile/v0/siteverify', {
@@ -27,26 +29,9 @@ export default function FormPage() {
       console.error('Turnstile verification failed:', turnstileData);
       throw new Error('Turnstile verification failed');
     }
-    // eslint-disable-next-line unicorn/no-unused-array-method-return
-    await db.insert(contactsTable).values({ name, email, subject, content });
-    try {
-      // Webhook送信の成否に関係なく訪問者には成功を返す
-      await postDiscordWebhook(process.env.DISCORD_FORM_WEBHOOK!, {
-        embeds: [
-          {
-            author: { name },
-            title: subject,
-            description: content,
-            fields: [
-              { name: 'メールアドレス', value: `\`${email}\`` },
-            ],
-            color: 0x00_BF_FF,
-          },
-        ],
-      });
-    } catch (e) {
-      console.error('Webhook post failed:', e);
-    }
+    const [{ id }] = await db.insert(contactsTable).values(parsed.data).returning({ id: contactsTable.id });
+    // 通知の成否に関係なく訪問者には成功を返す
+    await notifyNewContact({ id, ...parsed.data });
   }
   return (
     <ContactForm submitForm={submitForm} />
