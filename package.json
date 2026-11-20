@@ -31,7 +31,7 @@
     "html-to-text": "^10.0.1",
     "imapflow": "^2.10.2",
     "iovalkey": "^0.4.0",
-    "lucide-react": "^1.73.0",
+    "lucide-react": "^1.74.0",
     "mailparser": "^3.14.2",
     "markdown-it": "^15.0.3",
     "next": "16.4.6",
