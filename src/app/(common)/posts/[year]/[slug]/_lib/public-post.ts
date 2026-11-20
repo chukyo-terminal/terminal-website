@@ -4,11 +4,11 @@ import { and, eq, gte, lt } from 'drizzle-orm';
 
 import { publishedPostsView } from '@/db/schema';
 import { db } from '@/lib/drizzle';
-import { selectPostVersions } from '@/lib/post-version-queries';
-import { isPublicVersion } from '@/lib/post-versions';
+import { selectPostVersions } from '@/utils/post-version-queries';
+import { isPublicVersion } from '@/utils/post-versions';
 import { getFiscalYearStart } from '@/utils/date';
 
-import type { PublishedPostVersion } from '@/lib/post-versions';
+import type { PublishedPostVersion } from '@/utils/post-versions';
 
 
 /**

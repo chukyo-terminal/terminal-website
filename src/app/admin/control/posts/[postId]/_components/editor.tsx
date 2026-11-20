@@ -12,7 +12,7 @@ import {
 import { z } from 'zod';
 
 import Modal from '@/components/elements/modal';
-import { MAX_IMAGE_FILES_PER_UPLOAD, toImageMarkdown, uploadImageFiles, validateImageFile } from '@/lib/images';
+import { MAX_IMAGE_FILES_PER_UPLOAD, toImageMarkdown, uploadImageFiles, validateImageFile } from '@/utils/images';
 
 import { PostStatusBadge, PrivateBadge } from '../../_components/post-status-badge';
 
@@ -38,8 +38,8 @@ import type { MarkdownPreviewHandle } from './markdown-preview';
 import type { ViewMode } from './markdown-toolbar';
 import type { MarkdownCommand } from '../_lib/markdown-commands';
 import type { PostFormValues, PostStatus, PublishResult, SaveResult, TagOption } from '../_lib/post-form';
-import type { ManagedImage, UploadImageAction } from '@/lib/images';
-import type { PostVersion } from '@/lib/post-versions';
+import type { ManagedImage, UploadImageAction } from '@/utils/images';
+import type { PostVersion } from '@/utils/post-versions';
 import type { ActionResult } from '@/types';
 
 

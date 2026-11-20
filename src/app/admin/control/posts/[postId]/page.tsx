@@ -6,10 +6,10 @@ import { PostFormSchema, normalizeDescription } from './_lib/post-form';
 import { db } from '@/lib/drizzle';
 import { postContentsTable, postTagsTable, postsTable, tagsTable, usersTable } from '@/db/schema';
 import { checkPermission } from '@/lib/auth';
-import { selectManagedImages } from '@/lib/image-queries';
-import { saveUploadedImage } from '@/lib/image-upload';
-import { selectCommentCounts } from '@/lib/post-feedback-queries';
-import { selectPostVersions } from '@/lib/post-version-queries';
+import { selectManagedImages } from '@/utils/image-queries';
+import { saveUploadedImage } from '@/utils/image-upload';
+import { selectCommentCounts } from '@/utils/post-feedback-queries';
+import { selectPostVersions } from '@/utils/post-version-queries';
 import { getFiscalYear } from '@/utils/date';
 
 import { getPostStatus } from '../_lib/post-status';
@@ -17,8 +17,8 @@ import { getPostStatus } from '../_lib/post-status';
 import type { JSX } from 'react';
 import type { Transaction } from './_lib/post-actions';
 import type { PostFormValues, PublishResult, SaveResult } from './_lib/post-form';
-import type { ImageInfo, ManagedImage } from '@/lib/images';
-import type { PostVersion } from '@/lib/post-versions';
+import type { ImageInfo, ManagedImage } from '@/utils/images';
+import type { PostVersion } from '@/utils/post-versions';
 import type { ActionResult } from '@/types';
 
 export const dynamic = 'force-dynamic';

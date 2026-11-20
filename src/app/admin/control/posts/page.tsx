@@ -5,7 +5,7 @@ import { parsePostListFilters } from './_lib/post-list';
 import { getPostStatus } from './_lib/post-status';
 import { postContentsTable, postTagsTable, postsTable, tagsTable, usersTable } from '@/db/schema';
 import { db } from '@/lib/drizzle';
-import { selectCommentCounts } from '@/lib/post-feedback-queries';
+import { selectCommentCounts } from '@/utils/post-feedback-queries';
 import { getFiscalYear } from '@/utils/date';
 
 import type { JSX } from 'react';

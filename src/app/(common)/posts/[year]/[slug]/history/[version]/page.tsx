@@ -4,9 +4,9 @@ import { notFound } from 'next/navigation';
 import { ArrowLeft, ChevronLeft, ChevronRight, FileText, GitCompareArrows, History } from 'lucide-react';
 
 import { FieldDiff, LineChangeStats, TextDiff } from '@/components/elements/text-diff';
-import { countLineChanges, diffLines } from '@/lib/diff';
+import { countLineChanges, diffLines } from '@/utils/diff';
 import { markdownIt } from '@/lib/markdown-it';
-import { getVersionLabel } from '@/lib/post-versions';
+import { getVersionLabel } from '@/utils/post-versions';
 import '@/styles/markdown.css';
 import '../../styles.css';
 
@@ -15,7 +15,7 @@ import { SITE_TITLE, findPublicPost, findPublicVersions, formatPublicDateTime } 
 import type { JSX } from 'react';
 import type { Metadata } from 'next';
 import type { PublicPost } from '../../_lib/public-post';
-import type { PublishedPostVersion } from '@/lib/post-versions';
+import type { PublishedPostVersion } from '@/utils/post-versions';
 
 export const dynamic = 'force-dynamic';
 

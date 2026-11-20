@@ -9,7 +9,7 @@ import { selectContactDetail, selectStaffUsers } from '../_lib/contact-queries';
 import { buildReplyMailText, getQuotedMessage } from '../_lib/reply-mail';
 import { contactRepliesTable, contactsTable, usersTable } from '@/db/schema';
 import { checkPermission, getCurrentUserId } from '@/lib/auth';
-import { toContactMessageId, toReplyMessageId } from '@/lib/contact';
+import { toContactMessageId, toReplyMessageId } from '@/utils/contact';
 import { db } from '@/lib/drizzle';
 import { isImapConfigured } from '@/lib/imap';
 import { getMailDomain, isMailConfigured, sendMail } from '@/lib/mail';

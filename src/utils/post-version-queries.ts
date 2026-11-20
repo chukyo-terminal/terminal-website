@@ -2,9 +2,9 @@ import { asc, eq } from 'drizzle-orm';
 
 import { postContentsTable } from '@/db/schema';
 import { db } from '@/lib/drizzle';
-import { numberPostVersions } from '@/lib/post-versions';
+import { numberPostVersions } from '@/utils/post-versions';
 
-import type { PostVersion } from '@/lib/post-versions';
+import type { PostVersion } from '@/utils/post-versions';
 
 
 /**

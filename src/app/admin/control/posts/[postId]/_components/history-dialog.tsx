@@ -8,14 +8,14 @@ import {
 import ReactModal from 'react-modal';
 
 import { FieldDiff, LineChangeStats, TextDiff } from '@/components/elements/text-diff';
-import { countLineChanges, diffLines } from '@/lib/diff';
-import { findDisplayedVersion, getVersionLabel, isPublicVersion, isPublishedVersion } from '@/lib/post-versions';
+import { countLineChanges, diffLines } from '@/utils/diff';
+import { findDisplayedVersion, getVersionLabel, isPublicVersion, isPublishedVersion } from '@/utils/post-versions';
 
 import MarkdownPreview from './markdown-preview';
 import { formatDateTime } from '../../_lib/date-format';
 
 import type { JSX, ReactNode } from 'react';
-import type { PostVersion } from '@/lib/post-versions';
+import type { PostVersion } from '@/utils/post-versions';
 import type { ActionResult } from '@/types';
 
 

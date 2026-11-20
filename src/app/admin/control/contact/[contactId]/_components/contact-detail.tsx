@@ -12,7 +12,7 @@ import {
 import ReplyComposer from './reply-composer';
 import Modal from '@/components/elements/modal';
 import { formatDateTime, formatRelativeTime } from '@/app/admin/control/posts/_lib/date-format';
-import { splitQuotedText } from '@/lib/contact';
+import { splitQuotedText } from '@/utils/contact';
 import ContactStatusBadge from '../../_components/contact-status-badge';
 
 import type { JSX, ReactNode } from 'react';

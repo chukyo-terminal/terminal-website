@@ -2,7 +2,7 @@ import { eq } from 'drizzle-orm';
 
 import { imagesTable } from '@/db/schema';
 import { db } from '@/lib/drizzle';
-import { IMAGE_FORMATS, getFileNameStem, isValidImageId } from '@/lib/images';
+import { IMAGE_FORMATS, getFileNameStem, isValidImageId } from '@/utils/images';
 
 export const dynamic = 'force-dynamic';
 

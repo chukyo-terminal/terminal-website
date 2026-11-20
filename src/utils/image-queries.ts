@@ -2,9 +2,9 @@ import { desc, eq, sql } from 'drizzle-orm';
 
 import { imagesTable, postContentsTable, usersTable } from '@/db/schema';
 import { db } from '@/lib/drizzle';
-import { IMAGE_PATH_PATTERN_SQL, getImagePath } from '@/lib/images';
+import { IMAGE_PATH_PATTERN_SQL, getImagePath } from '@/utils/images';
 
-import type { ImageUsage, ManagedImage } from '@/lib/images';
+import type { ImageUsage, ManagedImage } from '@/utils/images';
 
 
 /**

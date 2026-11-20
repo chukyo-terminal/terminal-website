@@ -11,15 +11,15 @@ import {
   ANONYMOUS_COMMENT_AUTHOR_NAME, COMMENT_AUTHOR_EMAIL_MAX_LENGTH, COMMENT_AUTHOR_NAME_MAX_LENGTH, COMMENT_MAX_LENGTH,
   CommentFormSchema, POST_FEEDBACK_TURNSTILE_ACTION, countPublicComments, getCommentAuthorName,
   toPostFeedbackTurnstileCData,
-} from '@/lib/post-feedback';
-import { useTurnstile } from '@/lib/use-turnstile';
+} from '@/utils/post-feedback';
+import { useTurnstile } from '@/utils/use-turnstile';
 
 import type { FormEvent, JSX, ReactNode, RefObject } from 'react';
 import type {
   CommentFormValues, CommentPostResult, PublicComment, PublicCommentAuthor, PublicReply, RatingState, RatingSummary,
   RatingValue,
-} from '@/lib/post-feedback';
-import type { TurnstileStatus } from '@/lib/use-turnstile';
+} from '@/utils/post-feedback';
+import type { TurnstileStatus } from '@/utils/use-turnstile';
 import type { ActionResult } from '@/types';
 
 

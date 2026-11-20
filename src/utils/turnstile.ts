@@ -40,21 +40,21 @@ type SiteverifyResponse = {
 
 
 /**
- * Non-interactive モードの Turnstile ウィジェットで発行されたトークンを検証する。
+ * Turnstile ウィジェットで発行されたトークンを検証する。
  *
- * トークンは1回しか検証できないため、同じトークンで2回呼び出すと2回目は失敗する。
- *
+ * @param secretKeyName - シークレットキーを設定した環境変数の名前
  * @param token - ブラウザから送信されたトークン
  * @param expected - トークンを発行したウィジェットに設定したアクション名と `cData`
  * @returns 検証に成功した場合は `true`
  */
-export async function verifyNonInteractiveTurnstileToken(
+async function verifyTurnstileToken(
+  secretKeyName: string,
   token: unknown,
   expected: { action: string; cdata: string },
 ): Promise<boolean> {
-  const secret = process.env.CLOUDFLARE_TURNSTILE_NON_INTERACTIVE_SECRET_KEY;
+  const secret = process.env[secretKeyName];
   if (!secret) {
-    console.error('CLOUDFLARE_TURNSTILE_NON_INTERACTIVE_SECRET_KEY is not set.');
+    console.error(`${secretKeyName} is not set.`);
     return false;
   }
   if (typeof token !== 'string' || token === '' || token.length > TOKEN_MAX_LENGTH) {
@@ -94,3 +94,33 @@ export async function verifyNonInteractiveTurnstileToken(
   }
   return true;
 }
+
+
+/**
+ * Non-interactive モードの Turnstile ウィジェットで発行されたトークンを検証する。
+ *
+ * トークンは1回しか検証できないため、同じトークンで2回呼び出すと2回目は失敗する。
+ *
+ * @param token - ブラウザから送信されたトークン
+ * @param expected - トークンを発行したウィジェットに設定したアクション名と `cData`
+ * @returns 検証に成功した場合は `true`
+ */
+export const verifyNonInteractiveTurnstileToken = (
+  token: unknown,
+  expected: { action: string; cdata: string },
+): Promise<boolean> => verifyTurnstileToken('CLOUDFLARE_TURNSTILE_NON_INTERACTIVE_SECRET_KEY', token, expected);
+
+
+/**
+ * 通常のモード（Managed など）の Turnstile ウィジェット（`NEXT_PUBLIC_CLOUDFLARE_TURNSTILE_SITE_KEY`）で発行されたトークンを検証する。
+ *
+ * トークンは1回しか検証できないため、同じトークンで2回呼び出すと2回目は失敗する。
+ *
+ * @param token - ブラウザから送信されたトークン
+ * @param expected - トークンを発行したウィジェットに設定したアクション名と `cData`
+ * @returns 検証に成功した場合は `true`
+ */
+export const verifyInteractiveTurnstileToken = (
+  token: unknown,
+  expected: { action: string; cdata: string },
+): Promise<boolean> => verifyTurnstileToken('CLOUDFLARE_TURNSTILE_SECRET_KEY', token, expected);

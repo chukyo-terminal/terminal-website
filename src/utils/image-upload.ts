@@ -3,11 +3,11 @@ import sharp from 'sharp';
 import { imagesTable } from '@/db/schema';
 import { checkPermission, getCurrentUserId } from '@/lib/auth';
 import { db } from '@/lib/drizzle';
-import { imageInfoColumns } from '@/lib/image-queries';
-import { MAX_IMAGE_DIMENSION, MAX_IMAGE_FILE_SIZE, formatFileSize, normalizeFileName } from '@/lib/images';
+import { imageInfoColumns } from '@/utils/image-queries';
+import { MAX_IMAGE_DIMENSION, MAX_IMAGE_FILE_SIZE, formatFileSize, normalizeFileName } from '@/utils/images';
 
 import type { Metadata, Sharp } from 'sharp';
-import type { ImageInfo, ImageMimeType } from '@/lib/images';
+import type { ImageInfo, ImageMimeType } from '@/utils/images';
 import type { ActionResult } from '@/types';
 
 

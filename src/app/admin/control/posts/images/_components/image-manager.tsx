@@ -14,7 +14,7 @@ import Modal from '@/components/elements/modal';
 import {
   IMAGE_ACCEPT, MAX_IMAGE_FILES_PER_UPLOAD, MAX_IMAGE_FILE_SIZE, formatFileSize, getImagePath, toImageMarkdown,
   uploadImageFiles, validateImageFile,
-} from '@/lib/images';
+} from '@/utils/images';
 
 import { formatDateTime } from '../../_lib/date-format';
 import {
@@ -24,7 +24,7 @@ import {
 
 import type { CSSProperties, JSX, ReactNode } from 'react';
 import type { ImageListFilters, ImageSortOrder, ManagedImage } from '../_lib/image';
-import type { UploadImageAction } from '@/lib/images';
+import type { UploadImageAction } from '@/utils/images';
 import type { ActionResult } from '@/types';
 
 
