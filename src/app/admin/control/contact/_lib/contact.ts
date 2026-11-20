@@ -6,7 +6,7 @@
 
 import { z } from 'zod';
 
-import { ContactContentSchema, createSubjectSchema } from '@/lib/contact';
+import { ContactContentSchema, createSubjectSchema } from '@/utils/contact';
 
 
 /**

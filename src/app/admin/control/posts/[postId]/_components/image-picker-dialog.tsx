@@ -8,10 +8,10 @@ import {
 } from 'lucide-react';
 import ReactModal from 'react-modal';
 
-import { IMAGE_ACCEPT, MAX_IMAGE_FILE_SIZE, formatFileSize, getImagePath } from '@/lib/images';
+import { IMAGE_ACCEPT, MAX_IMAGE_FILE_SIZE, formatFileSize, getImagePath } from '@/utils/images';
 
 import type { DragEvent, JSX } from 'react';
-import type { ManagedImage } from '@/lib/images';
+import type { ManagedImage } from '@/utils/images';
 import type { ActionResult } from '@/types';
 
 

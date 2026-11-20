@@ -4,12 +4,12 @@ import ImageManager from './_components/image-manager';
 import { imagesTable } from '@/db/schema';
 import { checkPermission } from '@/lib/auth';
 import { db } from '@/lib/drizzle';
-import { selectImageUsages, selectManagedImages } from '@/lib/image-queries';
-import { saveUploadedImage } from '@/lib/image-upload';
-import { isValidImageId } from '@/lib/images';
+import { selectImageUsages, selectManagedImages } from '@/utils/image-queries';
+import { saveUploadedImage } from '@/utils/image-upload';
+import { isValidImageId } from '@/utils/images';
 
 import type { JSX } from 'react';
-import type { ManagedImage } from '@/lib/images';
+import type { ManagedImage } from '@/utils/images';
 import type { ActionResult } from '@/types';
 
 export const dynamic = 'force-dynamic';

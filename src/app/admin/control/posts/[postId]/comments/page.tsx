@@ -4,12 +4,12 @@ import CommentManager from './_components/comment-manager';
 import { postCommentsTable, postContentsTable, postsTable } from '@/db/schema';
 import { checkPermission, getCurrentUserId } from '@/lib/auth';
 import { db } from '@/lib/drizzle';
-import { ReplyContentSchema } from '@/lib/post-feedback';
-import { findReplyTarget, selectComments, selectRatingSummary } from '@/lib/post-feedback-queries';
+import { ReplyContentSchema } from '@/utils/post-feedback';
+import { findReplyTarget, selectComments, selectRatingSummary } from '@/utils/post-feedback-queries';
 import { getFiscalYear } from '@/utils/date';
 
 import type { JSX } from 'react';
-import type { ManagedComment } from '@/lib/post-feedback';
+import type { ManagedComment } from '@/utils/post-feedback';
 import type { ActionResult } from '@/types';
 
 export const dynamic = 'force-dynamic';

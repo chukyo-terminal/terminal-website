@@ -6,7 +6,7 @@ import {
 
 import { as } from '@/lib/drizzle';
 
-import type { ImageMimeType } from '@/lib/images';
+import type { ImageMimeType } from '@/utils/images';
 
 
 /**

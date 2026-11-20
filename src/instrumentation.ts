@@ -10,6 +10,6 @@ export async function register(): Promise<void> {
   if (process.env.NEXT_RUNTIME !== 'nodejs' || process.env.NEXT_PHASE === PHASE_PRODUCTION_BUILD) {
     return;
   }
-  const { startContactMailPolling } = await import('@/lib/contact-mail-sync');
+  const { startContactMailPolling } = await import('@/utils/contact-mail-sync');
   startContactMailPolling();
 }

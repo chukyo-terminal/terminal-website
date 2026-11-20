@@ -14,8 +14,8 @@ import { ImapFlow } from 'imapflow';
 import { simpleParser } from 'mailparser';
 
 import { contactRepliesTable, contactsTable, mailboxSyncStatesTable } from '@/db/schema';
-import { normalizeContactContent, normalizeSingleLine, parseContactMessageId, splitQuotedText } from '@/lib/contact';
-import { notifyContactReply } from '@/lib/contact-notification';
+import { normalizeContactContent, normalizeSingleLine, parseContactMessageId, splitQuotedText } from '@/utils/contact';
+import { notifyContactReply } from '@/utils/contact-notification';
 import { db } from '@/lib/drizzle';
 import { getImapConfig, getMailboxKey } from '@/lib/imap';
 import { getMailDomain, getMailFromAddress } from '@/lib/mail';

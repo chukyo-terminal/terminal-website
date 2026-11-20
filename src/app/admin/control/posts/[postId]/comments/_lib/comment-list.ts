@@ -1,6 +1,6 @@
-import { needsReply } from '@/lib/post-feedback';
+import { needsReply } from '@/utils/post-feedback';
 
-import type { ManagedComment } from '@/lib/post-feedback';
+import type { ManagedComment } from '@/utils/post-feedback';
 
 
 /**

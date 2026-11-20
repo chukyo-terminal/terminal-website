@@ -1,6 +1,6 @@
 import { EditorSelection } from '@codemirror/state';
 
-import { escapeMarkdownAlt } from '@/lib/images';
+import { escapeMarkdownAlt } from '@/utils/images';
 
 import type { EditorView } from '@codemirror/view';
 

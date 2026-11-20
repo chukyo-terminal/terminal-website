@@ -1,6 +1,6 @@
-import type { ManagedImage } from '@/lib/images';
+import type { ManagedImage } from '@/utils/images';
 
-export type { ManagedImage } from '@/lib/images';
+export type { ManagedImage } from '@/utils/images';
 
 
 /**

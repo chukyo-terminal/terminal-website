@@ -14,11 +14,11 @@ import {
   COMMENT_SORT_ORDERS, COMMENT_STATUS_FILTERS, DEFAULT_COMMENT_FILTERS, countByCommentStatus, filterAndSortComments,
   formatVisitorTag,
 } from '../_lib/comment-list';
-import { COMMENT_MAX_LENGTH, ReplyContentSchema, getCommentAuthorName, needsReply } from '@/lib/post-feedback';
+import { COMMENT_MAX_LENGTH, ReplyContentSchema, getCommentAuthorName, needsReply } from '@/utils/post-feedback';
 
 import type { JSX, ReactNode } from 'react';
 import type { CommentListFilters, CommentSortOrder } from '../_lib/comment-list';
-import type { ManagedComment, ManagedCommentAuthor, ManagedReply, RatingSummary } from '@/lib/post-feedback';
+import type { ManagedComment, ManagedCommentAuthor, ManagedReply, RatingSummary } from '@/utils/post-feedback';
 import type { ActionResult } from '@/types';
 
 

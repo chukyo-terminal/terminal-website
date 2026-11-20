@@ -11,18 +11,18 @@ import { db } from '@/lib/drizzle';
 import { markdownIt } from '@/lib/markdown-it';
 import {
   CommentFormSchema, POST_FEEDBACK_TURNSTILE_ACTION, toPostFeedbackTurnstileCData, toPublicComments,
-} from '@/lib/post-feedback';
+} from '@/utils/post-feedback';
 import {
   countRecentVisitorComments, findReplyTarget, isPublicPost, selectComments, selectRatingSummary, selectVisitorRating,
-} from '@/lib/post-feedback-queries';
-import { verifyNonInteractiveTurnstileToken } from '@/lib/turnstile';
-import { getOrCreateVisitorId, getVisitorId } from '@/lib/visitor';
+} from '@/utils/post-feedback-queries';
+import { verifyNonInteractiveTurnstileToken } from '@/utils/turnstile';
+import { getOrCreateVisitorId, getVisitorId } from '@/utils/visitor';
 import { getFiscalYearStart } from '@/utils/date';
 import '@/styles/markdown.css';
 import './styles.css';
 
 import type { JSX } from 'react';
-import type { CommentFormValues, CommentPostResult, RatingState, RatingValue } from '@/lib/post-feedback';
+import type { CommentFormValues, CommentPostResult, RatingState, RatingValue } from '@/utils/post-feedback';
 import type { ActionResult } from '@/types';
 
 
