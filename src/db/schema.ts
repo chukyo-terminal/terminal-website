@@ -1,10 +1,20 @@
 import { and, asc, desc, eq, isNull, isNotNull, sql, ne } from 'drizzle-orm';
 import {
-  bigint, boolean, char, check, date, foreignKey, index, integer,
+  bigint, boolean, char, check, customType, date, foreignKey, index, integer,
   pgEnum, pgTable, pgView, primaryKey, text, timestamp, unique, uuid, varchar,
 } from 'drizzle-orm/pg-core';
 
 import { as } from '@/lib/drizzle';
+
+import type { ImageMimeType } from '@/lib/images';
+
+
+/**
+ * バイナリデータ（`bytea`）の列の型
+ */
+const bytea = customType<{ data: Buffer; driverData: Buffer }>({
+  dataType: () => 'bytea',
+});
 
 
 /**
@@ -293,6 +303,49 @@ export const postCommentsTable = pgTable(
     check('valid_comment_author_email', sql`(${table.authorId} IS NULL) = (${table.authorEmail} IS NOT NULL)`),
     check('valid_comment_author_name', sql`${table.authorId} IS NULL OR ${table.authorName} IS NULL`),
     check('valid_comment_email', sql`${table.authorEmail} IS NULL OR ${table.authorEmail} ~* '^[^@[:space:]]+@[^@[:space:]]+\\.[^@[:space:]]+$'`),
+  ],
+);
+
+
+/**
+ * 画像テーブル
+ *
+ * 記事に掲載するためにアップロードされた画像を保存する。画像は `/images/{id}` で公開する（URL を知っていれば誰でも閲覧できる）。
+ * 保存する画像は、アップロード時に形式を検証し、位置情報などのメタデータを除去したもの。
+ * どの記事で使われているかは保存せず、記事の本文に含まれる画像の URL から判定する。
+ *
+ * UPDATEは想定されない。
+ */
+export const imagesTable = pgTable(
+  'images',
+  {
+    /** 画像ID（URL を推測されないよう、ランダムな UUID を使う） */
+    id: uuid().primaryKey().defaultRandom(),
+    /** アップロードされたファイルの名前 */
+    fileName: text('file_name').notNull(),
+    /** MIME タイプ */
+    mimeType: text('mime_type').$type<ImageMimeType>().notNull(),
+    /** データの大きさ（バイト） */
+    size: integer().notNull(),
+    /** 幅（px） */
+    width: integer().notNull(),
+    /** 高さ（px） */
+    height: integer().notNull(),
+    /** 画像のデータ */
+    data: bytea().notNull(),
+    /** アップロードしたユーザー（ユーザーが削除された場合は `null`） */
+    uploadedBy: integer('uploaded_by').references(() => usersTable.id, { onDelete: 'set null' }),
+    /** 作成日時（アップロード日時） */
+    createdAt: timestamp('created_at', { mode: 'date', precision: 3, withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [
+    index('images_created_at_index').on(table.createdAt),
+    check(
+      'valid_image_mime_type',
+      sql`${table.mimeType} IN ('image/jpeg', 'image/png', 'image/gif', 'image/webp', 'image/avif')`,
+    ),
+    check('valid_image_size', sql`${table.size} > 0 AND ${table.size} = OCTET_LENGTH(${table.data})`),
+    check('valid_image_dimensions', sql`${table.width} > 0 AND ${table.height} > 0`),
   ],
 );
 

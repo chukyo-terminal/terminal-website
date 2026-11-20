@@ -5,7 +5,7 @@ import { Fragment } from 'react';
 import { redo, undo } from '@codemirror/commands';
 import { openSearchPanel } from '@codemirror/search';
 import {
-  ArrowDownUp, Bold, Code, Columns2, Eye, Heading2, Heading3, ImageIcon, Italic, Keyboard, LinkIcon, List,
+  ArrowDownUp, Bold, Code, Columns2, Eye, Heading2, Heading3, ImageIcon, ImagePlus, Italic, Keyboard, LinkIcon, List,
   ListOrdered, Maximize2, Minimize2, Minus, PenLine, Redo2, Search, SquareCode, Strikethrough, Table, TextQuote, Undo2,
 } from 'lucide-react';
 
@@ -27,14 +27,19 @@ export type ViewMode = 'edit' | 'split' | 'preview';
 
 
 /**
- * ツールバーの編集ボタン。
+ * エディタの編集コマンド以外の、ツールバーの操作。
+ */
+type ToolbarAction = 'insertImage';
+
+
+/**
+ * ツールバーの編集ボタン（`command` を実行するか、`action` を親に通知する）。
  */
 type CommandItem = {
   label: string;
   icon: LucideIcon;
-  command: MarkdownCommand;
   shortcut?: string;
-};
+} & ({ command: MarkdownCommand } | { action: ToolbarAction });
 
 
 /**
@@ -53,7 +58,8 @@ const COMMAND_GROUPS: readonly (readonly CommandItem[])[] = [
   ],
   [
     { label: 'リンク', icon: LinkIcon, command: insertLink, shortcut: SHORTCUT_KEYS.link },
-    { label: '画像', icon: ImageIcon, command: insertImage },
+    { label: '画像を挿入（アップロード済みの画像から選択・アップロード）', icon: ImagePlus, action: 'insertImage' },
+    { label: '画像（URL を指定）', icon: ImageIcon, command: insertImage },
   ],
   [
     { label: '箇条書き', icon: List, command: toggleList('bullet') },
@@ -134,6 +140,8 @@ function ToolbarButton({
 type MarkdownToolbarProperties = {
   /** 編集コマンドを実行する */
   onCommand: (command: MarkdownCommand) => void;
+  /** 画像を挿入するダイアログを開く */
+  onInsertImage: () => void;
   /** 編集ボタンを無効にするかどうか */
   isCommandDisabled: boolean;
   viewMode: ViewMode;
@@ -154,6 +162,7 @@ type MarkdownToolbarProperties = {
  */
 export default function MarkdownToolbar({
   onCommand,
+  onInsertImage,
   isCommandDisabled,
   viewMode,
   onViewModeChange,
@@ -185,7 +194,13 @@ export default function MarkdownToolbar({
                 label={item.shortcut ? `${item.label}（${formatShortcut(item.shortcut, isApple)}）` : item.label}
                 icon={item.icon}
                 disabled={isCommandDisabled}
-                onClick={() => onCommand(item.command)}
+                onClick={() => {
+                  if ('command' in item) {
+                    onCommand(item.command);
+                  } else if (item.action === 'insertImage') {
+                    onInsertImage();
+                  }
+                }}
               />
             ))}
           </Fragment>

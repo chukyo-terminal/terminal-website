@@ -42,8 +42,23 @@ type MarkdownEditorProperties = {
   onCursorChange: (cursor: CursorInfo) => void;
   /** スクロールしたときに呼ばれる（描画フレームごとに最大1回） */
   onScroll: () => void;
+  /**
+   * 画像のファイルが貼り付け・ドロップされたときに呼ばれる。
+   *
+   * `position` はドロップした位置（貼り付けの場合は `undefined` で、選択範囲に挿入する）。
+   */
+  onImageFiles: (files: File[], position?: number) => void;
   className?: string;
 };
+
+
+/**
+ * 画像のファイルを含むかどうかを判定する。
+ *
+ * @param files - ファイル
+ * @returns 画像のファイルを含む場合は `true`
+ */
+const containsImageFile = (files: readonly File[]): boolean => files.some((file) => file.type.startsWith('image/'));
 
 
 /**
@@ -58,6 +73,7 @@ export default function MarkdownEditor({
   onChange,
   onCursorChange,
   onScroll,
+  onImageFiles,
   className,
 }: MarkdownEditorProperties): JSX.Element {
   const containerReference = useRef<HTMLDivElement>(null);
@@ -67,6 +83,7 @@ export default function MarkdownEditor({
   const handleChange = useEffectEvent((value: string) => onChange(value));
   const handleCursorChange = useEffectEvent((cursor: CursorInfo) => onCursorChange(cursor));
   const handleScroll = useEffectEvent(() => onScroll());
+  const handleImageFiles = useEffectEvent((files: File[], position?: number) => onImageFiles(files, position));
 
   useEffect(() => {
     const container = containerReference.current;
@@ -100,6 +117,28 @@ export default function MarkdownEditor({
           editorTheme,
           Prec.high(keymap.of(markdownShortcutKeymap)),
           keymap.of([...defaultKeymap, ...historyKeymap, ...searchKeymap, indentWithTab]),
+          // 画像のファイルの貼り付け・ドロップ（エディタ標準の処理では、ファイルの内容がテキストとして挿入されてしまう）
+          EditorView.domEventHandlers({
+            paste: (event) => {
+              const files = [...(event.clipboardData?.files ?? [])];
+              // テキストも含む場合（表計算ソフトからコピーした表など）は、テキストとして貼り付ける
+              if (!containsImageFile(files) || event.clipboardData?.types.includes('text/plain')) {
+                return false;
+              }
+              event.preventDefault();
+              handleImageFiles(files);
+              return true;
+            },
+            drop: (event, view) => {
+              const files = [...(event.dataTransfer?.files ?? [])];
+              if (!containsImageFile(files)) {
+                return false;
+              }
+              event.preventDefault();
+              handleImageFiles(files, view.posAtCoords({ x: event.clientX, y: event.clientY }) ?? undefined);
+              return true;
+            },
+          }),
           EditorView.updateListener.of((update) => {
             if (update.docChanged) {
               handleChange(update.state.doc.toString());

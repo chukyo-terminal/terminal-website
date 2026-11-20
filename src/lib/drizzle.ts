@@ -60,10 +60,8 @@ function startMigrations(): Promise<void> {
 // 本番環境で、起動時にマイグレーションを実行する。
 // サーバーの起動時の処理（instrumentation）とページは別々にバンドルされ、このモジュールが複数回読み込まれるため、
 // 同時に実行して競合しないよう、`globalThis` で共有して1回だけ実行する
-/*
 if (process.env.NODE_ENV === 'production' && process.env.NEXT_PHASE !== PHASE_PRODUCTION_BUILD) {
   const store = globalThis as unknown as Record<symbol, Promise<void> | undefined>;
   store[MIGRATION_KEY] ??= startMigrations();
   await store[MIGRATION_KEY];
 }
-*/

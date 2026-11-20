@@ -12,15 +12,18 @@ import {
 import { z } from 'zod';
 
 import Modal from '@/components/elements/modal';
+import { MAX_IMAGE_FILES_PER_UPLOAD, toImageMarkdown, uploadImageFiles, validateImageFile } from '@/lib/images';
 
 import { PostStatusBadge, PrivateBadge } from '../../_components/post-status-badge';
 
 import HistoryDialog from './history-dialog';
+import ImagePickerDialog from './image-picker-dialog';
 import MarkdownEditor from './markdown-editor';
 import MarkdownPreview from './markdown-preview';
 import MarkdownToolbar from './markdown-toolbar';
 import ShortcutHelpModal from './shortcut-help-modal';
 import TagInput from './tag-input';
+import { createUploadPlaceholder, insertImageLines, replaceUploadPlaceholder } from '../_lib/image-insertion';
 import {
   MAX_TAGS_PER_POST, PostFormSchema, PostFormValuesSchema, RECOMMENDED_DESCRIPTION_LENGTH, isSamePostFormValues,
   normalizeDescription,
@@ -35,6 +38,7 @@ import type { MarkdownPreviewHandle } from './markdown-preview';
 import type { ViewMode } from './markdown-toolbar';
 import type { MarkdownCommand } from '../_lib/markdown-commands';
 import type { PostFormValues, PostStatus, PublishResult, SaveResult, TagOption } from '../_lib/post-form';
+import type { ManagedImage, UploadImageAction } from '@/lib/images';
 import type { PostVersion } from '@/lib/post-versions';
 import type { ActionResult } from '@/types';
 
@@ -257,6 +261,10 @@ type EditorProperties = {
   onLoadHistory: () => Promise<ActionResult<PostVersion[]>>;
   /** 版の非公開設定を変更し、変更後のすべての版を返す */
   onSetVersionPrivate: (identifier: number, isPrivate: boolean) => Promise<ActionResult<PostVersion[]>>;
+  /** 画像をアップロードする */
+  onUploadImage: UploadImageAction;
+  /** アップロード済みの画像を読み込む */
+  onLoadImages: () => Promise<ActionResult<ManagedImage[]>>;
 };
 
 
@@ -282,6 +290,8 @@ export default function Editor({
   onPublish,
   onLoadHistory,
   onSetVersionPrivate,
+  onUploadImage,
+  onLoadImages,
 }: EditorProperties): JSX.Element {
   const router = useRouter();
   const isApple = useIsApplePlatform();
@@ -297,15 +307,17 @@ export default function Editor({
   const [viewMode, setViewMode] = useState<ViewMode>('split');
   const [isScrollSyncEnabled, setIsScrollSyncEnabled] = useState(true);
   const [isFullscreen, setIsFullscreen] = useState(false);
-  const [openedModal, setOpenedModal] = useState<'publish' | 'help' | 'history' | null>(null);
+  const [openedModal, setOpenedModal] = useState<'publish' | 'help' | 'history' | 'image' | null>(null);
   const [shouldShare, setShouldShare] = useState(false);
   const [toast, setToast] = useState<Toast | null>(null);
   const [storedDraft, setStoredDraft] = useState<StoredDraft | null>(null);
   const [isDraftChecked, setIsDraftChecked] = useState(false);
+  const [uploadingImageCount, setUploadingImageCount] = useState(0);
 
   const draftStorageKey = getDraftStorageKey(postId);
   const isDirty = !isSamePostFormValues(values, savedValues);
   const canPublish = isDirty || status !== 'published';
+  const isUploadingImage = uploadingImageCount > 0;
   // 画面幅が狭い場合は並べて表示できないため、エディタのみを表示する
   const effectiveViewMode: ViewMode = viewMode === 'split' && !isDesktop ? 'edit' : viewMode;
   const urlYear = publishedYear ?? expectedYear;
@@ -407,6 +419,74 @@ export default function Editor({
   }
 
   /**
+   * 画像をアップロードして、本文に挿入する。
+   *
+   * アップロード中は目印を挿入しておき、アップロードが終わったら画像の Markdown に置き換える。
+   *
+   * @param files - アップロードするファイル
+   * @param position - 挿入する位置（指定しない場合は、選択範囲に挿入する）
+   */
+  async function uploadImages(files: readonly File[], position?: number): Promise<void> {
+    const view = editorViewReference.current;
+    if (!view || files.length === 0) {
+      return;
+    }
+    const errors: string[] = [];
+    const validFiles = files.filter((file) => {
+      const error = validateImageFile(file);
+      if (error) {
+        errors.push(error);
+      }
+      return !error;
+    });
+    if (validFiles.length > MAX_IMAGE_FILES_PER_UPLOAD) {
+      errors.push(`一度にアップロードできる画像は${MAX_IMAGE_FILES_PER_UPLOAD}件までです。`);
+    }
+    const targets = validFiles.slice(0, MAX_IMAGE_FILES_PER_UPLOAD);
+    if (targets.length === 0) {
+      setToast({ type: 'error', message: errors.join('\n') });
+      return;
+    }
+
+    const placeholders = new Map(targets.map((file) => [file, createUploadPlaceholder(file.name)]));
+    insertImageLines(view, [...placeholders.values()], position);
+    setUploadingImageCount((count) => count + targets.length);
+    let uploadedCount = 0;
+    let missingCount = 0;
+    await uploadImageFiles(targets, onUploadImage, (file, result) => {
+      setUploadingImageCount((count) => count - 1);
+      const placeholder = placeholders.get(file) ?? '';
+      const currentView = editorViewReference.current;
+      if (result.ok) {
+        uploadedCount++;
+        if (!currentView || !replaceUploadPlaceholder(currentView, placeholder, toImageMarkdown(result.data))) {
+          missingCount++;
+        }
+      } else {
+        errors.push(result.error);
+        if (currentView) {
+          replaceUploadPlaceholder(currentView, placeholder, '');
+        }
+      }
+    });
+
+    if (missingCount > 0) {
+      errors.push(
+        `挿入する位置が本文から削除されていたため、${missingCount}件の画像は挿入していません。`
+        + '「画像を挿入」から選んで挿入できます。',
+      );
+    }
+    if (errors.length > 0) {
+      setToast({
+        type: 'error',
+        message: (uploadedCount > 0 ? `${uploadedCount}件の画像をアップロードしました。\n` : '') + errors.join('\n'),
+      });
+    } else {
+      setToast({ type: 'success', message: `${uploadedCount}件の画像をアップロードしました。` });
+    }
+  }
+
+  /**
    * 編集内容を保存する。
    *
    * @returns 保存に成功した場合は `true`
@@ -449,6 +529,10 @@ export default function Editor({
    */
   async function publish(): Promise<void> {
     setOpenedModal(null);
+    if (isUploadingImage) {
+      setToast({ type: 'error', message: '画像のアップロードが終わってから公開してください。' });
+      return;
+    }
     if (isDirty && !(await save())) {
       return;
     }
@@ -476,6 +560,10 @@ export default function Editor({
    * 公開の確認画面を開く。
    */
   function openPublishDialog(): void {
+    if (isUploadingImage) {
+      setToast({ type: 'error', message: '画像のアップロードが終わってから公開してください。' });
+      return;
+    }
     const firstError = Object.values(fieldErrors).at(0);
     if (firstError) {
       setToast({ type: 'error', message: firstError });
@@ -803,6 +891,7 @@ export default function Editor({
       >
         <MarkdownToolbar
           onCommand={runCommand}
+          onInsertImage={() => setOpenedModal('image')}
           isCommandDisabled={effectiveViewMode === 'preview'}
           viewMode={effectiveViewMode}
           onViewModeChange={(mode) => updatePreferences({ viewMode: mode })}
@@ -821,6 +910,7 @@ export default function Editor({
             onChange={(content) => updateField('content', content)}
             onCursorChange={setCursor}
             onScroll={syncPreviewScroll}
+            onImageFiles={(files, position) => uploadImages(files, position)}
             className={`h-full min-w-0 flex-1 ${effectiveViewMode === 'preview' ? 'hidden' : ''}`}
           />
           <MarkdownPreview
@@ -858,6 +948,12 @@ export default function Editor({
             </span>
           )}
           <div className="ml-auto flex flex-wrap items-center gap-3">
+            {isUploadingImage && (
+              <span role="status" className="inline-flex items-center gap-1.5 text-sky-300">
+                <LoaderCircle className="h-3.5 w-3.5 animate-spin" aria-hidden />
+                画像をアップロード中（{uploadingImageCount}件）
+              </span>
+            )}
             <span aria-live="polite" className={isDirty ? 'text-amber-300' : ''}>
               {isDirty ? '● 未保存の変更があります' : `最終保存: ${formatDateTime(lastSaved)}`}
             </span>
@@ -879,8 +975,12 @@ export default function Editor({
             <button
               type="button"
               onClick={openPublishDialog}
-              disabled={!canPublish || busyAction !== null}
-              title={canPublish ? undefined : '公開されていない変更はありません'}
+              disabled={!canPublish || busyAction !== null || isUploadingImage}
+              title={
+                isUploadingImage
+                  ? '画像のアップロードが終わるまで公開できません'
+                  : (canPublish ? undefined : '公開されていない変更はありません')
+              }
               className={
                 'inline-flex items-center gap-1.5 rounded bg-blue-600 px-3 py-1.5 text-sm font-medium text-white '
                 + 'enabled:hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50'
@@ -910,7 +1010,7 @@ export default function Editor({
           {toast.type === 'error'
             ? <CircleAlert className="mt-0.5 h-4 w-4 shrink-0 text-red-400" aria-hidden />
             : <CircleCheck className="mt-0.5 h-4 w-4 shrink-0 text-emerald-400" aria-hidden />}
-          <p className="min-w-0 flex-1">{toast.message}</p>
+          <p className="min-w-0 flex-1 whitespace-pre-line">{toast.message}</p>
           <button
             type="button"
             aria-label="通知を閉じる"
@@ -966,6 +1066,25 @@ export default function Editor({
       </Modal>
 
       <ShortcutHelpModal isOpen={openedModal === 'help'} onRequestClose={() => setOpenedModal(null)} />
+
+      {openedModal === 'image' && (
+        <ImagePickerDialog
+          postId={postId}
+          onLoad={onLoadImages}
+          onInsert={(images) => {
+            setOpenedModal(null);
+            const view = editorViewReference.current;
+            if (view) {
+              insertImageLines(view, images.map((image) => toImageMarkdown(image)));
+            }
+          }}
+          onUpload={(files) => {
+            setOpenedModal(null);
+            uploadImages(files);
+          }}
+          onRequestClose={() => setOpenedModal(null)}
+        />
+      )}
 
       {openedModal === 'history' && (
         <HistoryDialog

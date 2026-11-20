@@ -6,6 +6,8 @@ import { PostFormSchema, normalizeDescription } from './_lib/post-form';
 import { db } from '@/lib/drizzle';
 import { postContentsTable, postTagsTable, postsTable, tagsTable, usersTable } from '@/db/schema';
 import { checkPermission } from '@/lib/auth';
+import { selectManagedImages } from '@/lib/image-queries';
+import { saveUploadedImage } from '@/lib/image-upload';
 import { selectCommentCounts } from '@/lib/post-feedback-queries';
 import { selectPostVersions } from '@/lib/post-version-queries';
 import { getFiscalYear } from '@/utils/date';
@@ -15,6 +17,7 @@ import { getPostStatus } from '../_lib/post-status';
 import type { JSX } from 'react';
 import type { Transaction } from './_lib/post-actions';
 import type { PostFormValues, PublishResult, SaveResult } from './_lib/post-form';
+import type { ImageInfo, ManagedImage } from '@/lib/images';
 import type { PostVersion } from '@/lib/post-versions';
 import type { ActionResult } from '@/types';
 
@@ -295,6 +298,25 @@ export default async function PostEditPage({ params }: { params: Promise<{ postI
     }
   }
 
+  async function handleUploadImage(formData: FormData): Promise<ActionResult<ImageInfo>> {
+    'use server';
+    return await saveUploadedImage(formData);
+  }
+
+  async function handleLoadImages(): Promise<ActionResult<ManagedImage[]>> {
+    'use server';
+    const permissionError = await checkPermission('user');
+    if (permissionError) {
+      return { ok: false, error: permissionError };
+    }
+    try {
+      return { ok: true, data: await selectManagedImages() };
+    } catch (e) {
+      console.error('Failed to load images:', e);
+      return { ok: false, error: '画像を読み込めませんでした。' };
+    }
+  }
+
   return (
     <div className="mx-auto px-4 py-12">
       <Editor
@@ -320,6 +342,8 @@ export default async function PostEditPage({ params }: { params: Promise<{ postI
         onPublish={handlePublish}
         onLoadHistory={handleLoadHistory}
         onSetVersionPrivate={handleSetVersionPrivate}
+        onUploadImage={handleUploadImage}
+        onLoadImages={handleLoadImages}
       />
     </div>
   );
