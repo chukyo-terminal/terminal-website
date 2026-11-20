@@ -19,7 +19,7 @@ import {
 import type { JSX } from 'react';
 import type { ContactListItem, StaffUser } from '../_lib/contact';
 import type { ContactListFilters, ContactSortOrder } from '../_lib/contact-list';
-import type { MailSyncResult, MailSyncStatus } from '@/lib/contact-mail-sync';
+import type { MailSyncResult, MailSyncStatus } from '@/utils/contact-mail-sync';
 import type { ActionResult } from '@/types';
 
 

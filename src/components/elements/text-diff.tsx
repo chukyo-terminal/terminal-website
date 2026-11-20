@@ -1,7 +1,7 @@
-import { collapseUnchangedLines, diffInline, diffLines } from '@/lib/diff';
+import { collapseUnchangedLines, diffInline, diffLines } from '@/utils/diff';
 
 import type { JSX } from 'react';
-import type { DiffSegment, DiffType } from '@/lib/diff';
+import type { DiffSegment, DiffType } from '@/utils/diff';
 
 
 /**

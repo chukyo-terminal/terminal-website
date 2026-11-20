@@ -11,10 +11,38 @@ services:
       - .env
     # ports:
     #   - 3000:3000
+    depends_on:
+      valkey:
+        condition: service_healthy
     networks:
       - frontend
+      - backend
+
+  # 一時的なデータ (お問い合わせフォームの入力用 URL など) を保存する Valkey。
+  # アプリからは valkey://valkey:6379 で接続する (.env の VALKEY_URL)。外部には公開しない
+  valkey:
+    image: valkey/valkey:9
+    restart: always
+    # 再起動しても有効期限内のデータが消えないよう、1分ごと (変更がある場合のみ) に保存する
+    command: ["valkey-server", "--save", "60", "1"]
+    volumes:
+      - valkey-data:/data
+    healthcheck:
+      test: ["CMD", "valkey-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    networks:
+      - backend
+
+volumes:
+  valkey-data:
 
 networks:
   frontend:
     driver: bridge
     internal: false
+  backend:
+    driver: bridge
+    internal: true

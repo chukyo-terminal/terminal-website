@@ -5,7 +5,7 @@
  */
 
 import { formatDateTime } from '@/app/admin/control/posts/_lib/date-format';
-import { splitQuotedText } from '@/lib/contact';
+import { splitQuotedText } from '@/utils/contact';
 
 import type { ContactDetail } from './contact';
 

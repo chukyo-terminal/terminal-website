@@ -4,8 +4,8 @@ import { notFound } from 'next/navigation';
 import { ArrowLeft, GitCompareArrows } from 'lucide-react';
 
 import { LineChangeStats } from '@/components/elements/text-diff';
-import { countLineChanges, diffLines } from '@/lib/diff';
-import { getVersionLabel } from '@/lib/post-versions';
+import { countLineChanges, diffLines } from '@/utils/diff';
+import { getVersionLabel } from '@/utils/post-versions';
 
 import { SITE_TITLE, findPublicPost, findPublicVersions, formatPublicDateTime } from '../_lib/public-post';
 

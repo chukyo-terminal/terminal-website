@@ -18,6 +18,8 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
+      valkey:
+        condition: service_healthy
     networks:
       - app-network
 
@@ -44,6 +46,20 @@ services:
 
     # Add "forwardPorts": ["5432"] to **devcontainer.json** to forward PostgreSQL locally.
     # (Adding the "ports" property to this file will not forward from a Codespace.)
+
+  # 一時的なデータ (お問い合わせフォームの入力用 URL など) を保存する Valkey。valkey:6379 (TLS・認証なし)。
+  # 保存したデータはコンテナを作り直すと消える。中身は `valkey-cli -h valkey` で確認できる (別途インストールが必要)
+  valkey:
+    image: valkey/valkey:latest
+    restart: unless-stopped
+    networks:
+      - app-network
+    healthcheck:
+      test: ["CMD", "valkey-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
 
   # メールの開発用の SMTP サーバー (Mailpit)。届いたメールはすべて受け止めて外部には配送しない (コンテナを作り直すと消える)。
   # ただし、サイトのアドレス (contact@terminal-website.test) 宛てのメールは、受信用の IMAP サーバー (imap サービス) にも配送する。

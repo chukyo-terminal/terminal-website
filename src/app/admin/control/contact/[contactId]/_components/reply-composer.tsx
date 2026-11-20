@@ -9,7 +9,7 @@ import {
   InquirerMessageFormSchema, REPLY_SUBJECT_MAX_LENGTH, ReplyFormSchema, toReplySubject,
 } from '../../_lib/contact';
 import { buildReplyMailText, buildReplyTemplate, getQuotedMessage } from '../../_lib/reply-mail';
-import { CONTACT_CONTENT_MAX_LENGTH, normalizeContactContent, normalizeSingleLine } from '@/lib/contact';
+import { CONTACT_CONTENT_MAX_LENGTH, normalizeContactContent, normalizeSingleLine } from '@/utils/contact';
 
 import type { JSX } from 'react';
 import type { ContactDetail, InquirerMessageFormValues, ReplyFormValues, StaffUser } from '../../_lib/contact';

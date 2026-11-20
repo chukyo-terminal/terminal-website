@@ -81,9 +81,20 @@ export const ContactContentSchema = z
 
 
 /**
- * お問い合わせフォームの検証スキーマ。
+ * メールアドレスの検証スキーマ（お問い合わせフォームの最初の段階で入力する）。
  */
-export const ContactFormSchema = z.object({
+export const ContactEmailSchema = z
+  .string({ error: 'メールアドレスを入力してください。' })
+  .trim()
+  .min(1, 'メールアドレスを入力してください。')
+  .max(CONTACT_EMAIL_MAX_LENGTH, 'メールアドレスが長すぎます。')
+  .pipe(z.email('メールアドレスの形式が正しくありません。'));
+
+
+/**
+ * お問い合わせ内容の検証スキーマ（メールアドレスの確認後に、入力用 URL のページで入力する）。
+ */
+export const ContactDetailsFormSchema = z.object({
   name: z
     .string({ error: 'お名前を入力してください。' })
     .transform(normalizeSingleLine)
@@ -91,21 +102,33 @@ export const ContactFormSchema = z.object({
       .string()
       .min(1, 'お名前を入力してください。')
       .max(CONTACT_NAME_MAX_LENGTH, `お名前は${CONTACT_NAME_MAX_LENGTH}文字以内で入力してください。`)),
-  email: z
-    .string({ error: 'メールアドレスを入力してください。' })
-    .trim()
-    .min(1, 'メールアドレスを入力してください。')
-    .max(CONTACT_EMAIL_MAX_LENGTH, 'メールアドレスが長すぎます。')
-    .pipe(z.email('メールアドレスの形式が正しくありません。')),
   subject: createSubjectSchema(CONTACT_SUBJECT_MAX_LENGTH),
   content: ContactContentSchema,
 });
 
 
 /**
- * お問い合わせフォームの入力値。
+ * お問い合わせ内容の入力値。
  */
-export type ContactFormValues = z.input<typeof ContactFormSchema>;
+export type ContactDetailsFormValues = z.input<typeof ContactDetailsFormSchema>;
+
+
+/**
+ * お問い合わせフォームの最初の段階（メールアドレスの入力）で使用する Turnstile ウィジェットのアクション名と `cData`。
+ */
+export const CONTACT_EMAIL_TURNSTILE = { action: 'contact-email', cdata: 'contact' } as const;
+
+
+/**
+ * お問い合わせの入力用 URL（メールアドレスの確認後に送る一時的な URL）の有効期間（時間）。
+ */
+export const CONTACT_SESSION_TTL_HOURS = 24;
+
+
+/**
+ * 入力用 URL が無効な場合（有効期限が過ぎた場合や、送信済みの場合）のメッセージ。
+ */
+export const CONTACT_SESSION_INVALID_MESSAGE = 'お問い合わせの入力用URLの有効期限が過ぎたか、既に送信済みです。お手数ですが、メールアドレスの入力からやり直してください。';
 
 
 /**

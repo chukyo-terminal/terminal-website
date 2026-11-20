@@ -3,11 +3,11 @@ import { alias } from 'drizzle-orm/pg-core';
 
 import { postCommentsTable, postRatingsTable, postsTable, publishedPostsView, usersTable } from '@/db/schema';
 import { db } from '@/lib/drizzle';
-import { getCommentAuthorName } from '@/lib/post-feedback';
+import { getCommentAuthorName } from '@/utils/post-feedback';
 
 import type {
   ManagedComment, ManagedCommentAuthor, ManagedReply, RatingSummary, RatingValue,
-} from '@/lib/post-feedback';
+} from '@/utils/post-feedback';
 
 
 /**

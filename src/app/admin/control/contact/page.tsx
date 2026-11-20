@@ -2,10 +2,10 @@ import ContactList from './_components/contact-list';
 import { parseContactListFilters } from './_lib/contact-list';
 import { selectContactList, selectStaffUsers } from './_lib/contact-queries';
 import { checkPermission, getCurrentUserId } from '@/lib/auth';
-import { selectMailSyncStatus, syncContactMail } from '@/lib/contact-mail-sync';
+import { selectMailSyncStatus, syncContactMail } from '@/utils/contact-mail-sync';
 
 import type { JSX } from 'react';
-import type { MailSyncResult } from '@/lib/contact-mail-sync';
+import type { MailSyncResult } from '@/utils/contact-mail-sync';
 import type { ActionResult } from '@/types';
 
 export const dynamic = 'force-dynamic';
