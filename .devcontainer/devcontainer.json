@@ -20,7 +20,8 @@
 	"forwardPorts": [3000, "mail:8025"],
 
 	// Use 'postCreateCommand' to run commands after the container is created.
-	"postCreateCommand": "pnpm install",
+	// 開発用の LDAP (389ds) に cluvela の開発用データを投入する (親ディレクトリに cluvela が必要)。失敗しても開発環境の作成は続ける
+	"postCreateCommand": "pnpm install && (.devcontainer/setup-ldap.sh || echo 'LDAP の初期化に失敗しました。.devcontainer/setup-ldap.sh を手動で実行してください')",
 
 	// Configure tool-specific properties.
 	"customizations": {

@@ -6,6 +6,7 @@ import UserManager from './_components/user-manager';
 import { UserCreateFormSchema, UserUpdateFormSchema } from './_lib/user';
 import { sudoersTable, usersTable } from '@/db/schema';
 import { checkPermission } from '@/lib/auth';
+import { findRegistrableMember, pickContactEmail } from '@/lib/account';
 import { db } from '@/lib/drizzle';
 
 import type { JSX } from 'react';
@@ -52,6 +53,26 @@ function getDatabaseError(e: unknown): { code: string | undefined; constraint: s
     return { code: e.cause.code, constraint: e.cause.constraint };
   }
   return null;
+}
+
+
+/**
+ * 会員のメールアドレスから、利用者に登録するアドレスを選ぶ。他の利用者が同じアドレスを使っている場合は登録しない。
+ *
+ * @param emails - 会員のメールアドレス
+ * @returns 登録するメールアドレス。登録しない場合は `null`
+ */
+async function selectContactEmail(emails: readonly string[]): Promise<string | null> {
+  const email = pickContactEmail(emails);
+  if (!email) {
+    return null;
+  }
+  const existing = await db
+    .select({ id: usersTable.id })
+    .from(usersTable)
+    .where(eq(usersTable.email, email))
+    .limit(1);
+  return existing.length > 0 ? null : email;
 }
 
 
@@ -134,20 +155,22 @@ export default async function RootControlPage(): Promise<JSX.Element> {
     if (!parsed.success) {
       return { ok: false, error: parsed.error.issues[0]?.message ?? '入力内容が正しくありません。' };
     }
+    const { cuId, roles } = parsed.data;
     try {
+      // 氏名とメールアドレスは LDAP の会員情報から取得する。LDAP にない会員・退会・除名した会員は登録できない
+      const member = await findRegistrableMember(cuId);
+      if (!member) {
+        return { ok: false, error: `CU_ID「${cuId}」の会員が LDAP に見つからないか、退会・除名しています。` };
+      }
       const [{ id }] = await db
         .insert(usersTable)
-        .values(parsed.data)
+        .values({ cuId, name: member.name, email: await selectContactEmail(member.emails), roles })
         .returning({ id: usersTable.id });
       const [user] = await selectUsers(eq(usersTable.id, id));
       return { ok: true, data: user };
     } catch (e) {
-      const error = getDatabaseError(e);
-      if (error?.code === PostgresError.UNIQUE_VIOLATION && error.constraint === 'users_cu_id_unique') {
-        return { ok: false, error: `CU_ID「${parsed.data.cuId}」のユーザーは既に存在します。` };
-      }
-      if (error?.code === PostgresError.CHECK_VIOLATION && error.constraint === 'valid_cu_id') {
-        return { ok: false, error: 'CU_IDの形式が正しくありません。' };
+      if (getDatabaseError(e)?.code === PostgresError.UNIQUE_VIOLATION) {
+        return { ok: false, error: `CU_ID「${cuId}」のユーザーは既に存在します。` };
       }
       console.error('Failed to create user:', e);
       return { ok: false, error: '一般管理者の追加に失敗しました。' };
@@ -179,13 +202,6 @@ export default async function RootControlPage(): Promise<JSX.Element> {
       const [user] = await selectUsers(eq(usersTable.id, userId));
       return { ok: true, data: user };
     } catch (e) {
-      const error = getDatabaseError(e);
-      if (error?.code === PostgresError.UNIQUE_VIOLATION && error.constraint === 'users_email_unique') {
-        return { ok: false, error: 'このメールアドレスは別のユーザーが使用しています。' };
-      }
-      if (error?.code === PostgresError.CHECK_VIOLATION && error.constraint === 'valid_email') {
-        return { ok: false, error: 'メールアドレスが正しくありません（m.chukyo-u.ac.jp のアドレスは登録できません）。' };
-      }
       console.error('Failed to update user:', e);
       return { ok: false, error: '一般管理者の編集に失敗しました。' };
     }

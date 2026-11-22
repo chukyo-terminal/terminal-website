@@ -1,14 +1,25 @@
 import { eq } from 'drizzle-orm';
 import NextAuth, { NextAuthOptions } from 'next-auth';
-import GoogleProvider from 'next-auth/providers/google';
+import CredentialsProvider from 'next-auth/providers/credentials';
 
 import { sudoersTable, usersTable } from '@/db/schema';
+import { authenticateLogin } from '@/lib/account';
 import { db } from '@/lib/drizzle';
 
 
-// NextAuthのJWTトークンにmodeを追加するための型定義
+// NextAuthのユーザーに学籍番号（CU_ID）を追加するための型定義
+declare module 'next-auth' {
+  interface User {
+    cuId?: string;
+  }
+}
+
+
+// NextAuthのJWTトークンに学籍番号とmodeを追加するための型定義
 declare module 'next-auth/jwt' {
   interface JWT {
+    /** ログインした利用者の学籍番号（CU_ID）。LDAP で認証したログインにだけ設定される */
+    cuId?: string;
     mode?: 'user' | 'root';
     isSudoer?: boolean;
   }
@@ -28,71 +39,69 @@ declare module 'next-auth' {
 
 
 /**
- * NextAuthのプロバイダーの型定義。
+ * 学籍番号の利用者が上級管理者かどうかを判定する。
+ *
+ * @param cuId - 学籍番号（CU_ID）
+ * @returns 上級管理者の場合は `true`
  */
-type ClientType = {
-  clientId: string;
-  clientSecret: string;
-};
+async function isSudoer(cuId: string): Promise<boolean> {
+  const rows = await db
+    .select({ id: sudoersTable.id })
+    .from(sudoersTable)
+    .innerJoin(usersTable, eq(sudoersTable.id, usersTable.id))
+    .where(eq(usersTable.cuId, cuId))
+    .limit(1);
+  return rows.length > 0;
+}
 
 
 /**
  * NextAuthのオプション。
+ *
+ * ログインは LDAP（学籍番号とパスワード）で認証する。LDAP の会員でも、アプリの利用者として有効でなければログインできない（`lib/account.ts`）。
  */
 const authOptions: NextAuthOptions = {
   providers: [
-    GoogleProvider({
-      clientId: process.env.GOOGLE_CLIENT_ID,
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-    } as ClientType),
+    CredentialsProvider({
+      name: 'LDAP',
+      credentials: {
+        cuId: { label: 'ID（学籍番号）', type: 'text' },
+        password: { label: 'パスワード', type: 'password' },
+      },
+      async authorize(credentials) {
+        try {
+          const account = await authenticateLogin(credentials?.cuId ?? '', credentials?.password ?? '');
+          return account ? { id: String(account.id), name: account.name, cuId: account.cuId } : null;
+        } catch (e) {
+          // LDAP に接続できない場合なども、利用者にはログインできなかったことだけを伝える
+          console.error('Failed to authenticate with LDAP:', e);
+          return null;
+        }
+      },
+    }),
   ],
   secret: process.env.NEXTAUTH_SECRET,
   session: {
     strategy: 'jwt',
     maxAge: 4 * 60 * 60, // 4時間（秒単位）
   },
+  pages: {
+    signIn: '/admin/login',
+  },
   callbacks: {
-    async signIn({ user, account }) {
-      // Google SSOでログインしたアカウントが登録されているか検証
-      if (account?.provider === 'google' && user.email?.endsWith('@m.chukyo-u.ac.jp')) {
-        const cuId = user.email.split('@', 1)[0].toUpperCase();
-        let canSignIn = false;
-        await db.transaction(async (tx) => {
-          const rows = await tx.select({ id: usersTable.id, name: usersTable.name, isActive: usersTable.isActive }).from(usersTable).where(eq(usersTable.cuId, cuId)).limit(1);
-          if (rows.length > 0) {
-            if (rows[0].isActive) {
-              canSignIn = true;
-            }
-            if (user.name && rows[0].name !== user.name) {
-              // 名前が一致しない場合は更新
-              await tx.update(usersTable).set({ name: user.name }).where(eq(usersTable.id, rows[0].id));
-            }
-          }
-        });
-        return canSignIn;
+    async jwt({ token, user, trigger, session }) {
+      if (user?.cuId) {
+        token.cuId = user.cuId;
+        token.mode = 'user';
       }
-      // 許可しない場合はfalse
-      return false;
-    },
-    async jwt({ token, trigger, session }) {
-      const cuId = token.email?.split('@', 1)[0].toUpperCase();
+      // 学籍番号のないトークン（LDAP 導入前の Google 連携で発行されたもの）は、ログインしていないものとして扱う
+      const cuId = token.cuId;
       if (!cuId) {
-        throw new Error('Invalid user state');
+        return token;
       }
-      const isSudoer = await db.select().from(sudoersTable).leftJoin(usersTable, eq(sudoersTable.id, usersTable.id)).where(eq(usersTable.cuId, cuId)).limit(1).then(rows => rows.length > 0);
-      token.isSudoer = isSudoer;
-      switch (trigger) {
-        case 'signIn': {
-          token.mode = 'user';
-          token.isSudoer = isSudoer;
-          break;
-        }
-        case 'signUp': {
-          throw new Error('Sign up is not allowed');
-        }
-        case 'update': {
-          token.mode = session?.user?.mode === 'root' && isSudoer ? 'root' : 'user';
-        }
+      token.isSudoer = await isSudoer(cuId);
+      if (trigger === 'update') {
+        token.mode = session?.user?.mode === 'root' && token.isSudoer ? 'root' : 'user';
       }
       return token;
     },

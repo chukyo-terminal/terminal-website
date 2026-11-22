@@ -1,5 +1,6 @@
 import { z } from 'zod';
 
+import { CU_ID_PATTERN } from '@/utils/cu-id';
 import { trimUnprintableCharacters } from '@/utils/string';
 
 
@@ -59,10 +60,13 @@ function nonEmptyString(message: string) {
 
 /**
  * ユーザーの追加フォームの入力値のスキーマ定義。
+ *
+ * 氏名とメールアドレスは LDAP の会員情報から取得するため、入力は学籍番号（CU_ID）のみ。
  */
 export const UserCreateFormSchema = z.object({
-  cuId: nonEmptyString('CU_IDを入力してください。'),
-  name: nonEmptyString('名前を入力してください。'), // 初期登録時の識別用。Google連携時に自動で上書きされる
+  cuId: nonEmptyString('CU_IDを入力してください。')
+    .transform((value) => value.toUpperCase())
+    .pipe(z.string().regex(CU_ID_PATTERN, 'CU_IDの形式が正しくありません。')),
   roles: z.array(z.enum(USER_ROLES)),
 });
 
@@ -75,11 +79,11 @@ export type UserCreateFormValues = z.input<typeof UserCreateFormSchema>;
 
 /**
  * ユーザーの編集フォームの入力値のスキーマ定義。
+ *
+ * 氏名とメールアドレスは LDAP で管理するため、編集できるのは表示名・ロール・有効性のみ。
  */
 export const UserUpdateFormSchema = z.object({
-  name: nonEmptyString('名前を入力してください。'),
   displayName: NullableStringSchema,
-  email: NullableStringSchema.pipe(z.email('メールアドレスが正しくありません。').nullable()),
   roles: z.array(z.enum(USER_ROLES)),
   isActive: z.boolean(),
 });

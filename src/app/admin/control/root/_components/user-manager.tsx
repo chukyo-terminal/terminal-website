@@ -191,12 +191,11 @@ export default function UserManager({
               if (isSubmitting) return;
               const formData = new FormData(event.target as HTMLFormElement);
               const cuId = formData.get('cuId') as string;
-              const name = formData.get('name') as string;
               const roles = [...formData.getAll('role')]
                 .filter((role): role is UserRole => USER_ROLES.includes(role as UserRole));
               setIsSubmitting(true);
               try {
-                const result = await onCreateUser({ cuId, name, roles });
+                const result = await onCreateUser({ cuId, roles });
                 if (result.ok) {
                   console.info('Successfully added user');
                   setUsers((previous) => [...previous, result.data].toSorted((a, b) => a.id - b.id));
@@ -225,16 +224,9 @@ export default function UserManager({
                 required
               />
             </label>
-            <label className="block">
-              <span className="text-sm font-medium">名前</span>
-              <input
-                type="text"
-                name="name"
-                className="mt-1 block w-full rounded border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-emerald-500"
-                placeholder="名前を入力"
-                required
-              />
-            </label>
+            <p className="text-sm text-gray-600">
+              名前とメールアドレスは LDAP の会員情報から取得します（LDAP にない会員は追加できません）。
+            </p>
             <label className="block">
               <span className="text-sm font-medium">ロール</span>
               <div className="mt-2 flex flex-col gap-2">
@@ -278,14 +270,12 @@ export default function UserManager({
                   event.preventDefault();
                   if (isSubmitting) return;
                   const formData = new FormData(event.target as HTMLFormElement);
-                  const name = formData.get('name') as string;
                   const displayName = formData.get('displayName') as string | null;
-                  const email = formData.get('email') as string | null;
                   const isActive = formData.get('isActive') !== null;
                   const roles = editRoles;
                   setIsSubmitting(true);
                   try {
-                    const result = await onUpdateUser(user.id, { name, displayName, email, roles, isActive });
+                    const result = await onUpdateUser(user.id, { displayName, roles, isActive });
                     if (result.ok) {
                       console.info('Successfully edited user');
                       setUsers((previous) => previous.map((current) => (current.id === user.id ? result.data : current)));
@@ -314,16 +304,10 @@ export default function UserManager({
                     disabled
                   />
                 </label>
-                <label className="block">
-                  <span className="text-sm font-medium">名前</span>
-                  <input
-                    type="text"
-                    name="name"
-                    className="mt-1 block w-full rounded border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-emerald-500"
-                    placeholder="名前を入力"
-                    defaultValue={user.name ?? ''}
-                  />
-                </label>
+                <div className="block">
+                  <span className="text-sm font-medium">名前（LDAP）</span>
+                  <p className="mt-1 rounded border border-gray-200 bg-gray-50 px-3 py-2 text-gray-600">{user.name}</p>
+                </div>
                 <label className="block">
                   <span className="text-sm font-medium">表示名</span>
                   <input
@@ -334,16 +318,12 @@ export default function UserManager({
                     defaultValue={user.displayName ?? ''}
                   />
                 </label>
-                <label className="block">
-                  <span className="text-sm font-medium">メールアドレス</span>
-                  <input
-                    type="email"
-                    name="email"
-                    className="mt-1 block w-full rounded border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-emerald-500"
-                    placeholder="メールアドレスを入力"
-                    defaultValue={user.email ?? ''}
-                  />
-                </label>
+                <div className="block">
+                  <span className="text-sm font-medium">メールアドレス（LDAP）</span>
+                  <p className="mt-1 rounded border border-gray-200 bg-gray-50 px-3 py-2 text-gray-600">
+                    {user.email ?? '未登録'}
+                  </p>
+                </div>
                 <label className="block">
                   <span className="text-sm font-medium">ロール</span>
                   <div className="mt-2 flex flex-col gap-2">

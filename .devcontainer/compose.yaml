@@ -1,5 +1,6 @@
 volumes:
   postgres-data:
+  389ds-data:
 
 services:
   app:
@@ -20,6 +21,8 @@ services:
         condition: service_healthy
       valkey:
         condition: service_healthy
+      ldap:
+        condition: service_started
     networks:
       - app-network
 
@@ -80,6 +83,19 @@ services:
       # サイトのアドレス宛てのメール (問い合わせ者からの返信) を IMAP サーバーにも配送する (配送先は mailpit-relay.yaml)
       MP_SMTP_RELAY_CONFIG: /etc/mailpit/relay.yaml
       MP_SMTP_RELAY_MATCHING: '^contact@terminal-website\.test$'
+
+  # 管理画面のログインに使う、開発用の LDAP (389ds)。会員・組織のデータは cluvela の res/ldifs を .devcontainer/setup-ldap.sh で投入する
+  # (コンテナを作り直すと消える場合は setup-ldap.sh を再実行する)。LDAP は ldap:3389 (TLS なし)、Directory Manager は cn=Directory Manager / 389ds
+  ldap:
+    image: 389ds/dirsrv:latest
+    restart: unless-stopped
+    networks:
+      - app-network
+    volumes:
+      - 389ds-data:/data
+    environment:
+      DS_DM_PASSWORD: 389ds
+      DS_SUFFIX_NAME: dc=cut,dc=gr,dc=jp
 
   # 問い合わせ者からの返信を受信するための、開発用の IMAP サーバー (GreenMail)。Mailpit から配送されたメールを受け取る (コンテナを作り直すと消える)。
   # IMAP は imap:3143 (TLS なし)。ユーザー名はメールアドレス (contact@terminal-website.test) で、どのパスワードでもログインできる
