@@ -62,6 +62,29 @@ async function isSudoer(cuId: string): Promise<boolean> {
 
 
 /**
+ * 現在ログインしている利用者の情報を取得する。
+ *
+ * 権限の検証は行わないため、先に `checkPermission` で検証すること。
+ *
+ * @returns 利用者（ID・学籍番号・氏名）。ログインしていない場合や、有効な利用者が見つからない場合は `null`
+ */
+export async function getCurrentAccount(): Promise<{ id: number; cuId: string; name: string } | null> {
+  const token = await getRequestToken();
+  const cuId = token?.cuId;
+  if (!cuId) {
+    return null;
+  }
+  const user = await db
+    .select({ id: usersTable.id, name: usersTable.name })
+    .from(usersTable)
+    .where(and(eq(usersTable.cuId, cuId), eq(usersTable.isActive, true)))
+    .limit(1)
+    .then((result) => result.at(0));
+  return user ? { id: user.id, cuId, name: user.name } : null;
+}
+
+
+/**
  * 現在ログインしているユーザーのIDを取得する。
  *
  * 権限の検証は行わないため、先に `checkPermission` で検証すること。
@@ -69,16 +92,6 @@ async function isSudoer(cuId: string): Promise<boolean> {
  * @returns ユーザーID。ログインしていない場合や、有効なユーザーが見つからない場合は `null`
  */
 export async function getCurrentUserId(): Promise<number | null> {
-  const token = await getRequestToken();
-  const cuId = token?.cuId;
-  if (!cuId) {
-    return null;
-  }
-  const user = await db
-    .select({ id: usersTable.id })
-    .from(usersTable)
-    .where(and(eq(usersTable.cuId, cuId), eq(usersTable.isActive, true)))
-    .limit(1)
-    .then((result) => result.at(0));
-  return user?.id ?? null;
+  const account = await getCurrentAccount();
+  return account?.id ?? null;
 }

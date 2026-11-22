@@ -103,6 +103,8 @@ export type SaveResult =
     savedAt: Date;
     /** 内容の変更により、公開予約を取り消したかどうか */
     isScheduleCanceled: boolean;
+    /** 内容の変更により、審査中・承認済みのレビューを取り消したかどうか */
+    isReviewInvalidated: boolean;
   }
   | { ok: false; error: string };
 

@@ -1,5 +1,7 @@
 import { Client, InvalidCredentialsError } from 'ldapts';
 
+import type { Entry, SearchOptions } from 'ldapts';
+
 import { CU_ID_PATTERN } from '@/utils/cu-id';
 
 
@@ -223,7 +225,18 @@ export async function findMemberByCuId(cuId: string): Promise<LdapMember | null>
  * @returns ログインできない場合は `true`
  */
 export function isLoginDisabled(member: LdapMember): boolean {
-  return DISABLED_MEMBERSHIP_STATUSES.has(member.membershipStatus);
+  return isDisabledMembershipStatus(member.membershipStatus);
+}
+
+
+/**
+ * 在籍状況が退会・除名（ログインできず、役職にも就けない）かどうかを判定する。
+ *
+ * @param status - 在籍状況（`cutMembershipStatus`）
+ * @returns 退会・除名の場合は `true`
+ */
+export function isDisabledMembershipStatus(status: string): boolean {
+  return DISABLED_MEMBERSHIP_STATUSES.has(status);
 }
 
 
@@ -258,4 +271,75 @@ export async function authenticateMember(cuId: string, password: string): Promis
   } finally {
     await client.unbind().catch(() => {});
   }
+}
+
+
+/**
+ * LDAP の基点の DN を返す（`LDAP_BASE`、省略時は `dc=cut,dc=gr,dc=jp`）。
+ *
+ * @returns 基点の DN
+ * @throws LDAP が設定されていない場合
+ */
+export function getLdapBaseDn(): string {
+  return requireLdapConfig().baseDn;
+}
+
+
+/**
+ * サービスアカウントで LDAP を検索する。
+ *
+ * @param base - 基点の DN（基点の DN からの相対 DN。空の場合は基点そのもの）
+ * @param options - 検索のオプション
+ * @returns 見つかったエントリ
+ * @throws LDAP に接続できない場合など
+ */
+export async function searchDirectory(
+  base: string,
+  options: SearchOptions & { attributes: string[] },
+): Promise<Entry[]> {
+  return await withServiceAccount(async (client, baseDn) => {
+    const { searchEntries } = await client.search(base ? `${base},${baseDn}` : baseDn, options);
+    return searchEntries;
+  });
+}
+
+
+/**
+ * LDAP の属性の値（文字列・バイナリ・配列）を文字列の配列にする。
+ *
+ * @param value - 属性の値
+ * @returns 文字列の配列
+ */
+export function toStrings(value: unknown): string[] {
+  return allStrings(value);
+}
+
+
+/**
+ * LDAP の属性の値（文字列・バイナリ・配列）の先頭を文字列にする。
+ *
+ * @param value - 属性の値
+ * @returns 文字列（値がない場合は空文字列）
+ */
+export function toFirstString(value: unknown): string {
+  return firstString(value);
+}
+
+
+/**
+ * `schacPersonalUniqueCode` の値の一覧から学生 ID（大文字）を取り出す。見つからない場合は空文字列。
+ *
+ * @param codes - `schacPersonalUniqueCode` の値
+ * @returns 学生 ID（学籍番号）
+ */
+export function findStudentIdFromCodes(codes: readonly string[]): string {
+  for (const code of codes) {
+    if (code.toLowerCase().startsWith(STUDENT_ID_PREFIX.toLowerCase())) {
+      const id = code.slice(code.lastIndexOf(':') + 1);
+      if (id) {
+        return id.toUpperCase();
+      }
+    }
+  }
+  return '';
 }

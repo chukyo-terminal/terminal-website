@@ -1,6 +1,6 @@
-import { and, asc, isNull, lte } from 'drizzle-orm';
+import { and, asc, isNull, lte, sql } from 'drizzle-orm';
 
-import { postContentsTable } from '@/db/schema';
+import { postContentsTable, postReviewRequestsTable } from '@/db/schema';
 import { db } from '@/lib/drizzle';
 import { publishPostVersion } from '@/utils/post-publish';
 
@@ -54,6 +54,19 @@ export function getScheduledPublishInterval(): number {
 
 
 /**
+ * 承認された版かどうか（承認されていない版は、公開予約があっても公開しない）。
+ */
+const isApprovedVersion = sql`
+  EXISTS (
+    SELECT 1 FROM ${postReviewRequestsTable} AS review
+    WHERE review.post_id = ${postContentsTable.postId}
+      AND review.post_identifier = ${postContentsTable.identifier}
+      AND review.status = 'approved'
+  )
+`;
+
+
+/**
  * 公開予約の日時を過ぎた版を公開する。
  *
  * 公開予約の時刻を公開日時として記録する（サーバーが停止していた場合も、起動後に公開する）。
@@ -71,7 +84,11 @@ export async function publishDueScheduledPosts(now: Date = new Date()): Promise<
         scheduledPublishAt: postContentsTable.scheduledPublishAt,
       })
       .from(postContentsTable)
-      .where(and(isNull(postContentsTable.publishedAt), lte(postContentsTable.scheduledPublishAt, now)))
+      .where(and(
+        isNull(postContentsTable.publishedAt),
+        lte(postContentsTable.scheduledPublishAt, now),
+        isApprovedVersion,
+      ))
       .orderBy(asc(postContentsTable.scheduledPublishAt))
       .for('update', { skipLocked: true });
 

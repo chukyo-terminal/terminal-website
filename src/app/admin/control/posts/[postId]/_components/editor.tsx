@@ -39,6 +39,8 @@ import type { MarkdownPreviewHandle } from './markdown-preview';
 import type { ViewMode } from './markdown-toolbar';
 import type { MarkdownCommand } from '../_lib/markdown-commands';
 import type { PostFormValues, PostStatus, PublishResult, SaveResult, TagOption } from '../_lib/post-form';
+import type { ReviewRoute, ReviewSubmission } from '@/lib/review-routing';
+import type { ReviewPanel } from '@/utils/post-review';
 import type { ManagedImage, UploadImageAction } from '@/utils/images';
 import type { PostVersion } from '@/utils/post-versions';
 import type { ActionResult } from '@/types';
@@ -181,6 +183,55 @@ const formatDateTime = (date: Date): string => new Intl.DateTimeFormat('ja-JP', 
 
 
 /**
+ * 公開ボタンが無効な理由（有効な場合は `undefined`）。
+ *
+ * @param state - 状態
+ * @returns 利用者に表示する理由
+ */
+const getPublishBlockReason = (state: {
+  isPublished: boolean;
+  isAuthor: boolean;
+  isApproved: boolean;
+  isDirty: boolean;
+}): string | undefined => {
+  if (state.isPublished) {
+    return '公開されていない変更はありません';
+  }
+  if (!state.isAuthor) {
+    return '執筆者だけが公開できます';
+  }
+  if (!state.isApproved) {
+    return 'レビューで承認されると公開できます';
+  }
+  return state.isDirty ? '未保存の変更があります。保存すると承認は取り消されます' : undefined;
+};
+
+
+/**
+ * レビューの状態のバッジの配色。
+ *
+ * @param status - 依頼の状態（依頼していない場合は `undefined`）
+ * @returns クラス名
+ */
+const getReviewBadgeClassName = (status: string | undefined): string => {
+  switch (status) {
+    case 'pending': {
+      return 'border-amber-500/60 text-amber-300';
+    }
+    case 'approved': {
+      return 'border-emerald-500/60 text-emerald-300';
+    }
+    case 'rejected': {
+      return 'border-red-500/60 text-red-300';
+    }
+    default: {
+      return 'border-gray-500 text-gray-300';
+    }
+  }
+};
+
+
+/**
  * 日時を `datetime-local` の入力値の形式（ブラウザのローカル時刻。例: `2026-11-25T10:00`）にする。
  *
  * @param date - 日時
@@ -265,6 +316,29 @@ function Field({
 }
 
 
+/**
+ * 編集画面に表示するレビューの情報（最新の版）。
+ */
+export type EditorReview = {
+  /** 最新の依頼と、その操作の履歴 */
+  panel: ReviewPanel;
+  /** 表示している利用者が執筆者かどうか（依頼・公開は執筆者だけができる） */
+  isAuthor: boolean;
+  /** 担当課の一覧（依頼時に選ぶ） */
+  divisions: { dn: string; name: string }[];
+  /** 組織運営に関する記事を依頼できるか（執行委員会のメンバーのみ） */
+  canSubmitOrganizational: boolean;
+  /** 組織の情報を読み込めなかった場合のメッセージ */
+  organizationError: string | null;
+};
+
+
+/**
+ * 開いているモーダルの種類。
+ */
+type OpenedModal = 'publish' | 'schedule' | 'review' | 'help' | 'history' | 'image' | null;
+
+
 type EditorProperties = {
   postId: number;
   /** フォームの初期値 */
@@ -294,6 +368,12 @@ type EditorProperties = {
   onSchedule: (scheduledAt: string) => Promise<ActionResult<Date>>;
   /** 公開予約を取り消す */
   onCancelSchedule: () => Promise<ActionResult>;
+  /** レビューの情報（最新の版） */
+  review: EditorReview;
+  /** 担当課などを選んでレビューを依頼する */
+  onSubmitReview: (submission: ReviewSubmission) => Promise<ActionResult<ReviewRoute>>;
+  /** 審査中の依頼を取り下げる */
+  onWithdrawReview: () => Promise<ActionResult>;
   /** 編集履歴（すべての版）を読み込む */
   onLoadHistory: () => Promise<ActionResult<PostVersion[]>>;
   /** 版の非公開設定を変更し、変更後のすべての版を返す */
@@ -328,6 +408,9 @@ export default function Editor({
   onPublish,
   onSchedule,
   onCancelSchedule,
+  review,
+  onSubmitReview,
+  onWithdrawReview,
   onLoadHistory,
   onSetVersionPrivate,
   onUploadImage,
@@ -342,14 +425,16 @@ export default function Editor({
   const [values, setValues] = useState(initialValues);
   const [savedValues, setSavedValues] = useState(initialValues);
   const [lastSaved, setLastSaved] = useState(lastSavedAt);
-  const [busyAction, setBusyAction] = useState<'save' | 'publish' | 'schedule' | null>(null);
+  const [busyAction, setBusyAction] = useState<'save' | 'publish' | 'schedule' | 'review' | null>(null);
   const [cursor, setCursor] = useState<CursorInfo>({ line: 1, column: 1, selectedLength: 0 });
   const [viewMode, setViewMode] = useState<ViewMode>('split');
   const [isScrollSyncEnabled, setIsScrollSyncEnabled] = useState(true);
   const [isFullscreen, setIsFullscreen] = useState(false);
-  const [openedModal, setOpenedModal] = useState<'publish' | 'schedule' | 'help' | 'history' | 'image' | null>(null);
+  const [openedModal, setOpenedModal] = useState<OpenedModal>(null);
   const [scheduleInput, setScheduleInput] = useState('');
   const [scheduleMinInput, setScheduleMinInput] = useState('');
+  const [reviewDivisionInput, setReviewDivisionInput] = useState('');
+  const [isReviewOrganizational, setIsReviewOrganizational] = useState(false);
   const [shouldShare, setShouldShare] = useState(false);
   const [toast, setToast] = useState<Toast | null>(null);
   const [storedDraft, setStoredDraft] = useState<StoredDraft | null>(null);
@@ -358,7 +443,21 @@ export default function Editor({
 
   const draftStorageKey = getDraftStorageKey(postId);
   const isDirty = !isSamePostFormValues(values, savedValues);
-  const canPublish = isDirty || status !== 'published';
+  // 公開・予約は、執筆者が、承認された内容（未保存の変更がない）について行う
+  const canPublishNow = review.isAuthor && review.panel.isApproved && !isDirty && status !== 'published';
+  const publishBlockReason = getPublishBlockReason({
+    isPublished: status === 'published',
+    isAuthor: review.isAuthor,
+    isApproved: review.panel.isApproved,
+    isDirty,
+  });
+  const reviewRequest = review.panel.request;
+  const latestRejection = review.panel.actions.findLast((action) => !action.isApproved);
+  const canRequestReview = review.isAuthor
+    && reviewRequest?.status !== 'pending'
+    && reviewRequest?.status !== 'approved';
+  const canWithdrawReview = review.isAuthor && reviewRequest?.status === 'pending';
+  const reviewBadgeClassName = getReviewBadgeClassName(reviewRequest?.status);
   const isUploadingImage = uploadingImageCount > 0;
   // 画面幅が狭い場合は並べて表示できないため、エディタのみを表示する
   const effectiveViewMode: ViewMode = viewMode === 'split' && !isDesktop ? 'edit' : viewMode;
@@ -554,9 +653,16 @@ export default function Editor({
       setLastSaved(result.savedAt);
       setStoredDraft(null);
       removeStorage(draftStorageKey);
+      const canceled: string[] = [];
+      if (result.isScheduleCanceled) {
+        canceled.push('公開予約');
+      }
+      if (result.isReviewInvalidated) {
+        canceled.push('レビュー');
+      }
       setToast({
         type: 'success',
-        message: result.isScheduleCanceled ? '保存しました。内容が変わったため、公開予約を取り消しました。' : '保存しました。',
+        message: canceled.length > 0 ? `保存しました。内容が変わったため、${canceled.join('・')}を取り消しました。` : '保存しました。',
       });
       router.refresh();
       return true;
@@ -670,6 +776,72 @@ export default function Editor({
     } catch (e) {
       console.error('Failed to cancel scheduled post:', e);
       setToast({ type: 'error', message: '予約を取り消せませんでした。通信状況を確認してください。' });
+    } finally {
+      setBusyAction(null);
+    }
+  }
+
+  /**
+   * レビューの依頼の画面を開く。未保存の変更がある場合は、保存してから依頼してもらう。
+   */
+  function openReviewDialog(): void {
+    if (isDirty) {
+      setToast({ type: 'error', message: '未保存の変更があります。保存してから、レビューを依頼してください。' });
+      return;
+    }
+    setReviewDivisionInput('');
+    setIsReviewOrganizational(false);
+    setOpenedModal('review');
+  }
+
+  /**
+   * レビューを依頼する。
+   */
+  async function submitReview(): Promise<void> {
+    if (!isReviewOrganizational && !reviewDivisionInput) {
+      setToast({ type: 'error', message: '担当課を選択してください。' });
+      return;
+    }
+    setOpenedModal(null);
+    setBusyAction('review');
+    try {
+      const result = await onSubmitReview({
+        divisionDn: reviewDivisionInput || null,
+        isOrganizational: isReviewOrganizational,
+      });
+      if (!result.ok) {
+        setToast({ type: 'error', message: result.error });
+        return;
+      }
+      setToast({ type: 'success', message: 'レビューを依頼しました。承認者の確認をお待ちください。' });
+      router.refresh();
+    } catch (e) {
+      console.error('Failed to request review:', e);
+      setToast({ type: 'error', message: 'レビューを依頼できませんでした。通信状況を確認してください。' });
+    } finally {
+      setBusyAction(null);
+    }
+  }
+
+  /**
+   * 審査中の依頼を取り下げる。
+   */
+  async function withdrawReview(): Promise<void> {
+    if (!globalThis.confirm('レビューの依頼を取り下げますか？')) {
+      return;
+    }
+    setBusyAction('review');
+    try {
+      const result = await onWithdrawReview();
+      if (!result.ok) {
+        setToast({ type: 'error', message: result.error });
+        return;
+      }
+      setToast({ type: 'success', message: 'レビューの依頼を取り下げました。' });
+      router.refresh();
+    } catch (e) {
+      console.error('Failed to withdraw review:', e);
+      setToast({ type: 'error', message: '取り下げできませんでした。通信状況を確認してください。' });
     } finally {
       setBusyAction(null);
     }
@@ -912,6 +1084,97 @@ export default function Editor({
         </div>
       )}
 
+      {/* レビュー（公開前の承認。最新の版について表示する） */}
+      {status !== 'published' && (
+        <section aria-label="レビュー" className="rounded-lg border border-gray-700 bg-gray-900/40 p-4 text-sm">
+          <div className="flex flex-wrap items-center gap-3">
+            <h2 className="font-bold text-gray-100">レビュー</h2>
+            <span
+              className={
+                'inline-flex shrink-0 items-center rounded-full border px-2.5 py-0.5 text-xs whitespace-nowrap '
+                + reviewBadgeClassName
+              }
+            >
+              {reviewRequest
+                ? (reviewRequest.status === 'pending' ? reviewRequest.stageLabel : reviewRequest.statusLabel)
+                : '未依頼'}
+            </span>
+            {reviewRequest?.divisionName && (
+              <span className="text-gray-400">担当課: {reviewRequest.divisionName}</span>
+            )}
+            <div className="ml-auto flex flex-wrap items-center gap-2">
+              {canRequestReview && (
+                <button
+                  type="button"
+                  onClick={openReviewDialog}
+                  disabled={busyAction !== null || review.organizationError !== null}
+                  title={review.organizationError ?? undefined}
+                  className={
+                    'inline-flex items-center gap-1.5 rounded border border-emerald-500/60 px-3 py-1.5 '
+                    + 'text-emerald-200 enabled:hover:bg-emerald-950 disabled:cursor-not-allowed disabled:opacity-50'
+                  }
+                >
+                  {busyAction === 'review' ? <LoaderCircle className="h-4 w-4 animate-spin" aria-hidden /> : null}
+                  {reviewRequest ? '内容を修正して再依頼' : 'レビューを依頼'}
+                </button>
+              )}
+              {canWithdrawReview && (
+                <button
+                  type="button"
+                  onClick={withdrawReview}
+                  disabled={busyAction !== null}
+                  className={
+                    'rounded border border-gray-500 px-3 py-1.5 text-gray-200 '
+                    + 'enabled:hover:bg-gray-800 disabled:opacity-50'
+                  }
+                >
+                  依頼を取り下げる
+                </button>
+              )}
+            </div>
+          </div>
+          <p className="mt-2 text-gray-300">
+            {!review.isAuthor && '執筆者がレビューを依頼・公開します。'}
+            {review.isAuthor && !reviewRequest && (
+              isDirty
+                ? '未保存の変更を保存してから、レビューを依頼してください。'
+                : '公開するには、担当の承認者のレビューで承認される必要があります。'
+            )}
+            {reviewRequest?.status === 'pending' && (
+              '審査中です。審査中の内容を保存すると、審査は取り消されます。'
+            )}
+            {reviewRequest?.status === 'approved' && '承認されました。公開・公開予約できます。'}
+            {(reviewRequest?.status === 'withdrawn' || reviewRequest?.status === 'invalidated') && (
+              '依頼は取り消されています。内容を確認して、改めて依頼してください。'
+            )}
+          </p>
+          {latestRejection && reviewRequest?.status === 'rejected' && (
+            <div className="mt-2 rounded border border-red-500/40 bg-red-950/40 p-3 text-red-100">
+              <p className="font-medium">
+                差し戻し（{latestRejection.reviewerName}・{formatJstDateTime(latestRejection.createdAt)}）
+              </p>
+              <p className="mt-1 whitespace-pre-line">{latestRejection.comment}</p>
+            </div>
+          )}
+          {review.organizationError && <p className="mt-2 text-red-300">{review.organizationError}</p>}
+          {review.panel.actions.length > 0 && (
+            <details className="mt-2 text-gray-400">
+              <summary className="cursor-pointer hover:text-gray-200">
+                レビューの履歴（{review.panel.actions.length}件）
+              </summary>
+              <ul className="mt-2 flex flex-col gap-2">
+                {review.panel.actions.map((action) => (
+                  <li key={`${action.stage}-${action.createdAt.getTime()}`}>
+                    {action.isApproved ? '承認' : '差し戻し'}・{action.reviewerName}・{formatJstDateTime(action.createdAt)}
+                    {action.comment && <p className="whitespace-pre-line text-gray-300">{action.comment}</p>}
+                  </li>
+                ))}
+              </ul>
+            </details>
+          )}
+        </section>
+      )}
+
       {/* 記事の情報 */}
       <div className="grid gap-4 md:grid-cols-[minmax(0,1fr)_minmax(0,22rem)]">
         <div className="flex flex-col gap-4">
@@ -1104,12 +1367,8 @@ export default function Editor({
             <button
               type="button"
               onClick={openScheduleDialog}
-              disabled={!canPublish || busyAction !== null || isUploadingImage}
-              title={
-                isUploadingImage
-                  ? '画像のアップロードが終わるまで予約できません'
-                  : (canPublish ? undefined : '公開されていない変更はありません')
-              }
+              disabled={!canPublishNow || busyAction !== null || isUploadingImage}
+              title={isUploadingImage ? '画像のアップロードが終わるまで予約できません' : publishBlockReason}
               className={
                 'inline-flex items-center gap-1.5 rounded border border-blue-500/60 px-3 py-1.5 text-sm font-medium '
                 + 'text-blue-200 enabled:hover:bg-blue-950 disabled:cursor-not-allowed disabled:opacity-50'
@@ -1123,12 +1382,8 @@ export default function Editor({
             <button
               type="button"
               onClick={openPublishDialog}
-              disabled={!canPublish || busyAction !== null || isUploadingImage}
-              title={
-                isUploadingImage
-                  ? '画像のアップロードが終わるまで公開できません'
-                  : (canPublish ? undefined : '公開されていない変更はありません')
-              }
+              disabled={!canPublishNow || busyAction !== null || isUploadingImage}
+              title={isUploadingImage ? '画像のアップロードが終わるまで公開できません' : publishBlockReason}
               className={
                 'inline-flex items-center gap-1.5 rounded bg-blue-600 px-3 py-1.5 text-sm font-medium text-white '
                 + 'enabled:hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50'
@@ -1273,6 +1528,71 @@ export default function Editor({
               }
             >
               {scheduledPublishAt ? '予約を変更する' : '予約する'}
+            </button>
+          </div>
+        </div>
+      </Modal>
+
+      {/* レビューの依頼 */}
+      <Modal
+        isOpen={openedModal === 'review'}
+        onRequestClose={() => setOpenedModal(null)}
+        contentLabel="レビューの依頼"
+      >
+        <div className="flex flex-col gap-3 text-sm">
+          <p>「{values.title}」の公開を依頼します。</p>
+          <p className="text-gray-400">
+            通常の記事は、担当課の課長が承認したあと、局長または執行委員のいずれかが承認します。
+          </p>
+          <label className="flex flex-col gap-1">
+            <span className="text-gray-300">担当課</span>
+            <select
+              value={reviewDivisionInput}
+              onChange={(event) => setReviewDivisionInput(event.target.value)}
+              disabled={review.divisions.length === 0}
+              className={
+                'rounded border border-gray-600 bg-gray-900 px-3 py-2 text-gray-100 '
+                + 'focus:outline-none focus:ring-2 focus:ring-emerald-500 disabled:opacity-50'
+              }
+            >
+              <option value="">選択してください</option>
+              {review.divisions.map((division) => (
+                <option key={division.dn} value={division.dn}>{division.name}</option>
+              ))}
+            </select>
+          </label>
+          {review.canSubmitOrganizational && (
+            <label className="flex cursor-pointer items-start gap-2">
+              <input
+                type="checkbox"
+                checked={isReviewOrganizational}
+                onChange={(event) => setIsReviewOrganizational(event.target.checked)}
+                className="mt-1 h-4 w-4 accent-emerald-500"
+              />
+              <span>
+                組織運営に関する記事（会長または運営監査が承認します。担当課の承認は不要です）
+              </span>
+            </label>
+          )}
+          {review.organizationError && <p className="text-red-300">{review.organizationError}</p>}
+          <div className="mt-2 flex justify-end gap-2">
+            <button
+              type="button"
+              onClick={() => setOpenedModal(null)}
+              className="rounded bg-gray-600 px-4 py-2 hover:bg-gray-500"
+            >
+              キャンセル
+            </button>
+            <button
+              type="button"
+              onClick={submitReview}
+              disabled={review.organizationError !== null}
+              className={
+                'rounded bg-emerald-600 px-4 py-2 text-white hover:bg-emerald-700 '
+                + 'disabled:cursor-not-allowed disabled:opacity-50'
+              }
+            >
+              依頼する
             </button>
           </div>
         </div>

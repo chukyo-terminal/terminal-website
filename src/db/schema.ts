@@ -187,33 +187,91 @@ export const postContentsTable = pgTable(
 
 
 /**
- * 投稿レビューテーブル
+ * 投稿レビュー依頼テーブル
  *
- * UPDATEは想定されない。
+ * 版（投稿の内容）ごとに、公開のためのレビューの依頼を保存する。内容を変更した場合や、差し戻された後の再依頼では、新しい依頼を追加する。
+ *
+ * - `route`: 通常の記事（課長 → 局長・執行委員）か、組織運営に関する記事（会長・運営監査）か
+ * - `division_dn`: 担当課（通常の記事で必要。依頼時点の値）
+ * - `stage`: 審査中の段階（通常の記事は 1 → 2、組織運営に関する記事は 1 のみ）
+ * - `status`: 審査中・承認済み・差し戻し・取り下げ・内容の変更による取り消し
+ *
+ * 承認・差し戻しの操作は `post_review_actions` に保存する。
  */
-export const postReviewsTable = pgTable(
-  'post_reviews',
+export const postReviewRequestsTable = pgTable(
+  'post_review_requests',
   {
+    /** 依頼ID（自動生成連番） */
+    id: integer().primaryKey().generatedAlwaysAsIdentity(),
     /** 投稿ID */
     postId: integer('post_id').notNull(),
-    /** 識別子 */
+    /** 版の識別子 */
     postIdentifier: integer('post_identifier').notNull(),
-    /** レビュアー */
-    reviewerId: integer('reviewer_id').notNull().references(() => usersTable.id, { onDelete: 'cascade' }),
-    /** コメント */
-    comment: text(),
-    /** 承認フラグ */
-    isApproved: boolean('is_approved').notNull().default(false),
+    /** 依頼した執筆者 */
+    requestedBy: integer('requested_by').notNull().references(() => usersTable.id, { onDelete: 'cascade' }),
+    /** 経路（`ordinary` または `organizational`） */
+    route: text().notNull(),
+    /** 担当課の DN（依頼時点の値。組織運営に関する記事は `null`） */
+    divisionDn: text('division_dn'),
+    /** 担当課の表示名（依頼時点の値） */
+    divisionName: text('division_name'),
+    /** 審査中の段階 */
+    stage: integer().notNull().default(1),
+    /** 状態（`pending`・`approved`・`rejected`・`withdrawn`・`invalidated`） */
+    status: text().notNull().default('pending'),
     /** 作成日時 */
     createdAt: timestamp('created_at', { mode: 'date', precision: 3, withTimezone: true }).notNull().defaultNow(),
+    /** 更新日時 */
+    updatedAt: timestamp('updated_at', { mode: 'date', precision: 3, withTimezone: true }).notNull().defaultNow().$onUpdateFn(() => new Date()),
+    /** 終了日時（審査中は `null`） */
+    closedAt: timestamp('closed_at', { mode: 'date', precision: 3, withTimezone: true }),
   },
   (table) => [
     foreignKey({
       columns: [table.postId, table.postIdentifier],
       foreignColumns: [postContentsTable.postId, postContentsTable.identifier],
     }).onDelete('cascade'),
-    primaryKey({ columns: [table.postId, table.postIdentifier, table.reviewerId] }),
-    check('valid_review', sql`NOT (${table.isApproved} = false AND ${table.comment} IS NULL)`), // 承認されていない場合、コメントは必須
+    index('post_review_requests_post_index').on(table.postId, table.postIdentifier),
+    check('valid_review_request_route', sql`${table.route} IN ('ordinary', 'organizational')`),
+    check('valid_review_request_stage', sql`${table.stage} IN (1, 2)`),
+    check(
+      'valid_review_request_status',
+      sql`${table.status} IN ('pending', 'approved', 'rejected', 'withdrawn', 'invalidated')`,
+    ),
+    check('valid_review_request_division', sql`${table.route} = 'organizational' OR ${table.divisionDn} IS NOT NULL`),
+  ],
+);
+
+
+/**
+ * 投稿レビュー操作テーブル（承認・差し戻しの履歴）
+ *
+ * 段階ごとに1回だけ操作できる。UPDATEは想定されない。
+ * 承認者の学籍番号と氏名は操作時点の値を保存する（利用者が削除されても履歴を残すため）。
+ */
+export const postReviewActionsTable = pgTable(
+  'post_review_actions',
+  {
+    /** 操作ID（自動生成連番） */
+    id: integer().primaryKey().generatedAlwaysAsIdentity(),
+    /** 依頼ID */
+    requestId: integer('request_id').notNull().references(() => postReviewRequestsTable.id, { onDelete: 'cascade' }),
+    /** 操作した段階 */
+    stage: integer().notNull(),
+    /** 承認者の学籍番号（CU_ID） */
+    reviewerCuId: char('reviewer_cu_id', { length: 7 }).notNull(),
+    /** 承認者の氏名（操作時点の値） */
+    reviewerName: text('reviewer_name').notNull(),
+    /** 承認かどうか（`false` の場合は差し戻し） */
+    isApproved: boolean('is_approved').notNull(),
+    /** コメント（差し戻しの場合は必須） */
+    comment: text(),
+    /** 作成日時 */
+    createdAt: timestamp('created_at', { mode: 'date', precision: 3, withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [
+    unique('post_review_actions_request_stage_unique').on(table.requestId, table.stage),
+    check('valid_review_action_comment', sql`${table.isApproved} OR (${table.comment} IS NOT NULL AND ${table.comment} <> '')`),
   ],
 );
 

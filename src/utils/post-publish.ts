@@ -1,4 +1,4 @@
-import { and, asc, eq, isNotNull, isNull } from 'drizzle-orm';
+import { and, asc, desc, eq, isNotNull, isNull } from 'drizzle-orm';
 
 import { postContentsTable, postsTable } from '@/db/schema';
 import { getFiscalYear } from '@/utils/date';
@@ -10,6 +10,29 @@ import type { db } from '@/lib/drizzle';
  * トランザクション内でクエリを実行するオブジェクト。
  */
 type Transaction = Parameters<Parameters<typeof db.transaction>[0]>[0];
+
+
+/**
+ * 投稿の最新の版（内容）を取得する。
+ *
+ * @param executor - クエリを実行するオブジェクト
+ * @param postId - 投稿ID
+ * @param options - `forUpdate` が `true` の場合は、取得した版の行を更新できないようにロックする（トランザクション内で使う）
+ * @returns 最新の版。存在しない場合は `undefined`
+ */
+export async function selectLatestPostContent(
+  executor: Pick<Transaction, 'select'>,
+  postId: number,
+  options: { forUpdate?: boolean } = {},
+) {
+  const query = executor
+    .select()
+    .from(postContentsTable)
+    .where(eq(postContentsTable.postId, postId))
+    .orderBy(desc(postContentsTable.identifier))
+    .limit(1);
+  return await (options.forUpdate ? query.for('update') : query).then((result) => result.at(0));
+}
 
 
 /**
