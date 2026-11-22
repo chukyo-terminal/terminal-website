@@ -1,4 +1,4 @@
-import { and, asc, count, desc, eq, isNotNull } from 'drizzle-orm';
+import { and, asc, count, desc, eq } from 'drizzle-orm';
 
 import Editor from './_components/editor';
 import { PostActionError, syncPostTags, toErrorMessage } from './_lib/post-actions';
@@ -9,6 +9,7 @@ import { checkPermission } from '@/lib/auth';
 import { selectManagedImages } from '@/utils/image-queries';
 import { saveUploadedImage } from '@/utils/image-upload';
 import { selectCommentCounts } from '@/utils/post-feedback-queries';
+import { getFirstPublishedAt, publishPostVersion } from '@/utils/post-publish';
 import { selectPostVersions } from '@/utils/post-version-queries';
 import { getFiscalYear } from '@/utils/date';
 
@@ -25,39 +26,31 @@ export const dynamic = 'force-dynamic';
 
 
 /**
+ * 公開予約の日時として指定できる、現在時刻からの最短の時間（ms）。
+ */
+const MIN_SCHEDULE_DELAY = 60 * 1000;
+
+
+/**
  * 投稿の最新の版（内容）を取得する。
  *
  * @param executor - クエリを実行するオブジェクト
  * @param postId - 投稿ID
+ * @param options - `forUpdate` が `true` の場合は、取得した版の行を更新できないようにロックする（トランザクション内で使う）
  * @returns 最新の版。存在しない場合は `undefined`
  */
-async function getLatestPostContent(executor: Pick<Transaction, 'select'>, postId: number) {
-  return await executor
+async function getLatestPostContent(
+  executor: Pick<Transaction, 'select'>,
+  postId: number,
+  options: { forUpdate?: boolean } = {},
+) {
+  const query = executor
     .select()
     .from(postContentsTable)
     .where(eq(postContentsTable.postId, postId))
     .orderBy(desc(postContentsTable.identifier))
-    .limit(1)
-    .then((result) => result.at(0));
-}
-
-
-/**
- * 投稿が初めて公開された日時を取得する。
- *
- * @param executor - クエリを実行するオブジェクト
- * @param postId - 投稿ID
- * @returns 初めて公開された日時。未公開の場合は `null`
- */
-async function getFirstPublishedAt(executor: Pick<Transaction, 'select'>, postId: number): Promise<Date | null> {
-  const result = await executor
-    .select({ publishedAt: postContentsTable.publishedAt })
-    .from(postContentsTable)
-    .where(and(eq(postContentsTable.postId, postId), isNotNull(postContentsTable.publishedAt)))
-    .orderBy(asc(postContentsTable.identifier))
-    .limit(1)
-    .then((rows) => rows.at(0));
-  return result?.publishedAt ?? null;
+    .limit(1);
+  return await (options.forUpdate ? query.for('update') : query).then((result) => result.at(0));
 }
 
 
@@ -111,6 +104,10 @@ export default async function PostEditPage({ params }: { params: Promise<{ postI
 
   async function handleSave(values: PostFormValues): Promise<SaveResult> {
     'use server';
+    const permissionError = await checkPermission('user');
+    if (permissionError) {
+      return { ok: false, error: permissionError };
+    }
     const parsed = PostFormSchema.safeParse(values);
     if (!parsed.success) {
       return { ok: false, error: parsed.error.issues[0]?.message ?? '入力内容が正しくありません。' };
@@ -133,8 +130,9 @@ export default async function PostEditPage({ params }: { params: Promise<{ postI
         const isContentChanged = latest.title !== data.title
           || latest.description !== data.description
           || latest.content !== data.content;
+        // 予約していた内容が変わった場合は、予約を取り消す（変更後の内容は改めて予約してもらう）
+        let isScheduleCanceled = false;
         if (isContentChanged) {
-          // eslint-disable-next-line unicorn/prefer-ternary
           if (latest.publishedAt) {
             // 公開済みの版は書き換えず、新しい版（下書き）として追加する
             await tx
@@ -147,12 +145,14 @@ export default async function PostEditPage({ params }: { params: Promise<{ postI
                 content: data.content,
               });
           } else {
+            isScheduleCanceled = latest.scheduledPublishAt !== null;
             await tx
               .update(postContentsTable)
               .set({
                 title: data.title,
                 description: data.description,
                 content: data.content,
+                scheduledPublishAt: null,
               })
               .where(and(eq(postContentsTable.postId, postId), eq(postContentsTable.identifier, latest.identifier)));
           }
@@ -168,7 +168,7 @@ export default async function PostEditPage({ params }: { params: Promise<{ postI
         // タグは版ごとではなく記事ごとに管理しているため、保存時点で公開ページにも反映される
         await syncPostTags(tx, postId, data.tags);
 
-        return { ok: true, savedAt: new Date() };
+        return { ok: true, savedAt: new Date(), isScheduleCanceled };
       });
     } catch (e) {
       if (!(e instanceof PostActionError)) {
@@ -180,15 +180,19 @@ export default async function PostEditPage({ params }: { params: Promise<{ postI
 
   async function handlePublish(): Promise<PublishResult> {
     'use server';
+    const permissionError = await checkPermission('user');
+    if (permissionError) {
+      return { ok: false, error: permissionError };
+    }
     try {
       return await db.transaction(async (tx): Promise<PublishResult> => {
         const currentPost = await tx
-          .select({ slug: postsTable.slug, year: postsTable.year })
+          .select({ slug: postsTable.slug })
           .from(postsTable)
           .where(eq(postsTable.id, postId))
           .limit(1)
           .then((result) => result.at(0));
-        const latest = await getLatestPostContent(tx, postId);
+        const latest = await getLatestPostContent(tx, postId, { forUpdate: true });
         if (!currentPost || !latest) {
           return { ok: false, error: '投稿が見つかりませんでした。' };
         }
@@ -196,29 +200,15 @@ export default async function PostEditPage({ params }: { params: Promise<{ postI
           return { ok: false, error: '公開されていない変更はありません。' };
         }
 
-        const firstPublishedAt = await getFirstPublishedAt(tx, postId);
-        const now = new Date();
-        await tx
-          .update(postContentsTable)
-          .set({ publishedAt: now })
-          .where(and(eq(postContentsTable.postId, postId), eq(postContentsTable.identifier, latest.identifier)));
-
-        // 記事の URL の年度は初回の公開日時で決まるため、公開年度は初回の公開時に確定させ、更新の公開では変更しない
-        const year = getFiscalYear(firstPublishedAt ?? now);
-        if (currentPost.year === null) {
-          await tx
-            .update(postsTable)
-            .set({ year })
-            .where(eq(postsTable.id, postId));
-        }
-
+        // 公開予約がある場合も、今すぐ公開することで予約は解除される
+        const { year, isFirstPublication } = await publishPostVersion(tx, postId, latest.identifier, new Date());
         return {
           ok: true,
           year,
           slug: currentPost.slug,
           title: latest.title,
           description: latest.description,
-          isFirstPublication: firstPublishedAt === null,
+          isFirstPublication,
         };
       });
     } catch (e) {
@@ -226,6 +216,63 @@ export default async function PostEditPage({ params }: { params: Promise<{ postI
         console.error('Failed to publish post:', e);
       }
       return { ok: false, error: toErrorMessage(e, '公開に失敗しました。') };
+    }
+  }
+
+  async function handleSchedule(scheduledAtText: string): Promise<ActionResult<Date>> {
+    'use server';
+    const permissionError = await checkPermission('user');
+    if (permissionError) {
+      return { ok: false, error: permissionError };
+    }
+    const scheduledAt = new Date(scheduledAtText);
+    if (Number.isNaN(scheduledAt.getTime()) || scheduledAt.getTime() < Date.now() + MIN_SCHEDULE_DELAY) {
+      return { ok: false, error: '公開予約は1分以上先の日時を指定してください。' };
+    }
+    try {
+      return await db.transaction(async (tx): Promise<ActionResult<Date>> => {
+        const latest = await getLatestPostContent(tx, postId, { forUpdate: true });
+        if (!latest) {
+          return { ok: false, error: '投稿が見つかりませんでした。' };
+        }
+        if (latest.publishedAt) {
+          return { ok: false, error: '公開されていない変更がないため、予約できません。' };
+        }
+        await tx
+          .update(postContentsTable)
+          .set({ scheduledPublishAt: scheduledAt })
+          .where(and(eq(postContentsTable.postId, postId), eq(postContentsTable.identifier, latest.identifier)));
+        return { ok: true, data: scheduledAt };
+      });
+    } catch (e) {
+      console.error('Failed to schedule post:', e);
+      return { ok: false, error: '公開を予約できませんでした。' };
+    }
+  }
+
+  async function handleCancelSchedule(): Promise<ActionResult> {
+    'use server';
+    const permissionError = await checkPermission('user');
+    if (permissionError) {
+      return { ok: false, error: permissionError };
+    }
+    try {
+      return await db.transaction(async (tx): Promise<ActionResult> => {
+        const latest = await getLatestPostContent(tx, postId, { forUpdate: true });
+        if (!latest) {
+          return { ok: false, error: '投稿が見つかりませんでした。' };
+        }
+        if (latest.publishedAt === null && latest.scheduledPublishAt !== null) {
+          await tx
+            .update(postContentsTable)
+            .set({ scheduledPublishAt: null })
+            .where(and(eq(postContentsTable.postId, postId), eq(postContentsTable.identifier, latest.identifier)));
+        }
+        return { ok: true };
+      });
+    } catch (e) {
+      console.error('Failed to cancel scheduled post:', e);
+      return { ok: false, error: '予約を取り消せませんでした。' };
     }
   }
 
@@ -334,12 +381,15 @@ export default async function PostEditPage({ params }: { params: Promise<{ postI
         publishedYear={firstPublishedAt ? getFiscalYear(firstPublishedAt) : null}
         expectedYear={getFiscalYear(new Date())}
         firstPublishedAt={firstPublishedAt}
+        scheduledPublishAt={latestContent.scheduledPublishAt}
         lastSavedAt={latestContent.updatedAt}
         availableTags={availableTags}
         commentCount={commentCounts?.commentCount ?? 0}
         unrepliedCommentCount={commentCounts?.unrepliedCount ?? 0}
         onSave={handleSave}
         onPublish={handlePublish}
+        onSchedule={handleSchedule}
+        onCancelSchedule={handleCancelSchedule}
         onLoadHistory={handleLoadHistory}
         onSetVersionPrivate={handleSetVersionPrivate}
         onUploadImage={handleUploadImage}

@@ -1,0 +1,2 @@
+ALTER TABLE "post_contents" ADD COLUMN "scheduled_publish_at" timestamp (3) with time zone;--> statement-breakpoint
+ALTER TABLE "post_contents" ADD CONSTRAINT "valid_scheduled_publish" CHECK ("post_contents"."scheduled_publish_at" IS NULL OR "post_contents"."published_at" IS NULL);

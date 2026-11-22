@@ -50,6 +50,13 @@
       "when": 1795137418569,
       "tag": "0006_images",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1795314627548,
+      "tag": "0007_scheduled_publish",
+      "breakpoints": true
     }
   ]
 }
