@@ -7,7 +7,7 @@ import {
   CalendarDays, ExternalLink, FilePlus2, Images, MessageSquare, Plus, Search, SearchX, Tags, UserRound, X,
 } from 'lucide-react';
 
-import { PostStatusBadge, PrivateBadge } from './post-status-badge';
+import { PostStatusBadge, PrivateBadge, ScheduledBadge } from './post-status-badge';
 import { formatDate, formatDateTime, formatRelativeTime } from '../_lib/date-format';
 import {
   DEFAULT_FILTERS, SORT_ORDERS, STATUS_FILTERS, countByStatus, filterAndSortPosts, hasActiveFilters,
@@ -94,6 +94,7 @@ function PostCard({
           <div className="flex flex-wrap items-center gap-2">
             <PostStatusBadge status={post.status} />
             {post.isPrivate && <PrivateBadge />}
+            {post.scheduledPublishAt && <ScheduledBadge scheduledAt={post.scheduledPublishAt} />}
           </div>
           <h2 className="text-lg leading-snug font-bold break-words text-gray-100 group-hover:text-emerald-300">
             {/* カード全体をクリックできるよう、リンクの当たり判定をカード全体に広げる */}

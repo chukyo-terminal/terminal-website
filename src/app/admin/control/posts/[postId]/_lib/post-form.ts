@@ -98,7 +98,12 @@ export type { PostStatus } from '../../_lib/post-status';
  * 保存処理の結果。
  */
 export type SaveResult =
-  | { ok: true; savedAt: Date }
+  | {
+    ok: true;
+    savedAt: Date;
+    /** 内容の変更により、公開予約を取り消したかどうか */
+    isScheduleCanceled: boolean;
+  }
   | { ok: false; error: string };
 
 

@@ -1,3 +1,4 @@
+import { formatDateTime } from '../_lib/date-format';
 import { POST_STATUS_BADGES, PRIVATE_BADGE } from '../_lib/post-status';
 
 import type { JSX } from 'react';
@@ -30,4 +31,19 @@ export function PostStatusBadge({ status }: { status: PostStatus }): JSX.Element
  */
 export function PrivateBadge(): JSX.Element {
   return <span className={`${BADGE_CLASS_NAME} ${PRIVATE_BADGE.className}`}>{PRIVATE_BADGE.label}</span>;
+}
+
+
+/**
+ * 公開が予約されていることを表すバッジ。
+ *
+ * @param properties - プロパティ
+ * @returns バッジ
+ */
+export function ScheduledBadge({ scheduledAt }: { scheduledAt: Date }): JSX.Element {
+  return (
+    <span className={`${BADGE_CLASS_NAME} border-blue-500/60 text-blue-200`}>
+      予約中: {formatDateTime(scheduledAt)}
+    </span>
+  );
 }

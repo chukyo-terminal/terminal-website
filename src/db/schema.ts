@@ -171,6 +171,8 @@ export const postContentsTable = pgTable(
     isPrivate: boolean('is_private').notNull().default(false),
     /** 公開日時 */
     publishedAt: timestamp('published_at', { mode: 'date', precision: 3, withTimezone: true }),
+    /** 公開予約日時（予約していない場合は `null`。予約の時刻に公開されると `publishedAt` に移し、`null` に戻す） */
+    scheduledPublishAt: timestamp('scheduled_publish_at', { mode: 'date', precision: 3, withTimezone: true }),
     /** 作成日時 */
     createdAt: timestamp('created_at', { mode: 'date', precision: 3, withTimezone: true }).notNull().defaultNow(),
     /** 更新日時 */
@@ -178,6 +180,8 @@ export const postContentsTable = pgTable(
   },
   (table) => [
     primaryKey({ columns: [table.postId, table.identifier] }),
+    // 公開済みの版は予約できない
+    check('valid_scheduled_publish', sql`${table.scheduledPublishAt} IS NULL OR ${table.publishedAt} IS NULL`),
   ],
 );
 

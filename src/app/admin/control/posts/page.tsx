@@ -34,6 +34,7 @@ export default async function PostManagementPage({
         description: postContentsTable.description,
         updatedAt: postContentsTable.updatedAt,
         publishedAt: postContentsTable.publishedAt,
+        scheduledPublishAt: postContentsTable.scheduledPublishAt,
       })
       .from(postsTable)
       .innerJoin(usersTable, eq(postsTable.authorId, usersTable.id))
@@ -76,6 +77,7 @@ export default async function PostManagementPage({
       createdAt: content.createdAt,
       updatedAt: content.updatedAt,
       firstPublishedAt,
+      scheduledPublishAt: content.scheduledPublishAt,
       commentCount: commentCountsByPost.get(content.id)?.commentCount ?? 0,
       unrepliedCommentCount: commentCountsByPost.get(content.id)?.unrepliedCount ?? 0,
       // 記事の URL の年度は、初めて公開された日時で決まる

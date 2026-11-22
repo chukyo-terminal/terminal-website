@@ -6,14 +6,15 @@ import { useEffect, useEffectEvent, useMemo, useRef, useState } from 'react';
 
 import { EditorView } from '@codemirror/view';
 import {
-  ArrowLeft, CircleAlert, CircleCheck, ExternalLink, History, LoaderCircle, MessageSquare, Save, Send, TriangleAlert,
-  X,
+  ArrowLeft, CalendarClock, CircleAlert, CircleCheck, ExternalLink, History, LoaderCircle, MessageSquare, Save, Send,
+  TriangleAlert, X,
 } from 'lucide-react';
 import { z } from 'zod';
 
 import Modal from '@/components/elements/modal';
 import { MAX_IMAGE_FILES_PER_UPLOAD, toImageMarkdown, uploadImageFiles, validateImageFile } from '@/utils/images';
 
+import { formatDateTime as formatJstDateTime } from '../../_lib/date-format';
 import { PostStatusBadge, PrivateBadge } from '../../_components/post-status-badge';
 
 import HistoryDialog from './history-dialog';
@@ -180,6 +181,36 @@ const formatDateTime = (date: Date): string => new Intl.DateTimeFormat('ja-JP', 
 
 
 /**
+ * 日時を `datetime-local` の入力値の形式（ブラウザのローカル時刻。例: `2026-11-25T10:00`）にする。
+ *
+ * @param date - 日時
+ * @returns 入力値
+ */
+const toDateTimeLocalValue = (date: Date): string => {
+  const localTime = new Date(date.getTime() - date.getTimezoneOffset() * 60 * 1000);
+  return localTime.toISOString().slice(0, 16);
+};
+
+
+/**
+ * 公開予約の日時の既定値（1時間後を5分単位に切り上げた日時）を返す。
+ *
+ * @returns 入力値
+ */
+const getDefaultScheduleInput = (): string => {
+  const date = new Date(Date.now() + 60 * 60 * 1000);
+  date.setSeconds(0, 0);
+  date.setMinutes(Math.ceil(date.getMinutes() / 5) * 5);
+  return toDateTimeLocalValue(date);
+};
+
+/**
+ * 公開予約として指定できる最も早い日時（現在時刻の1分後）。サーバー側の検証と一致させる。
+ */
+const MIN_SCHEDULE_DELAY_MS = 60 * 1000;
+
+
+/**
  * 記事の公開を告知する X（旧Twitter）の投稿画面を開く。
  *
  * @param result - 公開処理の結果
@@ -247,6 +278,8 @@ type EditorProperties = {
   expectedYear: number;
   /** 初めて公開された日時（未公開の場合は `null`） */
   firstPublishedAt: Date | null;
+  /** 公開予約の日時（予約していない場合や、公開済みの場合は `null`） */
+  scheduledPublishAt: Date | null;
   /** 最後に保存された日時 */
   lastSavedAt: Date;
   /** 既存のタグ（タグの入力候補） */
@@ -257,6 +290,10 @@ type EditorProperties = {
   unrepliedCommentCount: number;
   onSave: (values: PostFormValues) => Promise<SaveResult>;
   onPublish: () => Promise<PublishResult>;
+  /** 未公開の内容を、指定した日時（ISO 8601 形式）に公開するよう予約する */
+  onSchedule: (scheduledAt: string) => Promise<ActionResult<Date>>;
+  /** 公開予約を取り消す */
+  onCancelSchedule: () => Promise<ActionResult>;
   /** 編集履歴（すべての版）を読み込む */
   onLoadHistory: () => Promise<ActionResult<PostVersion[]>>;
   /** 版の非公開設定を変更し、変更後のすべての版を返す */
@@ -282,12 +319,15 @@ export default function Editor({
   publishedYear,
   expectedYear,
   firstPublishedAt,
+  scheduledPublishAt,
   lastSavedAt,
   availableTags,
   commentCount,
   unrepliedCommentCount,
   onSave,
   onPublish,
+  onSchedule,
+  onCancelSchedule,
   onLoadHistory,
   onSetVersionPrivate,
   onUploadImage,
@@ -302,12 +342,14 @@ export default function Editor({
   const [values, setValues] = useState(initialValues);
   const [savedValues, setSavedValues] = useState(initialValues);
   const [lastSaved, setLastSaved] = useState(lastSavedAt);
-  const [busyAction, setBusyAction] = useState<'save' | 'publish' | null>(null);
+  const [busyAction, setBusyAction] = useState<'save' | 'publish' | 'schedule' | null>(null);
   const [cursor, setCursor] = useState<CursorInfo>({ line: 1, column: 1, selectedLength: 0 });
   const [viewMode, setViewMode] = useState<ViewMode>('split');
   const [isScrollSyncEnabled, setIsScrollSyncEnabled] = useState(true);
   const [isFullscreen, setIsFullscreen] = useState(false);
-  const [openedModal, setOpenedModal] = useState<'publish' | 'help' | 'history' | 'image' | null>(null);
+  const [openedModal, setOpenedModal] = useState<'publish' | 'schedule' | 'help' | 'history' | 'image' | null>(null);
+  const [scheduleInput, setScheduleInput] = useState('');
+  const [scheduleMinInput, setScheduleMinInput] = useState('');
   const [shouldShare, setShouldShare] = useState(false);
   const [toast, setToast] = useState<Toast | null>(null);
   const [storedDraft, setStoredDraft] = useState<StoredDraft | null>(null);
@@ -512,7 +554,10 @@ export default function Editor({
       setLastSaved(result.savedAt);
       setStoredDraft(null);
       removeStorage(draftStorageKey);
-      setToast({ type: 'success', message: '保存しました。' });
+      setToast({
+        type: 'success',
+        message: result.isScheduleCanceled ? '保存しました。内容が変わったため、公開予約を取り消しました。' : '保存しました。',
+      });
       router.refresh();
       return true;
     } catch (e) {
@@ -551,6 +596,80 @@ export default function Editor({
     } catch (e) {
       console.error('Failed to publish post:', e);
       setToast({ type: 'error', message: '公開できませんでした。通信状況を確認してください。' });
+    } finally {
+      setBusyAction(null);
+    }
+  }
+
+  /**
+   * 公開予約の日時を入力する画面を開く。
+   */
+  function openScheduleDialog(): void {
+    if (isUploadingImage) {
+      setToast({ type: 'error', message: '画像のアップロードが終わってから予約してください。' });
+      return;
+    }
+    const firstError = Object.values(fieldErrors).at(0);
+    if (firstError) {
+      setToast({ type: 'error', message: firstError });
+      return;
+    }
+    setScheduleInput(scheduledPublishAt ? toDateTimeLocalValue(scheduledPublishAt) : getDefaultScheduleInput());
+    setScheduleMinInput(toDateTimeLocalValue(new Date(Date.now() + MIN_SCHEDULE_DELAY_MS)));
+    setOpenedModal('schedule');
+  }
+
+  /**
+   * 公開を予約する。未保存の変更がある場合は、保存してから予約する。
+   */
+  async function schedule(): Promise<void> {
+    const scheduledAt = new Date(scheduleInput);
+    if (!scheduleInput || Number.isNaN(scheduledAt.getTime())) {
+      setToast({ type: 'error', message: '公開する日時を入力してください。' });
+      return;
+    }
+    if (scheduledAt.getTime() < Date.now() + MIN_SCHEDULE_DELAY_MS) {
+      setToast({ type: 'error', message: '公開予約は1分以上先の日時を指定してください。' });
+      return;
+    }
+    setOpenedModal(null);
+    if (isDirty && !(await save())) {
+      return;
+    }
+    setBusyAction('schedule');
+    try {
+      const result = await onSchedule(scheduledAt.toISOString());
+      if (!result.ok) {
+        setToast({ type: 'error', message: result.error });
+        return;
+      }
+      setToast({ type: 'success', message: `${formatJstDateTime(result.data)} に公開されるよう予約しました。` });
+      router.refresh();
+    } catch (e) {
+      console.error('Failed to schedule post:', e);
+      setToast({ type: 'error', message: '予約できませんでした。通信状況を確認してください。' });
+    } finally {
+      setBusyAction(null);
+    }
+  }
+
+  /**
+   * 公開予約を取り消す。
+   */
+  async function cancelSchedule(): Promise<void> {
+    setOpenedModal(null);
+    setBusyAction('schedule');
+    try {
+      const result = await onCancelSchedule();
+      if (!result.ok) {
+        setToast({ type: 'error', message: result.error });
+        return;
+      }
+      setToast({ type: 'success', message: '公開予約を取り消しました。' });
+      router.refresh();
+    } catch (e) {
+      console.error('Failed to cancel scheduled post:', e);
+      setToast({ type: 'error', message: '予約を取り消せませんでした。通信状況を確認してください。' });
     } finally {
       setBusyAction(null);
     }
@@ -704,6 +823,16 @@ export default function Editor({
         <h1 className="text-2xl">投稿編集</h1>
         <PostStatusBadge status={status} />
         {savedValues.isPrivate && <PrivateBadge />}
+        {scheduledPublishAt && (
+          <span
+            className={
+              'inline-flex shrink-0 items-center rounded-full border border-blue-500/60 px-2.5 py-0.5 text-xs '
+              + 'whitespace-nowrap text-blue-200'
+            }
+          >
+            予約中: {formatJstDateTime(scheduledPublishAt)} に公開
+          </span>
+        )}
         <div className="flex flex-wrap items-center gap-x-4 gap-y-2 sm:ml-auto">
           <button
             type="button"
@@ -974,6 +1103,25 @@ export default function Editor({
             </button>
             <button
               type="button"
+              onClick={openScheduleDialog}
+              disabled={!canPublish || busyAction !== null || isUploadingImage}
+              title={
+                isUploadingImage
+                  ? '画像のアップロードが終わるまで予約できません'
+                  : (canPublish ? undefined : '公開されていない変更はありません')
+              }
+              className={
+                'inline-flex items-center gap-1.5 rounded border border-blue-500/60 px-3 py-1.5 text-sm font-medium '
+                + 'text-blue-200 enabled:hover:bg-blue-950 disabled:cursor-not-allowed disabled:opacity-50'
+              }
+            >
+              {busyAction === 'schedule'
+                ? <LoaderCircle className="h-4 w-4 animate-spin" aria-hidden />
+                : <CalendarClock className="h-4 w-4" aria-hidden />}
+              {scheduledPublishAt ? '予約を変更' : '予約公開'}
+            </button>
+            <button
+              type="button"
               onClick={openPublishDialog}
               disabled={!canPublish || busyAction !== null || isUploadingImage}
               title={
@@ -1033,6 +1181,11 @@ export default function Editor({
             「{values.title}」を{status === 'draft' ? '公開' : '更新'}します。よろしいですか？
           </p>
           {isDirty && <p className="text-amber-300">未保存の変更は、保存してから公開されます。</p>}
+          {scheduledPublishAt && (
+            <p className="text-amber-300">
+              公開予約（{formatJstDateTime(scheduledPublishAt)}）は取り消され、すぐに公開されます。
+            </p>
+          )}
           {values.isPrivate && (
             <p className="text-red-300">「非公開にする」が有効なため、公開してもサイトには表示されません。</p>
           )}
@@ -1060,6 +1213,66 @@ export default function Editor({
               className="rounded bg-blue-600 px-4 py-2 text-white hover:bg-blue-700"
             >
               公開する
+            </button>
+          </div>
+        </div>
+      </Modal>
+
+      {/* 公開の予約 */}
+      <Modal
+        isOpen={openedModal === 'schedule'}
+        onRequestClose={() => setOpenedModal(null)}
+        contentLabel="公開の予約"
+      >
+        <div className="flex flex-col gap-3 text-sm">
+          <p>「{values.title}」を、指定した日時に公開します。</p>
+          {scheduledPublishAt && (
+            <p className="text-blue-200">現在の予約: {formatJstDateTime(scheduledPublishAt)}</p>
+          )}
+          {isDirty && <p className="text-amber-300">未保存の変更は、保存してから予約されます。</p>}
+          <label className="flex flex-col gap-1">
+            <span className="text-gray-300">公開日時（この端末のタイムゾーンで入力してください。日本では日本標準時）</span>
+            <input
+              type="datetime-local"
+              value={scheduleInput}
+              min={scheduleMinInput}
+              onChange={(event) => setScheduleInput(event.target.value)}
+              className={
+                'rounded border border-gray-600 bg-gray-900 px-3 py-2 text-gray-100 '
+                + 'focus:outline-none focus:ring-2 focus:ring-blue-500'
+              }
+            />
+          </label>
+          <p className="text-gray-400">
+            公開予約は、公開するまで記事を公開しません。内容を変更すると、予約は取り消されます。
+          </p>
+          <div className="mt-2 flex flex-wrap justify-end gap-2">
+            {scheduledPublishAt && (
+              <button
+                type="button"
+                onClick={cancelSchedule}
+                className="rounded border border-red-500/60 px-4 py-2 text-red-200 hover:bg-red-950"
+              >
+                予約を取り消す
+              </button>
+            )}
+            <button
+              type="button"
+              onClick={() => setOpenedModal(null)}
+              className="rounded bg-gray-600 px-4 py-2 hover:bg-gray-500"
+            >
+              キャンセル
+            </button>
+            <button
+              type="button"
+              onClick={schedule}
+              disabled={!scheduleInput}
+              className={
+                'rounded bg-blue-600 px-4 py-2 text-white hover:bg-blue-700 '
+                + 'disabled:cursor-not-allowed disabled:opacity-50'
+              }
+            >
+              {scheduledPublishAt ? '予約を変更する' : '予約する'}
             </button>
           </div>
         </div>

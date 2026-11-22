@@ -20,6 +20,8 @@ export type PostListItem = {
   updatedAt: Date;
   /** 初めて公開された日時（未公開の場合は `null`） */
   firstPublishedAt: Date | null;
+  /** 最新の版の公開予約日時（予約していない場合は `null`） */
+  scheduledPublishAt: Date | null;
   /** 訪問者のコメント数（非表示にしたコメントを含む） */
   commentCount: number;
   /** 返信していない（非表示にしていない）コメント数 */
