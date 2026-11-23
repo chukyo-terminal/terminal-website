@@ -1,7 +1,5 @@
 import ContactEmailForm from './_components/email-form';
-import {
-  CONTACT_LINK_MAIL_SUBJECT, buildContactLinkMailText, getSiteUrl, toContactLinkUrl,
-} from './_lib/contact-link';
+import { CONTACT_LINK_MAIL_SUBJECT, buildContactLinkMailText, toContactLinkUrl } from './_lib/contact-link';
 import { CONTACT_EMAIL_TURNSTILE, ContactEmailSchema } from '@/utils/contact';
 import {
   CONTACT_MAIL_COOLDOWN_SECONDS, createContactSession, deleteContactSession, releaseContactMailCooldown,
@@ -10,6 +8,7 @@ import {
 import { isMailConfigured, sendMail } from '@/lib/mail';
 import { verifyInteractiveTurnstileToken } from '@/utils/turnstile';
 import { isValkeyConfigured } from '@/lib/valkey';
+import { getSiteUrl } from '@/utils/site-url';
 
 import type { JSX } from 'react';
 import type { ActionResult } from '@/types';

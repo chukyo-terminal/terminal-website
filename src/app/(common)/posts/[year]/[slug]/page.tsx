@@ -6,9 +6,10 @@ import { and, count, eq, gte, isNotNull, lt } from 'drizzle-orm';
 import { History } from 'lucide-react';
 
 import PostFeedback from './_components/post-feedback';
+import JsonLd from '@/components/elements/json-ld';
 import { postCommentsTable, postContentsTable, postRatingsTable, publishedPostsView } from '@/db/schema';
 import { db } from '@/lib/drizzle';
-import { markdownIt } from '@/lib/markdown-it';
+import { extractImageSources, markdownIt } from '@/lib/markdown-it';
 import {
   CommentFormSchema, POST_FEEDBACK_TURNSTILE_ACTION, toPostFeedbackTurnstileCData, toPublicComments,
 } from '@/utils/post-feedback';
@@ -18,6 +19,8 @@ import {
 import { verifyNonInteractiveTurnstileToken } from '@/utils/turnstile';
 import { getOrCreateVisitorId, getVisitorId } from '@/utils/visitor';
 import { getFiscalYearStart } from '@/utils/date';
+import { toBlogPosting, toBreadcrumbList } from '@/utils/json-ld';
+import { getSiteUrl } from '@/utils/site-url';
 import '@/styles/markdown.css';
 import './styles.css';
 
@@ -242,8 +245,36 @@ export default async function Post({ params }: { params: Promise<{ year: string;
     }
   }
 
+  // 本文は一度だけ解析し、HTML への変換と、構造化データに載せる画像の抽出に使う
+  const markdownEnvironment = {};
+  const contentTokens = markdownIt.parse(post.content, markdownEnvironment);
+  const contentHtml = markdownIt.renderer.render(contentTokens, markdownIt.options, markdownEnvironment);
+
+  const siteUrl = getSiteUrl();
+  const postPath = `/posts/${year}/${post.slug}`;
+
   return (
     <div className="space-y-8 z-50 pt-20">
+      {siteUrl && (
+        <JsonLd
+          nodes={[
+            toBlogPosting(siteUrl, {
+              path: postPath,
+              title: post.title,
+              description: post.description,
+              authorName: post.author.displayName || post.author.name,
+              publishedAt: post.publishedAt!,
+              updatedAt: post.updatedAt!,
+              tags: post.tags.map((tag) => tag.name),
+              imageSources: extractImageSources(contentTokens),
+            }),
+            toBreadcrumbList(siteUrl, [
+              { name: '投稿一覧', path: '/posts' },
+              { name: post.title, path: postPath },
+            ]),
+          ]}
+        />
+      )}
       <div className="flex justify-between items-start">
         <h1 className="text-4xl font-bold text-emerald-400 flex items-center">
           {post.title}
@@ -280,7 +311,7 @@ export default async function Post({ params }: { params: Promise<{ year: string;
       </div>
       <div className="h-1 w-20 bg-emerald-400 rounded"></div>
       <div className="space-y-16 text-gray-200">
-        <div className="markdown-body" dangerouslySetInnerHTML={{ __html: markdownIt.render(post.content) }} />
+        <div className="markdown-body" dangerouslySetInnerHTML={{ __html: contentHtml }} />
       </div>
       <PostFeedback
         postId={postId}

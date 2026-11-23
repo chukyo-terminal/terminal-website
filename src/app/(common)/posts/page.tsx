@@ -3,9 +3,12 @@ import Link from 'next/link';
 import { arrayContains, inArray, sql } from 'drizzle-orm';
 import { Code } from 'lucide-react';
 
+import JsonLd from '@/components/elements/json-ld';
 import { tagsTable, publishedPostsView } from '@/db/schema';
 import { db } from '@/lib/drizzle';
 import { getFiscalYear } from '@/utils/date';
+import { toBreadcrumbList } from '@/utils/json-ld';
+import { getSiteUrl } from '@/utils/site-url';
 
 import type { JSX } from 'react';
 import type { Metadata } from 'next';
@@ -79,8 +82,11 @@ export default async function Posts({
     .from(publishedPostsView)
     .where(selectedTags.length > 0 ? arrayContains(publishedPostsView.tags, sql`${JSON.stringify(selectedTags.map((tag) => ({ slug: tag.slug })))}::JSONB`) : undefined);
 
+  const siteUrl = getSiteUrl();
+
   return (
     <div className="space-y-8 z-50 pt-20">
+      {siteUrl && <JsonLd nodes={[toBreadcrumbList(siteUrl, [{ name: '投稿一覧', path: '/posts' }])]} />}
       <div className="space-y-4">
         <h2 className="text-4xl font-bold text-emerald-400 flex items-center">
           <Code className="mr-2 h-8 w-8" />

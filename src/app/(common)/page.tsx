@@ -5,13 +5,18 @@ import Location from '@/components/sections/location';
 import Contact from '@/components/sections/contact';
 import Bylaws from '@/components/sections/bylaws';
 import LoadingScreen from '@/components/elements/loadingScreen';
+import JsonLd from '@/components/elements/json-ld';
+import { toOrganization, toWebsite } from '@/utils/json-ld';
+import { getSiteUrl } from '@/utils/site-url';
 
 import type { JSX } from 'react';
 
 
 export default function Home(): JSX.Element {
+  const siteUrl = getSiteUrl();
   return (
     <>
+      {siteUrl && <JsonLd nodes={[toWebsite(siteUrl), toOrganization(siteUrl)]} />}
       <LoadingScreen />
       <section id="overview" className="pt-20">
         <Overview />

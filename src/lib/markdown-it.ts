@@ -1,7 +1,7 @@
 
 import MarkdownIt from 'markdown-it';
 
-import type { MarkdownItOptions, MarkdownIt as MarkdownItInstance } from 'markdown-it';
+import type { MarkdownItOptions, MarkdownIt as MarkdownItInstance, Token } from 'markdown-it';
 
 
 /**
@@ -18,6 +18,23 @@ const markdownItOptions: MarkdownItOptions = {
  * 記事の Markdown を HTML に変換するためのインスタンス。
  */
 export const markdownIt = new MarkdownIt(markdownItOptions);
+
+
+/**
+ * Markdown のトークン列から、画像（`![代替テキスト](URL)`）の URL を出現順に取り出す。
+ *
+ * @param tokens - `parse()` で得たトークン列
+ * @returns 画像の URL（`src` 属性の値）
+ */
+export function extractImageSources(tokens: Token[]): string[] {
+  return tokens.flatMap((token) => {
+    if (token.type === 'image') {
+      const source = token.attrGet('src');
+      return typeof source === 'string' && source.length > 0 ? [source] : [];
+    }
+    return token.children ? extractImageSources(token.children) : [];
+  });
+}
 
 
 /**

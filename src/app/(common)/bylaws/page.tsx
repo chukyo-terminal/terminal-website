@@ -3,7 +3,10 @@ import { readFile } from 'node:fs/promises';
 import { Fragment } from 'react';
 import { XMLParser } from 'fast-xml-parser';
 
+import JsonLd from '@/components/elements/json-ld';
 import { KleeOne } from '@/styles/font';
+import { toBreadcrumbList } from '@/utils/json-ld';
+import { getSiteUrl } from '@/utils/site-url';
 
 import type { Metadata } from 'next';
 import type { JSX } from 'react';
@@ -64,8 +67,10 @@ export default async function BylawsPage(): Promise<JSX.Element> {
   const parser = new XMLParser();
   const xml: LawXml = parser.parse(buf.toString());
   const law = xml.Law;
+  const siteUrl = getSiteUrl();
   return (
     <div className="space-y-8 z-50 pt-20">
+      {siteUrl && <JsonLd nodes={[toBreadcrumbList(siteUrl, [{ name: '会則', path: '/bylaws' }])]} />}
       <article className={KleeOne.className}>
         <p className="text-right">{law.LawNum}</p>
         <h1 className="text-2xl font-extrabold"> {law.LawBody.LawTitle}</h1>

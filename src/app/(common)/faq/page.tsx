@@ -3,9 +3,12 @@ import Link from 'next/link';
 import { asc, eq } from 'drizzle-orm';
 import { ChevronDown, Code, ExternalLink, Mail, MessageCircleQuestionMark } from 'lucide-react';
 
+import JsonLd from '@/components/elements/json-ld';
 import { faqCategoriesTable, faqsTable } from '@/db/schema';
 import { db } from '@/lib/drizzle';
 import { faqMarkdownIt } from '@/lib/markdown-it';
+import { toBreadcrumbList, toFaqPage } from '@/utils/json-ld';
+import { getSiteUrl } from '@/utils/site-url';
 import '@/styles/markdown.css';
 
 import type { JSX } from 'react';
@@ -28,12 +31,14 @@ export const metadata: Metadata = {
 type PublicFaqCategory = {
   id: number;
   title: string;
-  faqs: { id: number; question: string; answer: string }[];
+  faqs: { id: number; question: string; answerHtml: string }[];
 };
 
 
 /**
  * 公開中のQ&Aを、分類ごとにまとめて取得する。
+ *
+ * 回答は、ページへの表示と構造化データの両方に使うため、ここで一度だけ HTML に変換する。
  *
  * @returns 表示順に並べた分類（公開中のQ&Aがない分類は含まない）
  */
@@ -63,7 +68,7 @@ async function selectPublicFaqCategories(): Promise<PublicFaqCategory[]> {
       category = { id: row.categoryId, title: row.categoryTitle, faqs: [] };
       categories.push(category);
     }
-    category.faqs.push({ id: row.id, question: row.question, answer: row.answer });
+    category.faqs.push({ id: row.id, question: row.question, answerHtml: faqMarkdownIt.render(row.answer) });
   }
   return categories;
 }
@@ -76,9 +81,29 @@ async function selectPublicFaqCategories(): Promise<PublicFaqCategory[]> {
  */
 export default async function Faq(): Promise<JSX.Element> {
   const categories = await selectPublicFaqCategories();
+  const siteUrl = getSiteUrl();
+  const faqs = categories.flatMap((category) => category.faqs);
 
   return (
     <div className="space-y-12 z-50 pt-20">
+      {siteUrl && (
+        <JsonLd
+          nodes={[
+            // 質問が一つもない FAQPage は無効なため、掲載中のQ&Aがある場合だけ出力する
+            ...(faqs.length > 0
+              ? [toFaqPage(siteUrl, {
+                path: '/faq',
+                faqs: faqs.map((faq) => ({
+                  fragment: `faq-${faq.id}`,
+                  question: faq.question,
+                  answerHtml: faq.answerHtml,
+                })),
+              })]
+              : []),
+            toBreadcrumbList(siteUrl, [{ name: 'Q&A', path: '/faq' }]),
+          ]}
+        />
+      )}
       <div className="space-y-4">
         <h1 className="text-4xl font-bold text-emerald-400 flex items-center">
           <Code className="mr-2 h-8 w-8" />
@@ -132,7 +157,7 @@ export default async function Faq(): Promise<JSX.Element> {
                   <span className="font-bold text-gray-400" aria-hidden>A.</span>
                   <div
                     className="markdown-body min-w-0 flex-1 text-gray-300"
-                    dangerouslySetInnerHTML={{ __html: faqMarkdownIt.render(faq.answer) }}
+                    dangerouslySetInnerHTML={{ __html: faq.answerHtml }}
                   />
                 </div>
               </details>

@@ -3,9 +3,12 @@ import Link from 'next/link';
 import { desc, inArray } from 'drizzle-orm';
 import { ArrowRight, Code, FileText } from 'lucide-react';
 
+import JsonLd from '@/components/elements/json-ld';
 import { achievementsTable, publishedPostsView } from '@/db/schema';
 import { db } from '@/lib/drizzle';
 import { getFiscalYear } from '@/utils/date';
+import { toBreadcrumbList } from '@/utils/json-ld';
+import { getSiteUrl } from '@/utils/site-url';
 
 import type { JSX } from 'react';
 import type { Metadata } from 'next';
@@ -139,8 +142,11 @@ export default async function Achievements(): Promise<JSX.Element> {
     post: row.postId === null ? null : relatedPostById.get(row.postId) ?? null,
   }));
 
+  const siteUrl = getSiteUrl();
+
   return (
     <div className="space-y-8 z-50 pt-20">
+      {siteUrl && <JsonLd nodes={[toBreadcrumbList(siteUrl, [{ name: '活動実績', path: '/achievements' }])]} />}
       <div className="space-y-4">
         <h2 className="text-4xl font-bold text-emerald-400 flex items-center">
           <Code className="mr-2 h-8 w-8" />
