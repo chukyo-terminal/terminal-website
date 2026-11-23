@@ -15,6 +15,7 @@ const navItems = [
   { name: '概要', href: '/' },
   { name: '活動実績', href: '/achievements' },
   { name: '投稿', href: '/posts' },
+  { name: 'Q&A', href: '/faq' },
   { name: 'お問い合わせ', href: '/contact', target: '_blank' },
 ];
 

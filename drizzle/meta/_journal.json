@@ -57,6 +57,20 @@
       "when": 1795314627548,
       "tag": "0007_scheduled_publish",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1795314627549,
+      "tag": "0008_faqs",
+      "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1795314627550,
+      "tag": "0009_seed_faqs",
+      "breakpoints": true
     }
   ]
 }

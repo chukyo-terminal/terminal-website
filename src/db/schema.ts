@@ -383,6 +383,59 @@ export const achievementsTable = pgTable(
 
 
 /**
+ * Q&A分類テーブル
+ *
+ * Q&Aのページに表示する質問の分類。
+ */
+export const faqCategoriesTable = pgTable(
+  'faq_categories',
+  {
+    /** 分類ID（自動生成連番） */
+    id: integer().primaryKey().generatedAlwaysAsIdentity(),
+    /** 分類名 */
+    title: text().notNull().unique(),
+    /** 表示順（昇順に表示する） */
+    sortOrder: integer('sort_order').notNull().default(0),
+    /** 作成日時 */
+    createdAt: timestamp('created_at', { mode: 'date', precision: 3, withTimezone: true }).notNull().defaultNow(),
+    /** 更新日時 */
+    updatedAt: timestamp('updated_at', { mode: 'date', precision: 3, withTimezone: true }).notNull().defaultNow().$onUpdateFn(() => new Date()),
+  },
+);
+
+
+/**
+ * Q&Aテーブル
+ *
+ * Q&Aのページに表示する質問と回答。分類は、質問が残っている間は削除できない。
+ */
+export const faqsTable = pgTable(
+  'faqs',
+  {
+    /** Q&AのID（自動生成連番） */
+    id: integer().primaryKey().generatedAlwaysAsIdentity(),
+    /** 分類ID */
+    categoryId: integer('category_id').notNull().references(() => faqCategoriesTable.id, { onDelete: 'restrict' }),
+    /** 質問 */
+    question: text().notNull(),
+    /** 回答（Markdown形式。HTMLは使用できない） */
+    answer: text().notNull(),
+    /** 表示順（分類内で昇順に表示する） */
+    sortOrder: integer('sort_order').notNull().default(0),
+    /** 非公開フラグ */
+    isPrivate: boolean('is_private').notNull().default(false),
+    /** 作成日時 */
+    createdAt: timestamp('created_at', { mode: 'date', precision: 3, withTimezone: true }).notNull().defaultNow(),
+    /** 更新日時 */
+    updatedAt: timestamp('updated_at', { mode: 'date', precision: 3, withTimezone: true }).notNull().defaultNow().$onUpdateFn(() => new Date()),
+  },
+  (table) => [
+    index('faqs_category_id_index').on(table.categoryId, table.sortOrder),
+  ],
+);
+
+
+/**
  * 問い合わせテーブル
  *
  * 対応状況は、完了日時と返信の有無から判定する（完了日時がある場合は完了、管理者の返信がある場合は対応中、それ以外は未対応）。

@@ -36,6 +36,9 @@ export default function Contact() {
         <p className="text-gray-300 mb-6">
           サークルへの入会希望や質問がありましたら、以下のフォームからお問い合わせください。
           48時間以内に返信いたします。
+          入会や活動についてのよくある質問は、
+          <Link href="/faq" className="text-blue-400 hover:underline">Q&A</Link>
+          にまとめています。
         </p>
 
         <div className="w-full bg-gray-900 border border-gray-700 rounded-lg overflow-hidden">
