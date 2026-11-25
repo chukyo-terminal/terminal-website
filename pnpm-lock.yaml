@@ -70,10 +70,10 @@ importers:
         version: 16.4.6(@babel/core@7.29.7(supports-color@7.2.0))(@types/node@24.12.0)(react-dom@19.2.8(react@19.3.1))(react@19.3.1)
       next-auth:
         specifier: ^4.24.15
-        version: 4.24.15(next@16.4.6(@babel/core@7.29.7(supports-color@7.2.0))(@types/node@24.12.0)(react-dom@19.2.8(react@19.3.1))(react@19.3.1))(nodemailer@10.3.1)(react-dom@19.2.8(react@19.3.1))(react@19.3.1)
+        version: 4.24.15(next@16.4.6(@babel/core@7.29.7(supports-color@7.2.0))(@types/node@24.12.0)(react-dom@19.2.8(react@19.3.1))(react@19.3.1))(nodemailer@10.6.1)(react-dom@19.2.8(react@19.3.1))(react@19.3.1)
       nodemailer:
-        specifier: ^10.3.1
-        version: 10.3.1
+        specifier: ^10.6.1
+        version: 10.6.1
       pg:
         specifier: ^8.23.1
         version: 8.23.1(pg-native@3.9.1)
@@ -2823,6 +2823,10 @@ packages:
 
   nodemailer@10.3.1:
     resolution: {integrity: sha512-uF0AFsJC07Y1vdW7p580DKAnh7rAO+4UPSSB3mDCPNDufoiaOebV6JmrzpxB14OjEEEiBsNdYoM2Y+fN8M7BBA==}
+    engines: {node: '>=20.0.0'}
+
+  nodemailer@10.6.1:
+    resolution: {integrity: sha512-d7kfFfS/tR4Aca+SBvRaQ+MXKNv7d2JiRe5TxaRcFT/kYMh4GGPnW9aKksTIEvyEbA7d/7HYWE4YPDEHxzJj/g==}
     engines: {node: '>=20.0.0'}
 
   oauth@0.9.15:
@@ -6031,7 +6035,7 @@ snapshots:
 
   natural-compare@1.4.0: {}
 
-  next-auth@4.24.15(next@16.4.6(@babel/core@7.29.7(supports-color@7.2.0))(@types/node@24.12.0)(react-dom@19.2.8(react@19.3.1))(react@19.3.1))(nodemailer@10.3.1)(react-dom@19.2.8(react@19.3.1))(react@19.3.1):
+  next-auth@4.24.15(next@16.4.6(@babel/core@7.29.7(supports-color@7.2.0))(@types/node@24.12.0)(react-dom@19.2.8(react@19.3.1))(react@19.3.1))(nodemailer@10.6.1)(react-dom@19.2.8(react@19.3.1))(react@19.3.1):
     dependencies:
       '@babel/runtime': 7.29.7
       '@panva/hkdf': 1.2.1
@@ -6046,7 +6050,7 @@ snapshots:
       react-dom: 19.2.8(react@19.3.1)
       uuid: 11.1.1
     optionalDependencies:
-      nodemailer: 10.3.1
+      nodemailer: 10.6.1
 
   next@16.4.6(@babel/core@7.29.7(supports-color@7.2.0))(@types/node@24.12.0)(react-dom@19.2.8(react@19.3.1))(react@19.3.1):
     dependencies:
@@ -6083,6 +6087,8 @@ snapshots:
   node-releases@2.0.54: {}
 
   nodemailer@10.3.1: {}
+
+  nodemailer@10.6.1: {}
 
   oauth@0.9.15: {}
 
