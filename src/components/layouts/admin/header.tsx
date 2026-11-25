@@ -22,7 +22,6 @@ type NavItem = {
 
 
 const baseNavItems: NavItem[] = [
-  { name: '概要管理', href: '/admin/control/index', onClick: undefined, mode: 'user' },
   { name: '活動実績管理', href: '/admin/control/achievements', onClick: undefined, mode: 'user' },
   { name: '投稿管理', href: '/admin/control/posts', onClick: undefined, mode: 'user' },
   { name: 'Q&A管理', href: '/admin/control/faq', onClick: undefined, mode: 'user' },
